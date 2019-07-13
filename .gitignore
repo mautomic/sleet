@@ -1,0 +1,8 @@
+.idea/
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+sleet-api-service/src/main/resources/credentials.cfg
+sleet-api-service/build/
+
