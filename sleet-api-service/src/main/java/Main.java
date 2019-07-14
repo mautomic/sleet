@@ -1,14 +1,21 @@
 import service.OptionService;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class Main {
 
+    private static final Logger LOG = LogManager.getLogger(Main.class);
+
     public static void main (String[] args) {
 
-        System.out.println("Initializing Sleet.......");
+        LOG.info("Initializing Sleet.......");
 
-        OptionService optionService = new OptionService();
-        String optionChainJson = optionService.getOptionChain("SPY", "5");
+        LOG.info("Retrieving API key");
+        Authenticator authenticator = Authenticator.getInstance();
 
-        System.out.println(optionChainJson);
+        OptionService optionService = new OptionService(authenticator.getApiKey());
+        String optionChain = optionService.getOptionChain("SPY");
+
+        LOG.info(optionChain);
     }
 }
