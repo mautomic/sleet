@@ -18,13 +18,15 @@ public class OptionService extends Service {
 
     public OptionChain getOptionChain(String ticker) {
 
-        return getOptionChain(ticker, "3");
+        return getOptionChain(ticker, "10");
     }
 
     public OptionChain getOptionChain(String ticker, String strikeCount) {
 
         try {
+            LOG.info("Requesting Option Chain ");
             OptionChain optionChain = restTemplate.getForObject(OPTION_CHAIN_URL + "&symbol=" + ticker + "&strikeCount=" + strikeCount, OptionChain.class);
+            LOG.info("Fetched Option Chain");
             return optionChain;
 
         } catch(Exception e) {

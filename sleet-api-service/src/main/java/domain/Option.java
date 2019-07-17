@@ -113,6 +113,6 @@ public class Option {
 
     @Override
     public String toString() {
-        return getDescription();
+        return getDescription() + " : " + getMark() ;
     }
 }
