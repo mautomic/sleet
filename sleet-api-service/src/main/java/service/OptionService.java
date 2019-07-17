@@ -18,7 +18,7 @@ public class OptionService extends Service {
 
     public OptionChain getOptionChain(String ticker) {
 
-        return getOptionChain(ticker, "10");
+        return getOptionChain(ticker, "20");
     }
 
     public OptionChain getOptionChain(String ticker, String strikeCount) {
