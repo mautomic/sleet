@@ -23,7 +23,7 @@ public class Option {
     private double gamma;
     private double theta;
     private double vega;
-    private int strikePrice;
+    private double strikePrice;
     private boolean inTheMoney;
     private int daysToExpiration;
 
@@ -99,7 +99,7 @@ public class Option {
         return vega;
     }
 
-    public int getStrikePrice() {
+    public double getStrikePrice() {
         return strikePrice;
     }
 
@@ -113,6 +113,6 @@ public class Option {
 
     @Override
     public String toString() {
-        return getDescription() + " : " + getMark() ;
+        return getStrikePrice() + " : " + getMark() ;
     }
 }
