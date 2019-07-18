@@ -135,12 +135,19 @@ public class Main {
                         longLeg = optionMap.get(date).get(strikes.get(i)).get(0);
                     }
 
-                    double spreadPrice = shortLeg.getMark() - longLeg.getMark();
-                    BigDecimal roundedSpreadPrice = new BigDecimal(spreadPrice);
-                    roundedSpreadPrice = roundedSpreadPrice.setScale(2, RoundingMode.HALF_UP);
+                    double spreadPrice = 0.0;
+                    try {
+                        spreadPrice = shortLeg.getMark() - longLeg.getMark();
 
-                    bfwriter.write(shortLeg.getStrikePrice() + "/" + longLeg.getStrikePrice() + " : " + roundedSpreadPrice);
-                    bfwriter.newLine();
+                        BigDecimal roundedSpreadPrice = new BigDecimal(spreadPrice);
+                        roundedSpreadPrice = roundedSpreadPrice.setScale(2, RoundingMode.HALF_UP);
+
+                        bfwriter.write(shortLeg.getStrikePrice() + "/" + longLeg.getStrikePrice() + " : " + roundedSpreadPrice);
+                        bfwriter.newLine();
+
+                    } catch (NullPointerException e) {
+                        LOG.error("NullPointerException in spread math");
+                    }
                 }
             }
         }
