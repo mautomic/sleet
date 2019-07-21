@@ -4,10 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import service.OptionService;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
@@ -27,21 +24,15 @@ public class Recorder {
     public void recordData() throws Exception {
 
         LOG.info("Retrieving API key");
-        Authenticator authenticator = Authenticator.getInstance();
-        OptionService optionService = new OptionService(authenticator.getApiKey());
+        OptionService optionService = new OptionService(GlobalProperties.getInstance().getApiKey());
 
         String dailyTimestamp = new SimpleDateFormat("yyyyMMdd.HHmmss").format(new Date());
 
-        // TODO: Proper resource retrieval
-        Scanner sc = new Scanner(new File(Main.class.getResource("resources.cfg").getFile()));
-        String optionLogLocation = sc.next();
-        String spreadLogLocation = sc.next();
-
-        File optionPriceFile = new File(optionLogLocation + dailyTimestamp + ".txt");
+        File optionPriceFile = new File(GlobalProperties.getInstance().getOptionLogPath() + dailyTimestamp + ".txt");
         optionPriceFile.createNewFile();
         LOG.info("Created daily log file : " + optionPriceFile.getName());
 
-        File spreadPriceFile = new File(spreadLogLocation + dailyTimestamp + ".txt");
+        File spreadPriceFile = new File(GlobalProperties.getInstance().getSpreadLogPath() + dailyTimestamp + ".txt");
         spreadPriceFile.createNewFile();
         LOG.info("Created daily log file : " + spreadPriceFile.getName());
 

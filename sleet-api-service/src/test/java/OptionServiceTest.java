@@ -9,7 +9,7 @@ public class OptionServiceTest {
 
     @Before
     public void initialize() {
-        optionService = new OptionService(Authenticator.getInstance().getApiKey());
+        optionService = new OptionService(GlobalProperties.getInstance().getApiKey());
     }
 
     @Test

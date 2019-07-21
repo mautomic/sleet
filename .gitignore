@@ -1,6 +1,5 @@
 .idea/
 .gradle/
-sleet-api-service/src/main/resources/credentials.cfg
 sleet-api-service/src/main/resources/resources.cfg
 sleet-api-service/build/
 
