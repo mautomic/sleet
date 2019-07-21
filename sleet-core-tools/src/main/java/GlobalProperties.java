@@ -35,11 +35,7 @@ public class GlobalProperties {
         return properties.getProperty("apiKey");
     }
 
-    public String getOptionLogPath() {
-        return properties.getProperty("optionLogPath");
-    }
-
-    public String getSpreadLogPath() {
-        return properties.getProperty("spreadLogPath");
+    public String getlogPath() {
+        return properties.getProperty("logPath");
     }
 }
