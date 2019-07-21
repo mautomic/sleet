@@ -1,5 +1,3 @@
 .idea/
 .gradle/
-sleet-api-service/src/main/resources/resources.cfg
-sleet-api-service/build/
-
+sleet-core-tools/src/main/resources/resources.cfg

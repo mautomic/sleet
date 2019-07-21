@@ -7,9 +7,11 @@ public class SpreadScanner {
 
     private static final Logger LOG = LogManager.getLogger(SpreadScanner.class);
 
-    public static void main(String[]args) {
+    public static void main(String[]args) throws Exception {
 
         LOG.info("Initializing spread screener.......");
+        Recorder recorder = new Recorder();
+        recorder.recordData();
 
     }
 }

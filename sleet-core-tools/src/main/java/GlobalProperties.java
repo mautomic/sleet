@@ -1,4 +1,4 @@
-package com.sleet.api;
+package com.sleet.tools;
 
 import java.io.InputStream;
 import java.util.Properties;
