@@ -1,6 +1,7 @@
+import com.sleet.api.GlobalProperties;
 import org.junit.Before;
 import org.junit.Test;
-import service.OptionService;
+import com.sleet.api.service.OptionService;
 import static junit.framework.TestCase.assertNotNull;
 
 public class OptionServiceTest {

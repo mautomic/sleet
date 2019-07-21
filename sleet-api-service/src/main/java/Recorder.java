@@ -1,8 +1,10 @@
-import domain.Option;
-import domain.OptionChain;
+package com.sleet.api;
+
+import com.sleet.api.domain.Option;
+import com.sleet.api.domain.OptionChain;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import service.OptionService;
+import com.sleet.api.service.OptionService;
 
 import java.io.*;
 import java.math.BigDecimal;

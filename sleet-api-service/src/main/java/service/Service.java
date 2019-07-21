@@ -1,4 +1,4 @@
-package service;
+package com.sleet.api.service;
 
 import org.springframework.web.client.RestTemplate;
 

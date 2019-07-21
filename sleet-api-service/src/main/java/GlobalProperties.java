@@ -1,3 +1,5 @@
+package com.sleet.api;
+
 import java.io.InputStream;
 import java.util.Properties;
 import org.apache.logging.log4j.Logger;

@@ -1,3 +1,4 @@
 rootProject.name = 'sleet'
 include 'sleet-api-service'
+include 'sleet-core-tools'
 
