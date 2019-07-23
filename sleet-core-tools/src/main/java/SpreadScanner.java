@@ -9,10 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +18,7 @@ public class SpreadScanner {
 
     private static final Logger LOG = LogManager.getLogger(SpreadScanner.class);
     private static final int API_REQUEST_INTERVAL = 60;
-    private static final int DELAY = 5;
+    private static final int DELAY = 2;
 
     public static void main(String[]args) {
 
@@ -37,9 +34,13 @@ public class SpreadScanner {
             Map<String, Map<String, List<Option>>> putMap = optionChain.getPutExpDateMap();
 
             List<Spread> callSpreadList = getSpreadList(callMap, "CALL");
+            List<Spread> putSpreadList = getSpreadList(putMap, "PUT");
 
-            for(Spread spread : callSpreadList)
-                LOG.info(spread.toString());
+            Collections.sort(putSpreadList);
+
+            for(Spread spread : putSpreadList)
+                if (spread.getExpirationDays() <= 30)
+                    LOG.info(spread.toString());
         };
 
         LOG.info("Starting scheduled executor");
@@ -56,7 +57,16 @@ public class SpreadScanner {
 
         for (String date : dates) {
 
+            if(date.split(":")[1].equalsIgnoreCase("0"))
+                continue;
+
             strikes = new ArrayList<>(optionMap.get(date).keySet());
+
+            // Only OTM options
+            if (type.equalsIgnoreCase("CALL"))
+                strikes = strikes.subList(strikes.size()/2, strikes.size());
+            else
+                strikes = strikes.subList(0, strikes.size()/2);
 
             for (int i = 0; i < strikes.size() - 1; i++) {
                 for (int j = i + 1; j < strikes.size(); j++) {

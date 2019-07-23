@@ -1,6 +1,6 @@
 package com.sleet.tools.objects;
 
-public class Spread {
+public class Spread implements Comparable<Spread> {
 
     private String spread;
     private int expirationDays;
@@ -40,5 +40,15 @@ public class Spread {
     @Override
     public String toString() {
         return "[ " + spread + " " + expirationDays + " " + price + " " + buyingPower + " " + roi + " ]";
+    }
+
+    @Override
+    public int compareTo(Spread spread) {
+
+        if(this.getRoi() > spread.getRoi())
+            return -1;
+        else if(this.getRoi() < spread.getRoi())
+            return 1;
+        return 0;
     }
 }
