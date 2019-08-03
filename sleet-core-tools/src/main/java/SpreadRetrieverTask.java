@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,11 +22,18 @@ public class SpreadRetrieverTask implements Runnable {
     private final OptionService optionService;
     private static final int API_REQUEST_INTERVAL = 20;
     private static final int DELAY = 2;
+    private static final int DAYS_TO_EXPIRATION = 40;
+    private static String expirationDate;
     private static final Logger LOG = LogManager.getLogger(SpreadRetrieverTask.class);
 
     public SpreadRetrieverTask(OptionService optionService, String ticker) {
         this.optionService = optionService;
         this.ticker = ticker;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, DAYS_TO_EXPIRATION);
+        expirationDate = sdf.format(cal.getTime());
     }
 
     @Override
@@ -33,7 +41,7 @@ public class SpreadRetrieverTask implements Runnable {
 
         Runnable retrieveSpreads = () -> {
 
-            OptionChain optionChain = optionService.getCloseExpirationOptionChain(ticker, "2019-09-21");
+            OptionChain optionChain = optionService.getCloseExpirationOptionChain(ticker, expirationDate);
             Map<String, Map<String, List<Option>>> callMap = optionChain.getCallExpDateMap();
             Map<String, Map<String, List<Option>>> putMap = optionChain.getPutExpDateMap();
 

@@ -7,8 +7,8 @@ import org.apache.logging.log4j.LogManager;
 
 public class OptionService extends Service {
 
-    private String OPTION_CHAIN_URL;
-    private final String STRIKE_COUNT = "50";
+    private static String OPTION_CHAIN_URL;
+    private static final String STRIKE_COUNT = "50";
     private static final Logger LOG = LogManager.getLogger(OptionService.class);
 
     public OptionService(String API_KEY) {
