@@ -3,6 +3,7 @@ package com.sleet.tools;
 import com.sleet.api.domain.Option;
 import com.sleet.api.domain.OptionChain;
 import com.sleet.api.service.OptionService;
+import com.sleet.tools.objects.Contract;
 import com.sleet.tools.objects.Spread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,25 +28,25 @@ public class SpreadScanner {
         LOG.info("Retrieving API key");
         OptionService optionService = new OptionService(GlobalProperties.getInstance().getApiKey());
 
-        Runnable logDataByMinute = () -> {
+        Runnable retrieveSpreads = () -> {
 
-            OptionChain optionChain = optionService.getOptionChain("SPX");
+            OptionChain optionChain = optionService.getCloseExpirationOptionChain("SPX", "2019-09-21");
             Map<String, Map<String, List<Option>>> callMap = optionChain.getCallExpDateMap();
             Map<String, Map<String, List<Option>>> putMap = optionChain.getPutExpDateMap();
 
-            List<Spread> callSpreadList = getSpreadList(callMap, "CALL");
-            List<Spread> putSpreadList = getSpreadList(putMap, "PUT");
+            List<Spread> callSpreadList = getSpreadList(callMap, Contract.CALL.name());
+            List<Spread> putSpreadList = getSpreadList(putMap, Contract.PUT.name());
 
             Collections.sort(putSpreadList);
 
             for(Spread spread : putSpreadList)
-                if (spread.getExpirationDays() <= 30)
+                if (spread.getBuyingPower() <= 5000 && spread.getRoi() >= 0.05)
                     LOG.info(spread.toString());
         };
 
         LOG.info("Starting scheduled executor");
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(logDataByMinute, DELAY, API_REQUEST_INTERVAL, TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(retrieveSpreads, DELAY, API_REQUEST_INTERVAL, TimeUnit.SECONDS);
     }
 
     private static List<Spread> getSpreadList(Map<String, Map<String, List<Option>>> optionMap, String type) {
@@ -63,7 +64,7 @@ public class SpreadScanner {
             strikes = new ArrayList<>(optionMap.get(date).keySet());
 
             // Only OTM options
-            if (type.equalsIgnoreCase("CALL"))
+            if (type.equalsIgnoreCase(Contract.CALL.name()))
                 strikes = strikes.subList(strikes.size()/2, strikes.size());
             else
                 strikes = strikes.subList(0, strikes.size()/2);
@@ -76,7 +77,7 @@ public class SpreadScanner {
 
                     try {
 
-                        if (type.equalsIgnoreCase("CALL")) {
+                        if (type.equalsIgnoreCase(Contract.CALL.name())) {
                             shortLeg = optionMap.get(date).get(strikes.get(i)).get(0);
                             longLeg = optionMap.get(date).get(strikes.get(j)).get(0);
                         } else {
