@@ -8,8 +8,6 @@ import com.sleet.tools.objects.Spread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -45,8 +43,8 @@ public class SpreadRetrieverTask implements Runnable {
             Map<String, Map<String, List<Option>>> callMap = optionChain.getCallExpDateMap();
             Map<String, Map<String, List<Option>>> putMap = optionChain.getPutExpDateMap();
 
-            List<Spread> callSpreadList = getSpreadList(callMap, Contract.CALL.name());
-            List<Spread> putSpreadList = getSpreadList(putMap, Contract.PUT.name());
+            List<Spread> callSpreadList = getSpreadList(callMap, Contract.CALL);
+            List<Spread> putSpreadList = getSpreadList(putMap, Contract.PUT);
 
             Collections.sort(putSpreadList);
 
@@ -61,7 +59,7 @@ public class SpreadRetrieverTask implements Runnable {
         executor.scheduleAtFixedRate(retrieveSpreads, DELAY, API_REQUEST_INTERVAL, TimeUnit.SECONDS);
     }
 
-    private List<Spread> getSpreadList(Map<String, Map<String, List<Option>>> optionMap, String type) {
+    private List<Spread> getSpreadList(Map<String, Map<String, List<Option>>> optionMap, Contract contract) {
 
         Set<String> dates = optionMap.keySet();
         List<String> strikes;
@@ -76,7 +74,7 @@ public class SpreadRetrieverTask implements Runnable {
             strikes = new ArrayList<>(optionMap.get(date).keySet());
 
             // Only OTM options
-            if (type.equalsIgnoreCase(Contract.CALL.name()))
+            if (contract.name().equalsIgnoreCase(Contract.CALL.name()))
                 strikes = strikes.subList(strikes.size()/2, strikes.size());
             else
                 strikes = strikes.subList(0, strikes.size()/2);
@@ -89,7 +87,7 @@ public class SpreadRetrieverTask implements Runnable {
 
                     try {
 
-                        if (type.equalsIgnoreCase(Contract.CALL.name())) {
+                        if (contract.name().equalsIgnoreCase(Contract.CALL.name())) {
                             shortLeg = optionMap.get(date).get(strikes.get(i)).get(0);
                             longLeg = optionMap.get(date).get(strikes.get(j)).get(0);
                         } else {
@@ -97,21 +95,7 @@ public class SpreadRetrieverTask implements Runnable {
                             longLeg = optionMap.get(date).get(strikes.get(i)).get(0);
                         }
 
-                        String spreadName = shortLeg.getStrikePrice() + "/" + longLeg.getStrikePrice();
-                        int expirationDate = Integer.parseInt(date.substring(date.indexOf(":")+1));
-
-                        double spreadPrice = shortLeg.getMark() - longLeg.getMark();
-                        BigDecimal roundedSpreadPrice = new BigDecimal(spreadPrice).setScale(2, RoundingMode.HALF_UP);
-                        BigDecimal multiplier = new BigDecimal(100);
-
-                        BigDecimal roundedBuyingPower = new BigDecimal(shortLeg.getStrikePrice() - longLeg.getStrikePrice());
-                        roundedBuyingPower = roundedBuyingPower.multiply(multiplier).abs().setScale(2, RoundingMode.HALF_UP);
-
-                        BigDecimal roundedRoi = roundedSpreadPrice.multiply(multiplier).divide(roundedBuyingPower, 3, RoundingMode.HALF_UP);
-
-                        Spread spread = new Spread(ticker, spreadName, expirationDate, roundedSpreadPrice.doubleValue(),
-                                roundedBuyingPower.intValue(), roundedRoi.doubleValue());
-
+                        Spread spread = new Spread(shortLeg, longLeg);
                         spreads.add(spread);
 
                     } catch(Exception e) {
