@@ -5,6 +5,9 @@ import com.sleet.api.domain.Option;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+/**
+ * Represents an option spread, constructed of two single {@link Option} contracts.
+ */
 public class Spread implements Comparable<Spread> {
 
     private String ticker;
@@ -69,9 +72,22 @@ public class Spread implements Comparable<Spread> {
 
     public double roundRoi() {
 
-        return new BigDecimal(this.price).multiply(optionMultiplier).divide(new BigDecimal(this.buyingPower), 3, RoundingMode.HALF_UP).doubleValue();
+        return new BigDecimal(this.price)
+                .multiply(optionMultiplier)
+                .divide(new BigDecimal(this.buyingPower), 3, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
+    /**
+     * Utility method to round doubles precisely using {@link BigDecimal} objects. Used for calculating the
+     * difference of multiple quantitative values between two {@link Option} objects
+     *
+     * @param d1 short leg value
+     * @param d2 long leg value
+     * @param multiplier enabled or not
+     * @param absValue enabled or not
+     * @return double of rounded value
+     */
     private double roundDifference(double d1, double d2, boolean multiplier, boolean absValue) {
 
         BigDecimal roundedValue = new BigDecimal(d1-d2);
@@ -90,6 +106,12 @@ public class Spread implements Comparable<Spread> {
         return "[ " + ticker + " " + spread + " " + expirationDays + " " + price + " " + buyingPower + " " + roi + " ]";
     }
 
+    /**
+     * Compare spreads using ROI, greater if higher ROI, less if lower ROI.
+     *
+     * @param spread to compare against
+     * @return int from comparison evaluation
+     */
     @Override
     public int compareTo(Spread spread) {
 

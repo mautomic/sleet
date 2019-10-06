@@ -13,6 +13,9 @@ import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * A recorder to log option spread prices
+ */
 public class SpreadRecorder extends Recorder {
 
     private static final Logger LOG = LogManager.getLogger(SpreadRecorder.class);

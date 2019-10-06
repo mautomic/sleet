@@ -14,6 +14,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Scheduled runnable to retrieve an option chain and calculate spreads at the defined interval. A SpreadTaskRetriever
+ * is meant to be created on its own non-blocking thread.
+ */
 public class SpreadRetrieverTask implements Runnable {
 
     private final String ticker;
@@ -59,6 +63,13 @@ public class SpreadRetrieverTask implements Runnable {
         executor.scheduleAtFixedRate(retrieveSpreads, DELAY, API_REQUEST_INTERVAL, TimeUnit.SECONDS);
     }
 
+    /**
+     * Generate all possible spreads for a chain of single options
+     *
+     * @param optionMap of single options for different strikes and expirations
+     * @param contract of type CALL or PUT
+     * @return a list of {@link Spread} objects
+     */
     private List<Spread> getSpreadList(Map<String, Map<String, List<Option>>> optionMap, Contract contract) {
 
         Set<String> dates = optionMap.keySet();
@@ -104,7 +115,6 @@ public class SpreadRetrieverTask implements Runnable {
                 }
             }
         }
-
         return spreads;
     }
 }

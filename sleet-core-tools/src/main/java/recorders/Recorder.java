@@ -7,6 +7,9 @@ import java.io.BufferedWriter;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A recorder is used for logging real-time data to files
+ */
 public abstract class Recorder {
 
     static String logPath = GlobalProperties.getInstance().getlogPath();

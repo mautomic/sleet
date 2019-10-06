@@ -5,6 +5,9 @@ import java.util.Properties;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+/**
+ * Singleton properties loader
+ */
 public class GlobalProperties {
 
     private static GlobalProperties instance;

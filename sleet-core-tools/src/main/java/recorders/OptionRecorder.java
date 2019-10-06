@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A recorder to log option prices
+ */
 public class OptionRecorder extends Recorder {
 
     private static final Logger LOG = LogManager.getLogger(OptionRecorder.class);
