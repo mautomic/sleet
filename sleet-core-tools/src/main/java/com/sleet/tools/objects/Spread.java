@@ -27,7 +27,7 @@ public class Spread implements Comparable<Spread> {
         this.spread = shortLeg.getStrikePrice() + "/" + longLeg.getStrikePrice();
         this.expirationDays = shortLeg.getDaysToExpiration();
 
-        String tempTicker = shortLeg.getSymbol().substring(0, shortLeg.getSymbol().indexOf('_'));
+        final String tempTicker = shortLeg.getSymbol().substring(0, shortLeg.getSymbol().indexOf('_'));
         this.ticker = tempTicker.charAt(tempTicker.length()-1) == 'W' ? tempTicker.substring(0, tempTicker.length()-1) : tempTicker;
 
         this.price = roundDifference(shortLeg.getMark(), longLeg.getMark(), false, false);

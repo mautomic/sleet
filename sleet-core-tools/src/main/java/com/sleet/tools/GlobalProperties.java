@@ -26,7 +26,7 @@ public class GlobalProperties {
         properties = new Properties();
 
         try {
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("resources.cfg");
+            final InputStream inputStream = getClass().getClassLoader().getResourceAsStream("resources.cfg");
             properties.load(inputStream);
 
         } catch (Exception e) {

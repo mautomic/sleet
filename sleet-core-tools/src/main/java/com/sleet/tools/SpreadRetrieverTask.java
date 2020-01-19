@@ -32,8 +32,8 @@ public class SpreadRetrieverTask implements Runnable {
         this.optionService = optionService;
         this.ticker = ticker;
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Calendar cal = Calendar.getInstance();
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, DAYS_TO_EXPIRATION);
         expirationDate = sdf.format(cal.getTime());
     }
@@ -43,12 +43,12 @@ public class SpreadRetrieverTask implements Runnable {
 
         Runnable retrieveSpreads = () -> {
 
-            OptionChain optionChain = optionService.getCloseExpirationOptionChain(ticker, expirationDate);
-            Map<String, Map<String, List<Option>>> callMap = optionChain.getCallExpDateMap();
-            Map<String, Map<String, List<Option>>> putMap = optionChain.getPutExpDateMap();
+            final OptionChain optionChain = optionService.getCloseExpirationOptionChain(ticker, expirationDate);
+            final Map<String, Map<String, List<Option>>> callMap = optionChain.getCallExpDateMap();
+            final Map<String, Map<String, List<Option>>> putMap = optionChain.getPutExpDateMap();
 
-            List<Spread> callSpreadList = getSpreadList(callMap, Contract.CALL);
-            List<Spread> putSpreadList = getSpreadList(putMap, Contract.PUT);
+            final List<Spread> callSpreadList = getSpreadList(callMap, Contract.CALL);
+            final List<Spread> putSpreadList = getSpreadList(putMap, Contract.PUT);
 
             Collections.sort(putSpreadList);
 
@@ -59,7 +59,7 @@ public class SpreadRetrieverTask implements Runnable {
         };
 
         LOG.info("Starting scheduled executor for " + ticker);
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(retrieveSpreads, DELAY, API_REQUEST_INTERVAL, TimeUnit.SECONDS);
     }
 
@@ -72,10 +72,10 @@ public class SpreadRetrieverTask implements Runnable {
      */
     private List<Spread> getSpreadList(Map<String, Map<String, List<Option>>> optionMap, Contract contract) {
 
-        Set<String> dates = optionMap.keySet();
+        final Set<String> dates = optionMap.keySet();
         List<String> strikes;
 
-        List<Spread> spreads = new ArrayList<>();
+        final List<Spread> spreads = new ArrayList<>();
 
         for (String date : dates) {
 
@@ -106,11 +106,10 @@ public class SpreadRetrieverTask implements Runnable {
                             longLeg = optionMap.get(date).get(strikes.get(i)).get(0);
                         }
 
-                        Spread spread = new Spread(shortLeg, longLeg);
-                        spreads.add(spread);
+                        spreads.add(new Spread(shortLeg, longLeg));
 
                     } catch(Exception e) {
-                        LOG.error(e.getMessage());
+                        LOG.error("Error creating spread",e);
                     }
                 }
             }

@@ -21,7 +21,7 @@ public class SpreadScanner {
 
         for(String ticker : WATCHLIST) {
 
-            SpreadRetrieverTask task = new SpreadRetrieverTask(optionService, ticker);
+            final SpreadRetrieverTask task = new SpreadRetrieverTask(optionService, ticker);
             new Thread(task).start();
         }
     }

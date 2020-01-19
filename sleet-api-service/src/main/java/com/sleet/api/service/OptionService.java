@@ -30,13 +30,15 @@ public class OptionService extends Service {
 
         try {
             LOG.info("Requesting Option Chain ");
-            OptionChain optionChain = restTemplate.getForObject(OPTION_CHAIN_URL + "&symbol=" + ticker + "&strikeCount=" +
+            final OptionChain optionChain = restTemplate.getForObject(OPTION_CHAIN_URL + "&symbol=" + ticker + "&strikeCount=" +
                     DEFAULT_STRIKE_COUNT + "&toDate=" + furthestExpirationDate, OptionChain.class);
             LOG.info("Fetched Option Chain");
             return optionChain;
 
         } catch(Exception e) {
-            LOG.error("Could not retrieve option chain: " + e.getMessage());
+            LOG.error("Could not retrieve option chain", e);
+            if(e.getMessage().contains("InvalidApiKey"))
+                System.exit(1);
         }
         return null;
     }
@@ -62,13 +64,15 @@ public class OptionService extends Service {
 
         try {
             LOG.info("Requesting Option Chain ");
-            OptionChain optionChain = restTemplate.getForObject(OPTION_CHAIN_URL + "&symbol=" + ticker +
+            final OptionChain optionChain = restTemplate.getForObject(OPTION_CHAIN_URL + "&symbol=" + ticker +
                     "&strikeCount=" + strikeCount, OptionChain.class);
             LOG.info("Fetched Option Chain");
             return optionChain;
 
         } catch(Exception e) {
-            LOG.error("Could not retrieve option chain: " + e.getMessage());
+            LOG.error("Could not retrieve option chain", e);
+            if(e.getMessage().contains("InvalidApiKey"))
+                System.exit(1);
         }
         return null;
     }

@@ -42,9 +42,9 @@ public class OptionRecorder extends Recorder {
 
     public void recordData(Map<String, Map<String, List<Option>>> optionMap, String type) {
 
-        String periodicTimestamp = new SimpleDateFormat("HH.mm.ss").format(new Date());
+        final String periodicTimestamp = new SimpleDateFormat("HH.mm.ss").format(new Date());
 
-        Set<String> dates = optionMap.keySet();
+        final Set<String> dates = optionMap.keySet();
         Set<String> strikes;
 
         for (String date : dates) {
