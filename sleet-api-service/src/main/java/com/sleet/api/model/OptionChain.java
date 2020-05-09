@@ -1,4 +1,4 @@
-package com.sleet.api.domain;
+package com.sleet.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -40,6 +40,14 @@ public class OptionChain {
 
     public Map<String, Map<String, List<Option>>> getPutExpDateMap() {
         return putExpDateMap;
+    }
+
+    public void setCallExpDateMap(Map<String, Map<String, List<Option>>> callExpDateMap) {
+        this.callExpDateMap = callExpDateMap;
+    }
+
+    public void setPutExpDateMap(Map<String, Map<String, List<Option>>> putExpDateMap) {
+        this.putExpDateMap = putExpDateMap;
     }
 
     @Override

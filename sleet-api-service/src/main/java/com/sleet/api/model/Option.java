@@ -1,4 +1,4 @@
-package com.sleet.api.domain;
+package com.sleet.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
