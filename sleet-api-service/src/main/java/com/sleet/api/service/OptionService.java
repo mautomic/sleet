@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 /**
- * A service class that provides methods to retrieve option data from the TD API
+ * A {@link Service} implementation that provides methods to retrieve option data from the TD API
  */
 public class OptionService extends Service {
 

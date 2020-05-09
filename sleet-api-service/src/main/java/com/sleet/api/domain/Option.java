@@ -11,10 +11,14 @@ public class Option {
     private String putCall;
     private String symbol;
     private String description;
+    private String exchangeName;
     private double bid;
     private double ask;
     private double last;
     private double mark;
+    private int bidSize;
+    private int askSize;
+    private int lastSize;
     private double highPrice;
     private double lowPrice;
     private double openPrice;
@@ -26,9 +30,15 @@ public class Option {
     private double gamma;
     private double theta;
     private double vega;
+    private int openInterest;
+    private double theoreticalOptionValue;
+    private double theoreticalVolatility;
     private double strikePrice;
     private boolean inTheMoney;
     private int daysToExpiration;
+    private int multiplier;
+    private double percentChange;
+    private double markChange;
 
     public String getPutCall() {
         return putCall;
@@ -40,6 +50,10 @@ public class Option {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getExchangeName() {
+        return exchangeName;
     }
 
     public double getBid() {
@@ -56,6 +70,18 @@ public class Option {
 
     public double getMark() {
         return mark;
+    }
+
+    public int getBidSize() {
+        return bidSize;
+    }
+
+    public int getAskSize() {
+        return askSize;
+    }
+
+    public int getLastSize() {
+        return lastSize;
     }
 
     public double getHighPrice() {
@@ -102,6 +128,18 @@ public class Option {
         return vega;
     }
 
+    public int getOpenInterest() {
+        return openInterest;
+    }
+
+    public double getTheoreticalOptionValue() {
+        return theoreticalOptionValue;
+    }
+
+    public double getTheoreticalVolatility() {
+        return theoreticalVolatility;
+    }
+
     public double getStrikePrice() {
         return strikePrice;
     }
@@ -112,6 +150,18 @@ public class Option {
 
     public int getDaysToExpiration() {
         return daysToExpiration;
+    }
+
+    public int getMultiplier() {
+        return multiplier;
+    }
+
+    public double getPercentChange() {
+        return percentChange;
+    }
+
+    public double getMarkChange() {
+        return markChange;
     }
 
     @Override

@@ -18,9 +18,6 @@ public class OptionChain {
     private Map<String, Map<String, List<Option>>> callExpDateMap;
     private Map<String, Map<String, List<Option>>> putExpDateMap;
 
-    public OptionChain() {
-    }
-
     public String getSymbol() {
         return symbol;
     }

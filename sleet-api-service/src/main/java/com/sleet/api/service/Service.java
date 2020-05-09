@@ -3,7 +3,7 @@ package com.sleet.api.service;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * A service class can connect to different TD API endpoints. All reusable/shared objects are stored here.
+ * An abstract implementation of a service class can connect to different TD API endpoints
  */
 public abstract class Service {
 
