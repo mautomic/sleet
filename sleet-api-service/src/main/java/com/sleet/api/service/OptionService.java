@@ -5,7 +5,6 @@ import com.sleet.api.model.Option;
 import com.sleet.api.model.OptionChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * A service class that provides methods to retrieve option data from the TD API
+ * A {@link Service} implementation that provides methods to retrieve option data from the TD API
  */
 public class OptionService extends Service {
 
@@ -31,7 +30,7 @@ public class OptionService extends Service {
 
     public OptionService(final String apiKey) {
         restTemplate = new RestTemplate(getClientHttpRequestFactory());
-        OPTION_CHAIN_URL = API_URL + "/chains?apikey=" + apiKey;
+        OPTION_CHAIN_URL = API_URL + "chains?apikey=" + apiKey;
     }
 
     /**
@@ -55,11 +54,7 @@ public class OptionService extends Service {
                 builder.append(contract.name());
                 urls.add(builder.toString());
             }
-
-            long time = System.currentTimeMillis();
-            final OptionChain optionChain = getCallsAndPutsConcurrently(urls);
-            LOG.info("Retrieval for {} took {} ms", ticker, (System.currentTimeMillis() - time));
-            return optionChain;
+            return getCallsAndPutsConcurrently(urls);
 
         } catch(Exception e) {
             logFailure(e);
@@ -97,11 +92,7 @@ public class OptionService extends Service {
                 builder.append(contract.name());
                 urls.add(builder.toString());
             }
-
-            long time = System.currentTimeMillis();
-            final OptionChain optionChain = getCallsAndPutsConcurrently(urls);
-            LOG.info("Retrieval for {} took {} ms", ticker, (System.currentTimeMillis() - time));
-            return optionChain;
+            return getCallsAndPutsConcurrently(urls);
 
         } catch(Exception e) {
             logFailure(e);
@@ -114,6 +105,7 @@ public class OptionService extends Service {
      *
      * @param ticker of security to retrieve options for
      * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
+     * @return {@link OptionChain} with all option data for the ticker
      */
     public OptionChain getOptionChainForDate(final String ticker, final String expirationDate) {
 
@@ -122,11 +114,7 @@ public class OptionService extends Service {
             setBuilderDefaultStrikeCount();
             setBuilderExpirationDate(expirationDate);
             final String url = builder.toString();
-
-            long time = System.currentTimeMillis();
-            final OptionChain optionChain = restTemplate.getForObject(url, OptionChain.class);
-            LOG.info("Retrieval for {} that expires on {}, took {} ms", ticker, expirationDate, (System.currentTimeMillis() - time));
-            return optionChain;
+            return restTemplate.getForObject(url, OptionChain.class);
 
         } catch(Exception e) {
             logFailure(e);
@@ -139,6 +127,7 @@ public class OptionService extends Service {
      *
      * @param ticker of security to retrieve options for
      * @param strike of the options to retrieve
+     * @return {@link OptionChain} with all option data for the ticker
      */
     public OptionChain getOptionChainForStrike(final String ticker, final int strike) {
 
@@ -148,10 +137,7 @@ public class OptionService extends Service {
             builder.append(strike);
             final String url = builder.toString();
 
-            long time = System.currentTimeMillis();
-            final OptionChain optionChain = restTemplate.getForObject(url, OptionChain.class);
-            LOG.info("Retrieval for {} with strike {}, took {} ms", ticker, strike, (System.currentTimeMillis() - time));
-            return optionChain;
+            return restTemplate.getForObject(url, OptionChain.class);
 
         } catch(Exception e) {
             logFailure(e);
@@ -165,6 +151,7 @@ public class OptionService extends Service {
      * @param ticker of security to retrieve options for
      * @param strike of the options to retrieve
      * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
+     * @return {@link OptionChain} with all option data for the ticker
      */
     public OptionChain getOptionChainForStrikeAndDate(final String ticker,
                                                       final int strike,
@@ -175,12 +162,7 @@ public class OptionService extends Service {
             builder.append(STRIKE);
             builder.append(strike);
             final String url = builder.toString();
-
-            long time = System.currentTimeMillis();
-            final OptionChain optionChain = restTemplate.getForObject(url, OptionChain.class);
-            LOG.info("Retrieval for {} with strike {} that expires on {}, took {} ms",
-                    ticker, strike, expirationDate, (System.currentTimeMillis() - time));
-            return optionChain;
+            return restTemplate.getForObject(url, OptionChain.class);
 
         } catch(Exception e) {
             logFailure(e);
@@ -223,16 +205,6 @@ public class OptionService extends Service {
             fullChain.setPutExpDateMap(chainList.get(1).getPutExpDateMap());
         }
         return fullChain;
-    }
-
-    /**
-     * Class used to configure properties for a {@link RestTemplate} as an HTTP connection and read timeout can hang
-     */
-    private SimpleClientHttpRequestFactory getClientHttpRequestFactory() {
-        SimpleClientHttpRequestFactory clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
-        clientHttpRequestFactory.setConnectTimeout(3000);
-        clientHttpRequestFactory.setReadTimeout(10000);
-        return clientHttpRequestFactory;
     }
 
     /**
