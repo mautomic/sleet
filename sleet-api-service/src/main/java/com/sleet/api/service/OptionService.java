@@ -26,7 +26,6 @@ public class OptionService extends Service {
     private static final String TO_DATE = "&toDate=";
     private static final String DEFAULT_STRIKE_COUNT = "100"; // Count for above and below at-the-money, so x2 contracts are returned
     private static final Logger LOG = LoggerFactory.getLogger(OptionService.class);
-    private static final StringBuilder builder = new StringBuilder();
 
     public OptionService(final String apiKey) {
         restTemplate = new RestTemplate(getClientHttpRequestFactory());
@@ -44,15 +43,16 @@ public class OptionService extends Service {
 
         try {
             final List<String> urls = new ArrayList<>();
-            for (final Contract contract : Contract.values()) {
+            final StringBuilder builder = new StringBuilder()
+                    .append(OPTION_CHAIN_URL)
+                    .append(SYMBOL)
+                    .append(ticker)
+                    .append(TO_DATE)
+                    .append(furthestExpirationDate)
+                    .append(OTM);
 
-                resetBuilderUrl(ticker);
-                builder.append(TO_DATE);
-                builder.append(furthestExpirationDate);
-                builder.append(OTM);
-                builder.append(CONTRACT_TYPE);
-                builder.append(contract.name());
-                urls.add(builder.toString());
+            for (final Contract contract : Contract.values()) {
+                urls.add(builder.toString() + contract.name());
             }
             return getCallsAndPutsConcurrently(urls);
 
@@ -83,14 +83,16 @@ public class OptionService extends Service {
 
         try {
             final List<String> urls = new ArrayList<>();
-            for (final Contract contract : Contract.values()) {
+            final StringBuilder builder = new StringBuilder()
+                    .append(OPTION_CHAIN_URL)
+                    .append(SYMBOL)
+                    .append(ticker)
+                    .append(STRIKE_COUNT)
+                    .append(strikeCount)
+                    .append(CONTRACT_TYPE);
 
-                resetBuilderUrl(ticker);
-                builder.append(STRIKE_COUNT);
-                builder.append(strikeCount);
-                builder.append(CONTRACT_TYPE);
-                builder.append(contract.name());
-                urls.add(builder.toString());
+            for (final Contract contract : Contract.values()) {
+                urls.add(builder.toString() + contract.name());
             }
             return getCallsAndPutsConcurrently(urls);
 
@@ -110,11 +112,17 @@ public class OptionService extends Service {
     public OptionChain getOptionChainForDate(final String ticker, final String expirationDate) {
 
         try {
-            resetBuilderUrl(ticker);
-            setBuilderDefaultStrikeCount();
-            setBuilderExpirationDate(expirationDate);
-            final String url = builder.toString();
-            return restTemplate.getForObject(url, OptionChain.class);
+            final StringBuilder builder = new StringBuilder()
+                    .append(OPTION_CHAIN_URL)
+                    .append(SYMBOL)
+                    .append(ticker)
+                    .append(STRIKE_COUNT)
+                    .append(DEFAULT_STRIKE_COUNT)
+                    .append(TO_DATE)
+                    .append(expirationDate)
+                    .append(FROM_DATE)
+                    .append(expirationDate);
+            return restTemplate.getForObject(builder.toString(), OptionChain.class);
 
         } catch(Exception e) {
             logFailure(e);
@@ -132,12 +140,14 @@ public class OptionService extends Service {
     public OptionChain getOptionChainForStrike(final String ticker, final int strike) {
 
         try {
-            resetBuilderUrl(ticker);
-            builder.append(STRIKE);
-            builder.append(strike);
-            final String url = builder.toString();
+            final StringBuilder builder = new StringBuilder()
+                    .append(OPTION_CHAIN_URL)
+                    .append(SYMBOL)
+                    .append(ticker)
+                    .append(STRIKE)
+                    .append(strike);
 
-            return restTemplate.getForObject(url, OptionChain.class);
+            return restTemplate.getForObject(builder.toString(), OptionChain.class);
 
         } catch(Exception e) {
             logFailure(e);
@@ -153,16 +163,21 @@ public class OptionService extends Service {
      * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
      * @return {@link OptionChain} with all option data for the ticker
      */
-    public OptionChain getOptionChainForStrikeAndDate(final String ticker,
-                                                      final int strike,
-                                                      final String expirationDate) {
+    public OptionChain getOptionChainForStrikeAndDate(final String ticker, final int strike, final String expirationDate) {
+
         try {
-            resetBuilderUrl(ticker);
-            setBuilderExpirationDate(expirationDate);
-            builder.append(STRIKE);
-            builder.append(strike);
-            final String url = builder.toString();
-            return restTemplate.getForObject(url, OptionChain.class);
+            final StringBuilder builder = new StringBuilder()
+                    .append(OPTION_CHAIN_URL)
+                    .append(SYMBOL)
+                    .append(ticker)
+                    .append(TO_DATE)
+                    .append(expirationDate)
+                    .append(FROM_DATE)
+                    .append(expirationDate)
+                    .append(STRIKE)
+                    .append(strike);
+
+            return restTemplate.getForObject(builder.toString(), OptionChain.class);
 
         } catch(Exception e) {
             logFailure(e);
@@ -214,37 +229,5 @@ public class OptionService extends Service {
         LOG.error("Could not retrieve option chain", e);
         if(e.getMessage().contains("InvalidApiKey"))
             System.exit(1);
-    }
-
-    /**
-     * Reset StringBuilder for url generation and add ticker, which is always required for a request
-     *
-     * @param ticker of security to retrieve options for
-     */
-    private void resetBuilderUrl(final String ticker) {
-        builder.setLength(0);
-        builder.append(OPTION_CHAIN_URL);
-        builder.append(SYMBOL);
-        builder.append(ticker);
-    }
-
-    /**
-     * Add toDate and fromDate to builder
-     *
-     * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
-     */
-    private void setBuilderExpirationDate(final String expirationDate) {
-        builder.append(TO_DATE);
-        builder.append(expirationDate);
-        builder.append(FROM_DATE);
-        builder.append(expirationDate);
-    }
-
-    /**
-     * Add default strike count to builder
-     */
-    private void setBuilderDefaultStrikeCount() {
-        builder.append(STRIKE_COUNT);
-        builder.append(DEFAULT_STRIKE_COUNT);
     }
 }
