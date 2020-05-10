@@ -24,7 +24,7 @@ public class Equity {
     private double lowPrice;
     private double closePrice;
     private double netChange;
-    private int totalVolume;
+    private long totalVolume;
     private long quoteTimeInLong;
     private long tradeTimeInLong;
     private double mark;
@@ -97,7 +97,7 @@ public class Equity {
         return netChange;
     }
 
-    public int getTotalVolume() {
+    public long getTotalVolume() {
         return totalVolume;
     }
 

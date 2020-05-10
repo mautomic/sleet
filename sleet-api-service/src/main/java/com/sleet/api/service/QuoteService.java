@@ -10,6 +10,8 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * A {@link Service} implementation that provides methods to retrieve equity quote data from the TD API
+ *
+ * TODO: Implement multiple quotes query
  */
 public class QuoteService extends Service {
 
