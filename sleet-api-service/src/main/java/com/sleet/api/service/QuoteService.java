@@ -45,6 +45,12 @@ public class QuoteService extends Service {
         return Optional.empty();
     }
 
+    /**
+     * Queries the TD API endpoint for current quote info for multiple tickers
+     *
+     * @param tickers to get quote info for
+     * @return an Optional List of {@link Equity} objects with quote information
+     */
     public Optional<List<Equity>> getQuotes(final String... tickers) {
 
         String concatenated = String.join("%2C", tickers);
