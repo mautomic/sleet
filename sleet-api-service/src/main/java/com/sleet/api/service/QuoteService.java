@@ -51,7 +51,7 @@ public class QuoteService extends Service {
      * @param tickers to get quote info for
      * @return an Optional List of {@link Equity} objects with quote information
      */
-    public Optional<List<Equity>> getQuotes(final String... tickers) {
+    public List<Equity> getQuotes(final String... tickers) {
 
         String concatenated = String.join("%2C", tickers);
         final String url = API_URL + QUOTE_URL + "&symbol=" + concatenated;
@@ -65,11 +65,11 @@ public class QuoteService extends Service {
                 Equity equity = mapper.treeToValue(topLevel, Equity.class);
                 equities.add(equity);
             }
-            return Optional.of(equities);
+            return equities;
 
         } catch (Exception e) {
             LOG.error("Could not retrieve quote for " + Arrays.toString(tickers), e);
         }
-        return Optional.empty();
+        return Collections.emptyList();
     }
 }
