@@ -8,8 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A {@link Service} implementation that provides methods to retrieve option data from the TD API
@@ -25,7 +29,9 @@ public class OptionService extends Service {
     private static final String FROM_DATE = "&fromDate=";
     private static final String TO_DATE = "&toDate=";
     private static final String DEFAULT_STRIKE_COUNT = "100"; // Count for above and below at-the-money, so x2 contracts are returned
+    private static final int DEFAULT_TIMEOUT_MILLIS = 5000;
     private static final Logger LOG = LoggerFactory.getLogger(OptionService.class);
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(50);
 
     public OptionService(final String apiKey) {
         restTemplate = new RestTemplate(getClientHttpRequestFactory());
@@ -54,7 +60,7 @@ public class OptionService extends Service {
             for (final Contract contract : Contract.values()) {
                 urls.add(builder.toString() + contract.name());
             }
-            return getCallsAndPutsConcurrently(urls);
+            return getCallsAndPutsConcurrently(urls, DEFAULT_TIMEOUT_MILLIS);
 
         } catch(Exception e) {
             logFailure(e);
@@ -94,7 +100,7 @@ public class OptionService extends Service {
             for (final Contract contract : Contract.values()) {
                 urls.add(builder.toString() + contract.name());
             }
-            return getCallsAndPutsConcurrently(urls);
+            return getCallsAndPutsConcurrently(urls, DEFAULT_TIMEOUT_MILLIS);
 
         } catch(Exception e) {
             logFailure(e);
@@ -186,40 +192,60 @@ public class OptionService extends Service {
     }
 
     /**
-     * Method to run two requests concurrently on their own {@link Thread}, one just for calls, and one just for puts.
-     * As the bottleneck for presenting large quantities of {@link Option}s back to the caller is the GET request to TD,
-     * this effectively cuts the retrieval speed in half.
+     * Method to run two requests concurrently on their own {@link Thread}, one just for calls, and one
+     * just for puts. As the bottleneck for presenting large quantities of {@link Option}s back to the
+     * caller is the GET request to TD, this effectively cuts the retrieval speed in half.
+     *
+     * Instead of spawning new threads every time for every {@link OptionService} query, which can
+     * be memory intensive and force lots of garbage collection, a standard thread pool is used.
+     * {@link OptionChain}s are returned in an async fashion via a {@link CompletableFuture}.
      *
      * @param urls to send GET requests
      * @return {@link OptionChain} for the original request
      */
-    private OptionChain getCallsAndPutsConcurrently(final List<String> urls) {
+    private OptionChain getCallsAndPutsConcurrently(final List<String> urls, final int timeoutMillis) {
 
-        final CountDownLatch latch = new CountDownLatch(2);
-        final List<OptionChain> chainList = new ArrayList<>(2);
-
+        final List<CompletableFuture<OptionChain>> futures = Arrays.asList(new CompletableFuture<>(), new CompletableFuture<>());
         try {
-            for (final String url : urls) {
-                new Thread(() -> {
-                    final OptionChain contractChain = restTemplate.getForObject(url, OptionChain.class);
-                    chainList.add(contractChain);
-                    latch.countDown();
-                }).start();
-            }
-            latch.await();
+            int index = 0;
+            for (final String url : urls)
+                threadPool.submit(optionChainFetcher(url, futures.get(index++)));
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(timeoutMillis, TimeUnit.MILLISECONDS);
 
+            // Combine the two chains
+            final OptionChain fullChain = futures.get(0).get();
+            if (fullChain.getCallExpDateMap().isEmpty()) {
+                fullChain.setCallExpDateMap(futures.get(1).get().getCallExpDateMap());
+            } else {
+                fullChain.setPutExpDateMap(futures.get(1).get().getPutExpDateMap());
+            }
+            return fullChain;
         } catch(final Exception e) {
             logFailure(e);
+            return new OptionChain();
         }
+    }
 
-        // Combine the two chains
-        final OptionChain fullChain = chainList.get(0);
-        if (fullChain.getCallExpDateMap().isEmpty()) {
-            fullChain.setCallExpDateMap(chainList.get(1).getCallExpDateMap());
-        } else {
-            fullChain.setPutExpDateMap(chainList.get(1).getPutExpDateMap());
-        }
-        return fullChain;
+    /**
+     * Method to create a runnable which fetches a single {@link OptionChain} for a particular URL. This can be
+     * submitted to a thread pool for concurrent execution.
+     *
+     * @param url to send GET request
+     * @param future to complete the OptionChain with
+     * @return Runnable to fetch a OptionChain
+     */
+    private Runnable optionChainFetcher(final String url, final CompletableFuture<OptionChain> future) {
+        Runnable runnable = () -> {
+            try {
+                final OptionChain optionChain = restTemplate.getForObject(url, OptionChain.class);
+                future.complete(optionChain);
+            } catch(Exception e) {
+                // If there's an exception during the API call, log and complete with an empty OptionChain
+                logFailure(e);
+                future.complete(new OptionChain());
+            }
+        };
+        return runnable;
     }
 
     /**
