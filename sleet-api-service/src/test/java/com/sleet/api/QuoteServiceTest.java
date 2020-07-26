@@ -13,7 +13,7 @@ import org.junit.Test;
 public class QuoteServiceTest {
 
     @Test
-    public void testQuoteRequest() {
+    public void testQuoteRequest() throws Exception {
 
         // Must supply API key for TD API in order to run test. See readme for info.
         final String apiKey = "";
@@ -34,7 +34,7 @@ public class QuoteServiceTest {
     }
 
     @Test
-    public void testContinuousQuoteScanningPerformance() throws InterruptedException {
+    public void testContinuousQuoteScanningPerformance() throws Exception {
 
         // Must supply API key for TD API in order to run test. See readme for info.
         final String apiKey = "";

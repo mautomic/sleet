@@ -46,7 +46,7 @@ public class OptionService extends Service {
      * @param ticker of security to retrieve options for
      * @return {@link OptionChain} with all option data for the ticker
      */
-    public OptionChain getOptionChain(final String ticker) {
+    public OptionChain getOptionChain(final String ticker) throws Exception {
         return getOptionChain(ticker, DEFAULT_STRIKE_COUNT);
     }
 
@@ -69,25 +69,20 @@ public class OptionService extends Service {
      * @param strikeCount of options to get in a single expiration period
      * @return {@link OptionChain} with all option data for the ticker
      */
-    public OptionChain getOptionChain(final String ticker, final String strikeCount) {
-        try {
-            final List<String> urls = new ArrayList<>();
-            final StringBuilder builder = new StringBuilder()
-                    .append(OPTION_CHAIN_URL)
-                    .append(SYMBOL)
-                    .append(ticker)
-                    .append(STRIKE_COUNT)
-                    .append(strikeCount)
-                    .append(CONTRACT_TYPE);
+    public OptionChain getOptionChain(final String ticker, final String strikeCount) throws Exception {
+        final List<String> urls = new ArrayList<>();
+        final StringBuilder builder = new StringBuilder()
+                .append(OPTION_CHAIN_URL)
+                .append(SYMBOL)
+                .append(ticker)
+                .append(STRIKE_COUNT)
+                .append(strikeCount)
+                .append(CONTRACT_TYPE);
 
-            for (final Contract contract : Contract.values())
-                urls.add(builder.toString() + contract.name());
+        for (final Contract contract : Contract.values())
+            urls.add(builder.toString() + contract.name());
 
-            return getCallsAndPutsConcurrently(urls);
-        } catch(Exception e) {
-            logFailure(e);
-        }
-        return null;
+        return getCallsAndPutsConcurrently(urls);
     }
 
     /**
@@ -119,26 +114,20 @@ public class OptionService extends Service {
      * @param furthestExpirationDate of options to retrieve starting from today
      * @return {@link OptionChain} with all option data for the ticker
      */
-    public OptionChain getOTMCloseExpirationOptionChain(final String ticker, final String furthestExpirationDate) {
-        try {
-            final List<String> urls = new ArrayList<>();
-            final StringBuilder builder = new StringBuilder()
-                    .append(OPTION_CHAIN_URL)
-                    .append(SYMBOL)
-                    .append(ticker)
-                    .append(TO_DATE)
-                    .append(furthestExpirationDate)
-                    .append(OTM);
+    public OptionChain getOTMCloseExpirationOptionChain(final String ticker, final String furthestExpirationDate) throws Exception {
+        final List<String> urls = new ArrayList<>();
+        final StringBuilder builder = new StringBuilder()
+                .append(OPTION_CHAIN_URL)
+                .append(SYMBOL)
+                .append(ticker)
+                .append(TO_DATE)
+                .append(furthestExpirationDate)
+                .append(OTM);
 
-            for (final Contract contract : Contract.values())
-                urls.add(builder.toString() + contract.name());
+        for (final Contract contract : Contract.values())
+            urls.add(builder.toString() + contract.name());
 
-            return getCallsAndPutsConcurrently(urls);
-
-        } catch(Exception e) {
-            logFailure(e);
-        }
-        return null;
+        return getCallsAndPutsConcurrently(urls);
     }
 
     /**
@@ -171,14 +160,9 @@ public class OptionService extends Service {
      * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
      * @return {@link OptionChain} with all option data for the ticker
      */
-    public OptionChain getOptionChainForDate(final String ticker, final String expirationDate) {
+    public OptionChain getOptionChainForDate(final String ticker, final String expirationDate) throws Exception {
         final CompletableFuture<OptionChain> future = getOptionChainForDateAsync(ticker, expirationDate);
-        try {
-            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-        } catch(Exception e) {
-            logFailure(e);
-        }
-        return null;
+        return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -213,14 +197,9 @@ public class OptionService extends Service {
      * @param strike of the options to retrieve
      * @return {@link OptionChain} with all option data for the ticker
      */
-    public OptionChain getOptionChainForStrike(final String ticker, final int strike) {
+    public OptionChain getOptionChainForStrike(final String ticker, final int strike) throws Exception {
         final CompletableFuture<OptionChain> future = getOptionChainForStrikeAsync(ticker, strike);
-        try {
-            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-        } catch(Exception e) {
-            logFailure(e);
-        }
-        return null;
+        return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -253,14 +232,9 @@ public class OptionService extends Service {
      * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
      * @return {@link OptionChain} with all option data for the ticker
      */
-    public OptionChain getOptionChainForStrikeAndDate(final String ticker, final int strike, final String expirationDate) {
+    public OptionChain getOptionChainForStrikeAndDate(final String ticker, final int strike, final String expirationDate) throws Exception {
         final CompletableFuture<OptionChain> future = getOptionChainForStrikeAndDateAsync(ticker, strike, expirationDate);
-        try {
-            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-        } catch(Exception e) {
-            logFailure(e);
-        }
-        return null;
+        return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -300,44 +274,24 @@ public class OptionService extends Service {
      * @param urls to send GET requests
      * @return {@link OptionChain} for the original request
      */
-    private OptionChain getCallsAndPutsConcurrently(final List<String> urls) {
+    private OptionChain getCallsAndPutsConcurrently(final List<String> urls) throws Exception {
         final List<CompletableFuture<OptionChain>> futures = Arrays.asList(new CompletableFuture<>(), new CompletableFuture<>());
-        try {
-            int index = 0;
-            for (final String url : urls)
-                fetchOptionChain(url, futures.get(index++));
-
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-
-            // Combine the two chains
-            final OptionChain fullChain = futures.get(0).get();
-            if (fullChain.getCallExpDateMap().isEmpty())
-                fullChain.setCallExpDateMap(futures.get(1).get().getCallExpDateMap());
-            else
-                fullChain.setPutExpDateMap(futures.get(1).get().getPutExpDateMap());
-
-            return fullChain;
-        } catch(final Exception e) {
-            logFailure(e);
-            return new OptionChain();
+        int index = 0;
+        for (final String url : urls) {
+            final CompletableFuture<OptionChain> future = futures.get(index++);
+            httpClient.get(url, response -> future.complete(deserializeResponse(response)));
         }
-    }
 
-    /**
-     * Asynchronously fetch a single {@link OptionChain} (or part of an OptionChain)
-     * for a particular URL
-     *
-     * @param url to send GET request
-     * @param future to complete the OptionChain with
-     */
-    private void fetchOptionChain(final String url, final CompletableFuture<OptionChain> future) {
-        httpClient.get(url, response -> {
-            try {
-                future.complete(deserializeResponse(response));
-            } catch(Exception e) {
-                future.completeExceptionally(e);
-            }
-        });
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+
+        // Combine the two chains
+        final OptionChain fullChain = futures.get(0).get();
+        if (fullChain.getCallExpDateMap().isEmpty())
+            fullChain.setCallExpDateMap(futures.get(1).get().getCallExpDateMap());
+        else
+            fullChain.setPutExpDateMap(futures.get(1).get().getPutExpDateMap());
+
+        return fullChain;
     }
 
     /**

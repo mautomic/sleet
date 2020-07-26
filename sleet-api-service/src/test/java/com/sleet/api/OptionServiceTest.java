@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class OptionServiceTest {
 
     @Test
-    public void testOptionChainRequest() {
+    public void testOptionChainRequest() throws Exception {
 
         // Must supply API key for TD API in order to run test. See readme for info.
         final String apiKey = "";

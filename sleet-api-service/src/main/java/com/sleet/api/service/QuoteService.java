@@ -32,19 +32,15 @@ public class QuoteService extends Service {
      * @param ticker to get quote info for
      * @return an {@link Equity} with quote information
      */
-    public Equity getQuote(final String ticker) {
+    public Equity getQuote(final String ticker) throws Exception {
         final String url = API_URL + ticker + QUOTE_URL;
-        try {
-            final CompletableFuture<Response> responseFuture = httpClient.get(url);
-            final Response response = responseFuture.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+        final CompletableFuture<Response> responseFuture = httpClient.get(url);
+        final Response response = responseFuture.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 
-            if (response.getStatusCode() == 200) {
-                final String json = response.getResponseBody();
-                final JsonNode node = mapper.readValue(json, JsonNode.class);
-                return mapper.readValue(node.get(ticker).toString(), Equity.class);
-            }
-        } catch(Exception e) {
-            LOG.error("Could not retrieve quote info for " + ticker, e);
+        if (response.getStatusCode() == 200) {
+            final String json = response.getResponseBody();
+            final JsonNode node = mapper.readValue(json, JsonNode.class);
+            return mapper.readValue(node.get(ticker).toString(), Equity.class);
         }
         return null;
     }
