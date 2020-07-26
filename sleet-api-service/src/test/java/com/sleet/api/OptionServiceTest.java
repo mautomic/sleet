@@ -5,6 +5,12 @@ import com.sleet.api.service.OptionService;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Test class for {@link OptionService}
  *
@@ -38,7 +44,7 @@ public class OptionServiceTest {
     }
 
     @Test
-    public void testContinuousOptionScanningPerformance() throws InterruptedException {
+    public void testContinuousOptionScanningPerformance() throws Exception {
 
         // Must supply API key for TD API in order to run test. See readme for info.
         final String apiKey = "";
@@ -47,14 +53,17 @@ public class OptionServiceTest {
         final String[] tickers = {"QQQ", "SPY", "IWM", "$VIX.X", "$SPX.X", "MSFT", "AAPL", "NFLX", "FB", "TSLA",
                 "NVDA", "BYND", "TLT", "SPCE", "XLF"};
 
+        final long startTime = System.currentTimeMillis();
         for (int j=0; j<3; j++) {
+
+            List<CompletableFuture<OptionChain>> futures = new ArrayList<>();
+            long time = System.currentTimeMillis();
             for (int i = 0; i < tickers.length; i++) {
-                long time = System.currentTimeMillis();
-                optionService.getOptionChain(tickers[i], "100");
-                System.out.println("Retrieval for " + tickers[i] + " quote info took " + (System.currentTimeMillis() - time) + " ms");
+                futures.add(optionService.getOptionChainAsync(tickers[i], "100"));
             }
-            // Throttle so TD API doesn't hit max requests per second limit
-            Thread.sleep(2000);
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(5, TimeUnit.SECONDS);
+            System.out.println("Retrieval for " + Arrays.toString(tickers) + "  took " + (System.currentTimeMillis() - time) + " ms");
         }
+        System.out.println("Took total of " + (System.currentTimeMillis() - startTime) + " ms");
     }
 }

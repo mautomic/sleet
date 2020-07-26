@@ -3,14 +3,12 @@ package com.sleet.api.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sleet.api.HttpClient;
-import com.sleet.api.model.Contract;
 import com.sleet.api.model.Option;
 import com.sleet.api.model.OptionChain;
 import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -41,29 +39,15 @@ public class OptionService extends Service {
     }
 
     /**
-     * Queries the TD API endpoint for a ticker's option chain, filtering for contracts expiring before a specified date
+     * Queries the TD API endpoint for a ticker's option chain, getting the default number of strikes for each expiration
      *
      * @param ticker of security to retrieve options for
-     * @param furthestExpirationDate of options to retrieve starting from today
      * @return {@link OptionChain} with all option data for the ticker
      */
-    public OptionChain getOTMCloseExpirationOptionChain(final String ticker, final String furthestExpirationDate) {
-
+    public OptionChain getOptionChain(final String ticker) {
+        final CompletableFuture<OptionChain> future = getOptionChainAsync(ticker);
         try {
-            final List<String> urls = new ArrayList<>();
-            final StringBuilder builder = new StringBuilder()
-                    .append(OPTION_CHAIN_URL)
-                    .append(SYMBOL)
-                    .append(ticker)
-                    .append(TO_DATE)
-                    .append(furthestExpirationDate)
-                    .append(OTM);
-
-            for (final Contract contract : Contract.values()) {
-                urls.add(builder.toString() + contract.name());
-            }
-            return getCallsAndPutsConcurrently(urls, DEFAULT_TIMEOUT_MILLIS);
-
+            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         } catch(Exception e) {
             logFailure(e);
         }
@@ -71,13 +55,13 @@ public class OptionService extends Service {
     }
 
     /**
-     * Queries the TD API endpoint for a ticker's option chain, getting the default number of strikes for each expiration
+     * Queries the TD API endpoint asynchronously for a ticker's option chain, getting the default number of strikes for each expiration
      *
      * @param ticker of security to retrieve options for
-     * @return {@link OptionChain} with all option data for the ticker
+     * @return {@link CompletableFuture} with an {@link OptionChain}
      */
-    public OptionChain getOptionChain(final String ticker) {
-        return getOptionChain(ticker, DEFAULT_STRIKE_COUNT);
+    public CompletableFuture<OptionChain> getOptionChainAsync(final String ticker) {
+        return getOptionChainAsync(ticker, DEFAULT_STRIKE_COUNT);
     }
 
     /**
@@ -88,26 +72,77 @@ public class OptionService extends Service {
      * @return {@link OptionChain} with all option data for the ticker
      */
     public OptionChain getOptionChain(final String ticker, final String strikeCount) {
-
+        final CompletableFuture<OptionChain> future = getOptionChainAsync(ticker, strikeCount);
         try {
-            final List<String> urls = new ArrayList<>();
-            final StringBuilder builder = new StringBuilder()
-                    .append(OPTION_CHAIN_URL)
-                    .append(SYMBOL)
-                    .append(ticker)
-                    .append(STRIKE_COUNT)
-                    .append(strikeCount)
-                    .append(CONTRACT_TYPE);
-
-            for (final Contract contract : Contract.values()) {
-                urls.add(builder.toString() + contract.name());
-            }
-            return getCallsAndPutsConcurrently(urls, DEFAULT_TIMEOUT_MILLIS);
-
+            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         } catch(Exception e) {
             logFailure(e);
         }
         return null;
+    }
+
+    /**
+     * Queries the TD API endpoint asynchronously for a ticker's option chain, getting the specified number of strikes for each expiration
+     *
+     * @param ticker of security to retrieve options for
+     * @param strikeCount of options to get in a single expiration period
+     * @return {@link CompletableFuture} with an {@link OptionChain}
+     */
+    public CompletableFuture<OptionChain> getOptionChainAsync(final String ticker, final String strikeCount) {
+
+        final StringBuilder builder = new StringBuilder()
+                .append(OPTION_CHAIN_URL)
+                .append(SYMBOL)
+                .append(ticker)
+                .append(STRIKE_COUNT)
+                .append(strikeCount);
+
+        final CompletableFuture<OptionChain> future = new CompletableFuture<>();
+        httpClient.get(builder.toString()).whenComplete((response, exception) -> {
+            future.complete(deserializeResponse(response));
+        });
+        return future;
+    }
+
+    /**
+     * Queries the TD API endpoint for a ticker's option chain, filtering for contracts expiring before a specified date
+     *
+     * @param ticker of security to retrieve options for
+     * @param furthestExpirationDate of options to retrieve starting from today
+     * @return {@link OptionChain} with all option data for the ticker
+     */
+    public OptionChain getOTMCloseExpirationOptionChain(final String ticker, final String furthestExpirationDate) {
+        final CompletableFuture<OptionChain> future = getOTMCloseExpirationOptionChainAsync(ticker, furthestExpirationDate);
+        try {
+            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+        } catch(Exception e) {
+            logFailure(e);
+        }
+        return null;
+    }
+
+    /**
+     * Queries the TD API endpoint asynchronously for a ticker's option chain, filtering for contracts expiring before a specified date
+     *
+     * @param ticker of security to retrieve options for
+     * @param furthestExpirationDate of options to retrieve starting from today
+     * @return {@link CompletableFuture} with an {@link OptionChain}
+     */
+    public CompletableFuture<OptionChain> getOTMCloseExpirationOptionChainAsync(final String ticker, final String furthestExpirationDate) {
+
+        final StringBuilder builder = new StringBuilder()
+                .append(OPTION_CHAIN_URL)
+                .append(SYMBOL)
+                .append(ticker)
+                .append(TO_DATE)
+                .append(furthestExpirationDate)
+                .append(OTM);
+
+        final CompletableFuture<OptionChain> future = new CompletableFuture<>();
+        httpClient.get(builder.toString()).whenComplete((response, exception) -> {
+            future.complete(deserializeResponse(response));
+        });
+        return future;
     }
 
     /**
@@ -118,26 +153,40 @@ public class OptionService extends Service {
      * @return {@link OptionChain} with all option data for the ticker
      */
     public OptionChain getOptionChainForDate(final String ticker, final String expirationDate) {
-
+        final CompletableFuture<OptionChain> future = getOptionChainForDateAsync(ticker, expirationDate);
         try {
-            final StringBuilder builder = new StringBuilder()
-                    .append(OPTION_CHAIN_URL)
-                    .append(SYMBOL)
-                    .append(ticker)
-                    .append(STRIKE_COUNT)
-                    .append(DEFAULT_STRIKE_COUNT)
-                    .append(TO_DATE)
-                    .append(expirationDate)
-                    .append(FROM_DATE)
-                    .append(expirationDate);
-
-            final Response response = httpClient.get(builder.toString(), DEFAULT_TIMEOUT_MILLIS);
-            return deserializeResponse(response);
-
+            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         } catch(Exception e) {
             logFailure(e);
         }
         return null;
+    }
+
+    /**
+     * Queries the TD API endpoint asynchronously for all options for a ticker on a specific expiration date
+     *
+     * @param ticker of security to retrieve options for
+     * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
+     * @return {@link CompletableFuture} with an {@link OptionChain}
+     */
+    public CompletableFuture<OptionChain> getOptionChainForDateAsync(final String ticker, final String expirationDate) {
+
+        final StringBuilder builder = new StringBuilder()
+                .append(OPTION_CHAIN_URL)
+                .append(SYMBOL)
+                .append(ticker)
+                .append(STRIKE_COUNT)
+                .append(DEFAULT_STRIKE_COUNT)
+                .append(TO_DATE)
+                .append(expirationDate)
+                .append(FROM_DATE)
+                .append(expirationDate);
+
+        final CompletableFuture<OptionChain> future = new CompletableFuture<>();
+        httpClient.get(builder.toString()).whenComplete((response, exception) -> {
+            future.complete(deserializeResponse(response));
+        });
+        return future;
     }
 
     /**
@@ -149,21 +198,36 @@ public class OptionService extends Service {
      */
     public OptionChain getOptionChainForStrike(final String ticker, final int strike) {
 
+        final CompletableFuture<OptionChain> future = getOptionChainForStrikeAsync(ticker, strike);
         try {
-            final StringBuilder builder = new StringBuilder()
-                    .append(OPTION_CHAIN_URL)
-                    .append(SYMBOL)
-                    .append(ticker)
-                    .append(STRIKE)
-                    .append(strike);
-
-            final Response response = httpClient.get(builder.toString(), DEFAULT_TIMEOUT_MILLIS);
-            return deserializeResponse(response);
-
+            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         } catch(Exception e) {
             logFailure(e);
         }
         return null;
+    }
+
+    /**
+     * Queries the TD API endpoint asynchronously for all options for a ticker with a specific strike price
+     *
+     * @param ticker of security to retrieve options for
+     * @param strike of the options to retrieve
+     * @return {@link CompletableFuture} with an {@link OptionChain}
+     */
+    public CompletableFuture<OptionChain> getOptionChainForStrikeAsync(final String ticker, final int strike) {
+
+        final StringBuilder builder = new StringBuilder()
+                .append(OPTION_CHAIN_URL)
+                .append(SYMBOL)
+                .append(ticker)
+                .append(STRIKE)
+                .append(strike);
+
+        final CompletableFuture<OptionChain> future = new CompletableFuture<>();
+        httpClient.get(builder.toString()).whenComplete((response, exception) -> {
+            future.complete(deserializeResponse(response));
+        });
+        return future;
     }
 
     /**
@@ -176,25 +240,41 @@ public class OptionService extends Service {
      */
     public OptionChain getOptionChainForStrikeAndDate(final String ticker, final int strike, final String expirationDate) {
 
+        final CompletableFuture<OptionChain> future = getOptionChainForStrikeAndDateAsync(ticker, strike, expirationDate);
         try {
-            final StringBuilder builder = new StringBuilder()
-                    .append(OPTION_CHAIN_URL)
-                    .append(SYMBOL)
-                    .append(ticker)
-                    .append(TO_DATE)
-                    .append(expirationDate)
-                    .append(FROM_DATE)
-                    .append(expirationDate)
-                    .append(STRIKE)
-                    .append(strike);
-
-            final Response response = httpClient.get(builder.toString(), DEFAULT_TIMEOUT_MILLIS);
-            return deserializeResponse(response);
-
+            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         } catch(Exception e) {
             logFailure(e);
         }
         return null;
+    }
+
+    /**
+     * Queries the TD API endpoint asynchronously for options for a ticker on a specific expiration date with a specific strike
+     *
+     * @param ticker of security to retrieve options for
+     * @param strike of the options to retrieve
+     * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
+     * @return {@link CompletableFuture} with an {@link OptionChain}
+     */
+    public CompletableFuture<OptionChain> getOptionChainForStrikeAndDateAsync(final String ticker, final int strike, final String expirationDate) {
+
+        final StringBuilder builder = new StringBuilder()
+                .append(OPTION_CHAIN_URL)
+                .append(SYMBOL)
+                .append(ticker)
+                .append(TO_DATE)
+                .append(expirationDate)
+                .append(FROM_DATE)
+                .append(expirationDate)
+                .append(STRIKE)
+                .append(strike);
+
+        final CompletableFuture<OptionChain> future = new CompletableFuture<>();
+        httpClient.get(builder.toString()).whenComplete((response, exception) -> {
+            future.complete(deserializeResponse(response));
+        });
+        return future;
     }
 
     /**
@@ -207,7 +287,7 @@ public class OptionService extends Service {
      * @param urls to send GET requests
      * @return {@link OptionChain} for the original request
      */
-    private OptionChain getCallsAndPutsConcurrently(final List<String> urls, final int timeoutMillis) {
+    private OptionChain getCallsAndPutsConcurrently(final List<String> urls) {
 
         final List<CompletableFuture<OptionChain>> futures = Arrays.asList(new CompletableFuture<>(), new CompletableFuture<>());
         try {
@@ -215,7 +295,7 @@ public class OptionService extends Service {
             for (final String url : urls)
                 fetchOptionChain(url, futures.get(index++));
 
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(timeoutMillis, TimeUnit.MILLISECONDS);
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 
             // Combine the two chains
             final OptionChain fullChain = futures.get(0).get();
