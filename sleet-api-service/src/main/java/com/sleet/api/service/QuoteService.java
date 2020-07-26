@@ -1,7 +1,6 @@
 package com.sleet.api.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sleet.api.HttpClient;
 import com.sleet.api.model.Equity;
 import org.asynchttpclient.Response;
@@ -21,7 +20,6 @@ public class QuoteService extends Service {
 
     private static String QUOTE_URL;
     private static final Logger LOG = LoggerFactory.getLogger(OptionService.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     public QuoteService(final String apiKey) {
         httpClient = new HttpClient(DEFAULT_TIMEOUT_MILLIS, DEFAULT_TIMEOUT_MILLIS);
@@ -35,7 +33,6 @@ public class QuoteService extends Service {
      * @return an {@link Equity} with quote information
      */
     public Equity getQuote(final String ticker) {
-
         final String url = API_URL + ticker + QUOTE_URL;
         try {
             final CompletableFuture<Response> responseFuture = httpClient.get(url);
