@@ -11,6 +11,7 @@ public abstract class Service {
 
     HttpClient httpClient;
     RestTemplate restTemplate;
+    static final int DEFAULT_TIMEOUT_MILLIS = 5000;
     final static String API_URL = "https://api.tdameritrade.com/v1/marketdata/";
 
     /**

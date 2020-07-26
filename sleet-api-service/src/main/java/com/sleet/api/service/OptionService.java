@@ -31,7 +31,6 @@ public class OptionService extends Service {
     private static final String FROM_DATE = "&fromDate=";
     private static final String TO_DATE = "&toDate=";
     private static final String DEFAULT_STRIKE_COUNT = "100"; // Count for above and below at-the-money, so x2 contracts are returned
-    private static final int DEFAULT_TIMEOUT_MILLIS = 5000;
     private static final Logger LOG = LoggerFactory.getLogger(OptionService.class);
     private static final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
 
