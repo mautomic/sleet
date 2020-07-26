@@ -3,12 +3,14 @@ package com.sleet.api.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sleet.api.HttpClient;
+import com.sleet.api.model.Contract;
 import com.sleet.api.model.Option;
 import com.sleet.api.model.OptionChain;
 import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -45,13 +47,7 @@ public class OptionService extends Service {
      * @return {@link OptionChain} with all option data for the ticker
      */
     public OptionChain getOptionChain(final String ticker) {
-        final CompletableFuture<OptionChain> future = getOptionChainAsync(ticker);
-        try {
-            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-        } catch(Exception e) {
-            logFailure(e);
-        }
-        return null;
+        return getOptionChain(ticker, DEFAULT_STRIKE_COUNT);
     }
 
     /**
@@ -72,9 +68,21 @@ public class OptionService extends Service {
      * @return {@link OptionChain} with all option data for the ticker
      */
     public OptionChain getOptionChain(final String ticker, final String strikeCount) {
-        final CompletableFuture<OptionChain> future = getOptionChainAsync(ticker, strikeCount);
         try {
-            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+            final List<String> urls = new ArrayList<>();
+            final StringBuilder builder = new StringBuilder()
+                    .append(OPTION_CHAIN_URL)
+                    .append(SYMBOL)
+                    .append(ticker)
+                    .append(STRIKE_COUNT)
+                    .append(strikeCount)
+                    .append(CONTRACT_TYPE);
+
+            for (final Contract contract : Contract.values()) {
+                urls.add(builder.toString() + contract.name());
+            }
+            return getCallsAndPutsConcurrently(urls);
+
         } catch(Exception e) {
             logFailure(e);
         }
@@ -112,9 +120,21 @@ public class OptionService extends Service {
      * @return {@link OptionChain} with all option data for the ticker
      */
     public OptionChain getOTMCloseExpirationOptionChain(final String ticker, final String furthestExpirationDate) {
-        final CompletableFuture<OptionChain> future = getOTMCloseExpirationOptionChainAsync(ticker, furthestExpirationDate);
         try {
-            return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+            final List<String> urls = new ArrayList<>();
+            final StringBuilder builder = new StringBuilder()
+                    .append(OPTION_CHAIN_URL)
+                    .append(SYMBOL)
+                    .append(ticker)
+                    .append(TO_DATE)
+                    .append(furthestExpirationDate)
+                    .append(OTM);
+
+            for (final Contract contract : Contract.values()) {
+                urls.add(builder.toString() + contract.name());
+            }
+            return getCallsAndPutsConcurrently(urls);
+
         } catch(Exception e) {
             logFailure(e);
         }
