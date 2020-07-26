@@ -1,8 +1,12 @@
 package com.sleet.api.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sleet.api.HttpClient;
 import com.sleet.api.model.Contract;
 import com.sleet.api.model.Option;
 import com.sleet.api.model.OptionChain;
+import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
@@ -11,8 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,9 +33,10 @@ public class OptionService extends Service {
     private static final String DEFAULT_STRIKE_COUNT = "100"; // Count for above and below at-the-money, so x2 contracts are returned
     private static final int DEFAULT_TIMEOUT_MILLIS = 5000;
     private static final Logger LOG = LoggerFactory.getLogger(OptionService.class);
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(50);
+    private static final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
 
     public OptionService(final String apiKey) {
+        httpClient = new HttpClient(DEFAULT_TIMEOUT_MILLIS, DEFAULT_TIMEOUT_MILLIS);
         restTemplate = new RestTemplate(getClientHttpRequestFactory());
         OPTION_CHAIN_URL = API_URL + "chains?apikey=" + apiKey;
     }
@@ -128,7 +131,9 @@ public class OptionService extends Service {
                     .append(expirationDate)
                     .append(FROM_DATE)
                     .append(expirationDate);
-            return restTemplate.getForObject(builder.toString(), OptionChain.class);
+
+            final Response response = httpClient.get(builder.toString(), DEFAULT_TIMEOUT_MILLIS);
+            return deserializeResponse(response);
 
         } catch(Exception e) {
             logFailure(e);
@@ -153,7 +158,8 @@ public class OptionService extends Service {
                     .append(STRIKE)
                     .append(strike);
 
-            return restTemplate.getForObject(builder.toString(), OptionChain.class);
+            final Response response = httpClient.get(builder.toString(), DEFAULT_TIMEOUT_MILLIS);
+            return deserializeResponse(response);
 
         } catch(Exception e) {
             logFailure(e);
@@ -183,7 +189,8 @@ public class OptionService extends Service {
                     .append(STRIKE)
                     .append(strike);
 
-            return restTemplate.getForObject(builder.toString(), OptionChain.class);
+            final Response response = httpClient.get(builder.toString(), DEFAULT_TIMEOUT_MILLIS);
+            return deserializeResponse(response);
 
         } catch(Exception e) {
             logFailure(e);
@@ -192,12 +199,10 @@ public class OptionService extends Service {
     }
 
     /**
-     * Method to run two requests concurrently on their own {@link Thread}, one just for calls, and one
-     * just for puts. As the bottleneck for presenting large quantities of {@link Option}s back to the
-     * caller is the GET request to TD, this effectively cuts the retrieval speed in half.
-     *
-     * Instead of spawning new threads every time for every {@link OptionService} query, which can
-     * be memory intensive and force lots of garbage collection, a standard thread pool is used.
+     * Method to run two {@link OptionChain} requests concurrently, one just for calls, and one
+     * just for puts. As the bottleneck for presenting large quantities of {@link Option}s back
+     * to the caller is the GET request to TD, this effectively cuts the retrieval speed in half.
+     * <p>
      * {@link OptionChain}s are returned in an async fashion via a {@link CompletableFuture}.
      *
      * @param urls to send GET requests
@@ -209,7 +214,8 @@ public class OptionService extends Service {
         try {
             int index = 0;
             for (final String url : urls)
-                threadPool.submit(optionChainFetcher(url, futures.get(index++)));
+                fetchOptionChain(url, futures.get(index++));
+
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(timeoutMillis, TimeUnit.MILLISECONDS);
 
             // Combine the two chains
@@ -227,25 +233,37 @@ public class OptionService extends Service {
     }
 
     /**
-     * Method to create a runnable which fetches a single {@link OptionChain} for a particular URL. This can be
-     * submitted to a thread pool for concurrent execution.
+     * Asynchronously fetch a single {@link OptionChain} (or part of an OptionChain) for a particular URL
      *
      * @param url to send GET request
      * @param future to complete the OptionChain with
-     * @return Runnable to fetch a OptionChain
      */
-    private Runnable optionChainFetcher(final String url, final CompletableFuture<OptionChain> future) {
-        Runnable runnable = () -> {
+    private void fetchOptionChain(final String url, final CompletableFuture<OptionChain> future) {
+        httpClient.get(url, response -> {
             try {
-                final OptionChain optionChain = restTemplate.getForObject(url, OptionChain.class);
-                future.complete(optionChain);
+                future.complete(deserializeResponse(response));
             } catch(Exception e) {
-                // If there's an exception during the API call, log and complete with an empty OptionChain
-                logFailure(e);
-                future.complete(new OptionChain());
+                future.complete(null);
             }
-        };
-        return runnable;
+        });
+    }
+
+    /**
+     * Deserialize a JSON response string into an {@link OptionChain}
+     *
+     * @param response to deserialize
+     * @return {@link OptionChain} for the original request, or null if exception occurs
+     */
+    private OptionChain deserializeResponse(final Response response) {
+        if (response.getStatusCode() == 200) {
+            final String json = response.getResponseBody();
+            try {
+                return mapper.readValue(json, OptionChain.class);
+            } catch(Exception e) {
+                logFailure(e);
+            }
+        }
+        return null;
     }
 
     /**

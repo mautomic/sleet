@@ -1,5 +1,6 @@
 package com.sleet.api.service;
 
+import com.sleet.api.HttpClient;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
@@ -8,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public abstract class Service {
 
+    HttpClient httpClient;
     RestTemplate restTemplate;
     final static String API_URL = "https://api.tdameritrade.com/v1/marketdata/";
 
