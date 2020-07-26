@@ -9,7 +9,6 @@ import com.sleet.api.model.OptionChain;
 import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +35,6 @@ public class OptionService extends Service {
 
     public OptionService(final String apiKey) {
         httpClient = new HttpClient(DEFAULT_TIMEOUT_MILLIS, DEFAULT_TIMEOUT_MILLIS);
-        restTemplate = new RestTemplate(getClientHttpRequestFactory());
         OPTION_CHAIN_URL = API_URL + "chains?apikey=" + apiKey;
     }
 

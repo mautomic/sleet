@@ -7,7 +7,6 @@ import com.sleet.api.model.Equity;
 import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +24,6 @@ public class QuoteService extends Service {
 
     public QuoteService(final String apiKey) {
         httpClient = new HttpClient(DEFAULT_TIMEOUT_MILLIS, DEFAULT_TIMEOUT_MILLIS);
-        restTemplate = new RestTemplate(getClientHttpRequestFactory());
         QUOTE_URL = "/quotes?apikey=" + apiKey;
     }
 
