@@ -8,13 +8,14 @@ import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
  * A {@link Service} implementation that provides methods to retrieve equity quote data from the TD API
  *
- * TODO: Implement multiple quotes query
+ * @author mautomic
  */
 public class QuoteService extends Service {
 
@@ -48,6 +49,17 @@ public class QuoteService extends Service {
         } catch(Exception e) {
             LOG.error("Could not retrieve quote info for " + ticker, e);
         }
+        return null;
+    }
+
+    /**
+     * Queries the TD API endpoint for current quote info for multiple tickers
+     *
+     * @param tickers to get quotes for
+     * @return a list of {@link Equity} objects with quote information
+     */
+    public List<Equity> getQuotes(final List<String> tickers) {
+        // TODO: Implement multiple quotes query
         return null;
     }
 }

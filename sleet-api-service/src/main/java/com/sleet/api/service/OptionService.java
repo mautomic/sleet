@@ -18,6 +18,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A {@link Service} implementation that provides methods to retrieve option data from the TD API
+ *
+ * @author mautomic
  */
 public class OptionService extends Service {
 

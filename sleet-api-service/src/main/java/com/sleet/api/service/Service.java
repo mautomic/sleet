@@ -4,6 +4,8 @@ import com.sleet.api.HttpClient;
 
 /**
  * An abstract implementation of a service class can connect to different TD API endpoints
+ *
+ * @author mautomic
  */
 public abstract class Service {
 

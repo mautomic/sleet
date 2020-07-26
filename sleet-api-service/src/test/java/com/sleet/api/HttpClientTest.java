@@ -7,6 +7,11 @@ import org.junit.Test;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Test class for {@link HttpClient}
+ *
+ * @author mautomic
+ */
 public class HttpClientTest {
 
     @Test

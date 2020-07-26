@@ -5,6 +5,11 @@ import com.sleet.api.service.OptionService;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Test class for {@link OptionService}
+ *
+ * @author mautomic
+ */
 public class OptionServiceTest {
 
     @Test

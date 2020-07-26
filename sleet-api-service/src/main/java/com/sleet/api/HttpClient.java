@@ -14,6 +14,8 @@ import static org.asynchttpclient.Dsl.config;
 
 /**
  * Generic wrapper around {@link AsyncHttpClient} supporting sync and async GET requests
+ *
+ * @author mautomic
  */
 public class HttpClient {
 

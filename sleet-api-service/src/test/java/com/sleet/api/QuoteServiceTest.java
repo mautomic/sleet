@@ -5,6 +5,11 @@ import com.sleet.api.service.QuoteService;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Test class for {@link QuoteService}
+ *
+ * @author mautomic
+ */
 public class QuoteServiceTest {
 
     @Test
