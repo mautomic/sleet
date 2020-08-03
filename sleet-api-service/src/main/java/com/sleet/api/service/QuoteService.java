@@ -33,7 +33,7 @@ public class QuoteService extends Service {
      * @return an {@link Equity} with quote information
      */
     public Equity getQuote(final String ticker) throws Exception {
-        final String url = API_URL + ticker + QUOTE_URL;
+        final String url = API_URL + MARKETDATA + "/" + ticker + QUOTE_URL;
         final CompletableFuture<Response> responseFuture = httpClient.get(url);
         final Response response = responseFuture.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 

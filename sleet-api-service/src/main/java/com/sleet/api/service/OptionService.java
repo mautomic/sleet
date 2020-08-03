@@ -36,7 +36,7 @@ public class OptionService extends Service {
 
     public OptionService(final String apiKey) {
         httpClient = new HttpClient(DEFAULT_TIMEOUT_MILLIS, DEFAULT_TIMEOUT_MILLIS);
-        OPTION_CHAIN_URL = API_URL + "chains?apikey=" + apiKey;
+        OPTION_CHAIN_URL = API_URL + MARKETDATA + "/chains?apikey=" + apiKey;
     }
 
     /**
