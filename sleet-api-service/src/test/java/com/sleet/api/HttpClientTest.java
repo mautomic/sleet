@@ -5,6 +5,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +27,18 @@ public class HttpClientTest {
     @Test
     public void testGetSync() throws Exception {
         String url = "https://httpbin.org/get";
-        Response response = client.get(url, 2000);
+        Response response = client.get(url, null, 2000);
+        Assert.assertEquals(200, response.getStatusCode());
+        Assert.assertTrue(response.getResponseBody().length() > 0);
+        Assert.assertTrue(response.getResponseBody().contains("httpbin.org"));
+    }
+
+    @Test
+    public void testGetSyncWithHeaders() throws Exception {
+        String url = "https://httpbin.org/get";
+        Map<String, String> map = new HashMap<>();
+        map.put("testHeader", "testContent");
+        Response response = client.get(url, map, 2000);
         Assert.assertEquals(200, response.getStatusCode());
         Assert.assertTrue(response.getResponseBody().length() > 0);
         Assert.assertTrue(response.getResponseBody().contains("httpbin.org"));
@@ -34,7 +47,7 @@ public class HttpClientTest {
     @Test
     public void testGetAsync() throws Exception {
         String url = "https://httpbin.org/get";
-        CompletableFuture<Response> responseFuture = client.get(url);
+        CompletableFuture<Response> responseFuture = client.get(url, null);
         Assert.assertNotNull(responseFuture);
 
         Response response = responseFuture.get(10, TimeUnit.SECONDS);
@@ -49,7 +62,7 @@ public class HttpClientTest {
             Assert.assertTrue(response.getResponseBody().length() > 0);
             Assert.assertTrue(response.getResponseBody().contains("httpbin.org"));
         };
-        client.get(url, handler);
+        client.get(url, null, handler);
     }
 
     @Test

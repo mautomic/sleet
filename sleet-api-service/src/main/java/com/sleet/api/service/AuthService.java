@@ -56,8 +56,7 @@ public class AuthService extends Service {
 
         final String url = API_URL + TOKEN_ENDPOINT;
         final Response response = httpClient.post(url, builder.toString(), DEFAULT_TIMEOUT_MILLIS);
-        final Token token = deserializeResponse(response);
-        return token;
+        return deserializeResponse(response);
     }
 
     /**
@@ -69,7 +68,6 @@ public class AuthService extends Service {
      */
     private Token deserializeResponse(final Response response) throws Exception {
         final String responseBody = response.getResponseBody();
-        final Token token = mapper.readValue(responseBody, Token.class);
-        return token;
+        return mapper.readValue(responseBody, Token.class);
     }
 }

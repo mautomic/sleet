@@ -102,7 +102,7 @@ public class OptionService extends Service {
                 .append(strikeCount);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
-        httpClient.get(builder.toString()).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
+        httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
         return future;
     }
 
@@ -148,7 +148,7 @@ public class OptionService extends Service {
                 .append(OTM);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
-        httpClient.get(builder.toString()).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
+        httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
         return future;
     }
 
@@ -186,7 +186,7 @@ public class OptionService extends Service {
                 .append(expirationDate);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
-        httpClient.get(builder.toString()).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
+        httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
         return future;
     }
 
@@ -219,7 +219,7 @@ public class OptionService extends Service {
                 .append(strike);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
-        httpClient.get(builder.toString()).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
+        httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
         return future;
     }
 
@@ -259,7 +259,7 @@ public class OptionService extends Service {
                 .append(strike);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
-        httpClient.get(builder.toString()).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
+        httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
         return future;
     }
 
@@ -279,7 +279,7 @@ public class OptionService extends Service {
         int index = 0;
         for (final String url : urls) {
             final CompletableFuture<OptionChain> future = futures.get(index++);
-            httpClient.get(url, response -> future.complete(deserializeResponse(response)));
+            httpClient.get(url, null, response -> future.complete(deserializeResponse(response)));
         }
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);

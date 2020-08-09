@@ -9,6 +9,7 @@ import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -32,34 +33,39 @@ public class HttpClient {
     /**
      * Executes a synchronous GET request
      *
-     * @param url to hit with a GET request
+     * @param url           to hit with a GET request
+     * @param headerParams  to add to request
      * @param timeoutMillis time to wait for response before throwing an exception
      * @return A HTTP {@link Response}
      * @throws Exception if the response is not received before the timeout
      */
-    public Response get(final String url, final int timeoutMillis) throws Exception {
-        return get(url).get(timeoutMillis, TimeUnit.MILLISECONDS);
+    public Response get(final String url, final Map<String, String> headerParams, final int timeoutMillis) throws Exception {
+        return get(url, headerParams).get(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Executes an asynchronous GET request
      *
-     * @param url to hit with a GET request
+     * @param url          to hit with a GET request
+     * @param headerParams to add to request
      * @return A {@link CompletableFuture} containing the HTTP Response
      */
-    public CompletableFuture<Response> get(final String url) {
-        return client.prepareGet(url).execute().toCompletableFuture();
+    public CompletableFuture<Response> get(final String url, Map<String, String> headerParams) {
+        final Request request = createGetRequest(url, headerParams);
+        return client.executeRequest(request).toCompletableFuture();
     }
 
     /**
      * Executes an asynchronous GET request and then the instructions in
      * the provided {@link Handler}
      *
-     * @param url to hit with a GET request
-     * @param handler for instructions after response is received
+     * @param url          to hit with a GET request
+     * @param headerParams to add to request
+     * @param handler      for instructions after response is received
      */
-    public void get(final String url, final Handler<Response> handler) {
-        client.prepareGet(url).execute(new AsyncCompletionHandler<Response>() {
+    public void get(final String url, Map<String, String> headerParams, final Handler<Response> handler) {
+        final Request request = createGetRequest(url, headerParams);
+        client.executeRequest(request, new AsyncCompletionHandler<Response>() {
             @Override
             public Response onCompleted(Response response) {
                 return response;
@@ -118,9 +124,25 @@ public class HttpClient {
     }
 
     /**
+     * Create a {@link Request} for GET methods
+     *
+     * @param url          to send a GET request
+     * @param headerParams to add to request
+     * @return a {@link Request} to fire with the http client
+     */
+    private Request createGetRequest(final String url, final Map<String, String> headerParams) {
+        final RequestBuilder requestBuilder = new RequestBuilder("GET")
+                .setUrl(url)
+                .addHeader("Content-Type", "application/x-www-form-urlencoded");
+        if (headerParams != null)
+            headerParams.forEach(requestBuilder::setHeader);
+        return requestBuilder.build();
+    }
+
+    /**
      * Create a {@link Request} for POST methods
      *
-     * @param url to send a POST request
+     * @param url  to send a POST request
      * @param body to send in request
      * @return a {@link Request} to fire with the http client
      */
