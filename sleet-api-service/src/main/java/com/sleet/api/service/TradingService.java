@@ -27,7 +27,7 @@ public class TradingService extends Service {
     }
 
     public String getAccountInfo(final String accountNum, final String accessToken) throws Exception {
-        final String url = API_URL + ACCOUNTS + accountNum;
+        final String url = API_URL + ACCOUNTS + "/" + accountNum;
         Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AUTHORIZATION, BEARER + accessToken);
         final Response response = httpClient.get(url, headerMap, DEFAULT_TIMEOUT_MILLIS);
