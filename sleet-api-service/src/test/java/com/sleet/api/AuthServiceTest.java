@@ -5,6 +5,11 @@ import com.sleet.api.service.AuthService;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Test class for {@link AuthService}
+ *
+ * @author mautomic
+ */
 public class AuthServiceTest {
 
     @Test

@@ -4,6 +4,9 @@ import com.sleet.api.HttpClient;
 import com.sleet.api.model.Token;
 import org.asynchttpclient.Response;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A {@link Service} implementation that provides a method to retrieve a
  * {@link Token} for order interactions and account information
@@ -21,6 +24,12 @@ public class AuthService extends Service {
     private final static String ACCESS_TYPE = "access_type";
     private final static String CODE = "code";
     private final static String OFFLINE = "offline";
+    private final static String CONTENT_TYPE = "Content-Type";
+    private final static String URL_ENCODED = "application/x-www-form-urlencoded";
+
+    private final static char EQUALS = '=';
+    private final static char AND = '&';
+
     private final String clientId;
     private final String redirectUri;
 
@@ -42,20 +51,23 @@ public class AuthService extends Service {
     public Token getPostAccessToken(final String code, final boolean isRefreshToken) throws Exception {
 
         final StringBuilder builder = new StringBuilder();
-        builder.append(CLIENT_ID).append("=").append(clientId).append("&");
-        builder.append(REDIRECT_URI).append("=").append(redirectUri).append("&");
-        builder.append(ACCESS_TYPE).append("=").append(OFFLINE).append("&");
+        builder.append(CLIENT_ID).append(EQUALS).append(clientId).append(AND);
+        builder.append(REDIRECT_URI).append(EQUALS).append(redirectUri).append(AND);
+        builder.append(ACCESS_TYPE).append(EQUALS).append(OFFLINE).append(AND);
 
         if (isRefreshToken) {
-            builder.append(GRANT_TYPE).append("=").append(REFRESH_TOKEN).append("&");
-            builder.append(REFRESH_TOKEN).append("=").append(code);
+            builder.append(GRANT_TYPE).append(EQUALS).append(REFRESH_TOKEN).append(AND);
+            builder.append(REFRESH_TOKEN).append(EQUALS).append(code);
         } else {
-            builder.append(GRANT_TYPE).append("=").append(AUTHORIZATION_CODE).append("&");
-            builder.append(CODE).append("=").append(code);
+            builder.append(GRANT_TYPE).append(EQUALS).append(AUTHORIZATION_CODE).append(AND);
+            builder.append(CODE).append(EQUALS).append(code);
         }
 
+        final Map<String, String> headerParams = new HashMap<>();
+        headerParams.put(CONTENT_TYPE, URL_ENCODED);
+
         final String url = API_URL + TOKEN_ENDPOINT;
-        final Response response = httpClient.post(url, builder.toString(), null, DEFAULT_TIMEOUT_MILLIS);
+        final Response response = httpClient.post(url, builder.toString(), headerParams, DEFAULT_TIMEOUT_MILLIS);
         return deserializeResponse(response);
     }
 

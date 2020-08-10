@@ -19,11 +19,14 @@ import java.util.Map;
 public class TradingService extends Service {
 
     private static final Logger LOG = LoggerFactory.getLogger(OptionService.class);
+
     private final static String ACCOUNTS = "accounts";
     private final static String ORDERS = "orders";
     private final static String SAVED_ORDERS = "savedorders";
     private final static String AUTHORIZATION = "authorization";
     private final static String BEARER = "Bearer ";
+    private final static String CONTENT_TYPE = "Content-Type";
+    private final static String APPLICATION_JSON = "application/json";
 
     public TradingService() {
         httpClient = new HttpClient(DEFAULT_TIMEOUT_MILLIS, DEFAULT_TIMEOUT_MILLIS);
@@ -50,9 +53,12 @@ public class TradingService extends Service {
     public Response placeOrder(final Order order, final String accountNum, final String accessToken) throws Exception {
         final String url = API_URL + ACCOUNTS + "/" + accountNum + "/" + ORDERS;
         final String orderJson = mapper.writeValueAsString(order);
+        LOG.info("Placing order: " + orderJson);
+
         final Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AUTHORIZATION, BEARER + accessToken);
         headerMap.put("Content-Type", "application/json");
+
         return httpClient.post(url, orderJson, headerMap, 5000);
     }
 
@@ -70,9 +76,11 @@ public class TradingService extends Service {
     public Response createSavedOrder(final Order order, final String accountNum, final String accessToken) throws Exception {
         final String url = API_URL + ACCOUNTS + "/" + accountNum + "/" + SAVED_ORDERS;
         final String orderJson = mapper.writeValueAsString(order);
+        LOG.info("Creating saved order: " + orderJson);
+
         final Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AUTHORIZATION, BEARER + accessToken);
-        headerMap.put("Content-Type", "application/json");
+        headerMap.put(CONTENT_TYPE, APPLICATION_JSON);
         return httpClient.post(url, orderJson, headerMap, 5000);
     }
 
