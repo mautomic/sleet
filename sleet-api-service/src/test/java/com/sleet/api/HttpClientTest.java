@@ -69,7 +69,7 @@ public class HttpClientTest {
     public void testPostSync() throws Exception {
         String url = "https://httpbin.org/post";
         String body = "key=value";
-        Response response = client.post(url, body, 2000);
+        Response response = client.post(url, body, null, 2000);
         Assert.assertEquals(200, response.getStatusCode());
         Assert.assertTrue(response.getResponseBody().length() > 0);
         Assert.assertTrue(response.getResponseBody().contains("httpbin.org"));
@@ -79,7 +79,7 @@ public class HttpClientTest {
     public void testPostAsync() throws Exception {
         String url = "https://httpbin.org/post";
         String body = "key=value";
-        CompletableFuture<Response> responseFuture = client.post(url, body);
+        CompletableFuture<Response> responseFuture = client.post(url, body, null);
         Assert.assertNotNull(responseFuture);
 
         Response response = responseFuture.get(10, TimeUnit.SECONDS);
@@ -95,6 +95,6 @@ public class HttpClientTest {
             Assert.assertTrue(response.getResponseBody().length() > 0);
             Assert.assertTrue(response.getResponseBody().contains("httpbin.org"));
         };
-        client.post(url, body, handler);
+        client.post(url, body, null, handler);
     }
 }

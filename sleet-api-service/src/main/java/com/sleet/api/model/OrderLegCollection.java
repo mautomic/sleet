@@ -10,15 +10,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class OrderLegCollection {
 
     @JsonProperty("instruction")
-    String instruction = "BUY";
+    String instruction;
 
     @JsonProperty("quantity")
-    double quantity;
+    int quantity;
 
     @JsonProperty("instrument")
     Instrument instrument;
 
-    public OrderLegCollection(String instruction, double quantity, Instrument instrument) {
+    public OrderLegCollection(String instruction, int quantity, Instrument instrument) {
         this.instruction = instruction;
         this.quantity = quantity;
         this.instrument = instrument;
@@ -32,11 +32,11 @@ public class OrderLegCollection {
         this.instruction = instruction;
     }
 
-    public double getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(double quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 

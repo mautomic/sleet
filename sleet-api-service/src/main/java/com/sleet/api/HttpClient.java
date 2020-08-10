@@ -135,8 +135,7 @@ public class HttpClient {
      */
     private Request createGetRequest(final String url, final Map<String, String> headerParams) {
         final RequestBuilder requestBuilder = new RequestBuilder("GET")
-                .setUrl(url)
-                .addHeader("Content-Type", "application/x-www-form-urlencoded");
+                .setUrl(url);
         if (headerParams != null)
             headerParams.forEach(requestBuilder::setHeader);
         return requestBuilder.build();
@@ -153,8 +152,7 @@ public class HttpClient {
     private Request createPostRequest(final String url, final String body, final Map<String, String> headerParams) {
         final RequestBuilder requestBuilder = new RequestBuilder("POST")
                 .setUrl(url)
-                .setBody(body)
-                .addHeader("Content-Type", "application/x-www-form-urlencoded");
+                .setBody(body);
         if (headerParams != null)
             headerParams.forEach(requestBuilder::setHeader);
         return requestBuilder.build();

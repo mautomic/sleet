@@ -2,6 +2,8 @@ package com.sleet.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 /**
  * Represents a single order from the TD API
  *
@@ -18,39 +20,35 @@ public class Order {
     @JsonProperty("duration")
     String duration = "DAY";
 
-    @JsonProperty("quantity")
-    double quantity;
-
     @JsonProperty("price")
     double price;
-
-    @JsonProperty("cancelable")
-    boolean cancelable = true;
 
     @JsonProperty("orderStrategyType")
     String orderStrategyType = "SINGLE";
 
+    @JsonProperty("complexOrderStrategyType")
+    String complexOrderStrategyType = "NONE";
+
     @JsonProperty("orderLegCollection")
-    OrderLegCollection orderLegCollection;
+    List<OrderLegCollection> orderLegCollection;
 
     public Order() {
     }
 
-    public Order(String orderType, double quantity, double price, OrderLegCollection orderLegCollection) {
+    public Order(String orderType, double price, List<OrderLegCollection> orderLegCollection) {
         this.orderType = orderType;
-        this.quantity = quantity;
         this.price = price;
         this.orderLegCollection = orderLegCollection;
     }
 
-    public Order(String orderType, String session, String duration, double quantity, double price, boolean cancelable, String orderStrategyType, OrderLegCollection orderLegCollection) {
+    public Order(String orderType, String session, String duration, double price, String orderStrategyType,
+                 String complexOrderStrategyType, List<OrderLegCollection> orderLegCollection) {
         this.orderType = orderType;
         this.session = session;
         this.duration = duration;
-        this.quantity = quantity;
         this.price = price;
-        this.cancelable = cancelable;
         this.orderStrategyType = orderStrategyType;
+        this.complexOrderStrategyType = complexOrderStrategyType;
         this.orderLegCollection = orderLegCollection;
     }
 
@@ -78,28 +76,12 @@ public class Order {
         this.duration = duration;
     }
 
-    public double getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(double quantity) {
-        this.quantity = quantity;
-    }
-
     public double getPrice() {
         return price;
     }
 
     public void setPrice(double price) {
         this.price = price;
-    }
-
-    public boolean isCancelable() {
-        return cancelable;
-    }
-
-    public void setCancelable(boolean cancelable) {
-        this.cancelable = cancelable;
     }
 
     public String getOrderStrategyType() {
@@ -110,11 +92,19 @@ public class Order {
         this.orderStrategyType = orderStrategyType;
     }
 
-    public OrderLegCollection getOrderLegCollection() {
+    public String getComplexOrderStrategyType() {
+        return complexOrderStrategyType;
+    }
+
+    public void setComplexOrderStrategyType(String complexOrderStrategyType) {
+        this.complexOrderStrategyType = complexOrderStrategyType;
+    }
+
+    public List<OrderLegCollection> getOrderLegCollection() {
         return orderLegCollection;
     }
 
-    public void setOrderLegCollection(OrderLegCollection orderLegCollection) {
+    public void setOrderLegCollection(List<OrderLegCollection> orderLegCollection) {
         this.orderLegCollection = orderLegCollection;
     }
 }

@@ -20,6 +20,7 @@ public class TradingService extends Service {
 
     private static final Logger LOG = LoggerFactory.getLogger(OptionService.class);
     private final static String ACCOUNTS = "accounts";
+    private final static String ORDERS = "orders";
     private final static String SAVED_ORDERS = "savedorders";
     private final static String AUTHORIZATION = "authorization";
     private final static String BEARER = "Bearer ";
@@ -46,7 +47,13 @@ public class TradingService extends Service {
     public void replaceOrder() {
     }
 
-    public void placeOrder() {
+    public Response placeOrder(final Order order, final String accountNum, final String accessToken) throws Exception {
+        final String url = API_URL + ACCOUNTS + "/" + accountNum + "/" + ORDERS;
+        final String orderJson = mapper.writeValueAsString(order);
+        final Map<String, String> headerMap = new HashMap<>();
+        headerMap.put(AUTHORIZATION, BEARER + accessToken);
+        headerMap.put("Content-Type", "application/json");
+        return httpClient.post(url, orderJson, headerMap, 5000);
     }
 
     public void getSavedOrder() {
@@ -60,12 +67,13 @@ public class TradingService extends Service {
      * @param accessToken to authenticate with to save order
      * @throws Exception if there is an issue with creating a saved order
      */
-    public void createSavedOrder(final Order order, final String accountNum, final String accessToken) throws Exception {
+    public Response createSavedOrder(final Order order, final String accountNum, final String accessToken) throws Exception {
         final String url = API_URL + ACCOUNTS + "/" + accountNum + "/" + SAVED_ORDERS;
         final String orderJson = mapper.writeValueAsString(order);
         final Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AUTHORIZATION, BEARER + accessToken);
-        httpClient.post(url, orderJson, headerMap, item -> LOG.info(item.getResponseBody()));
+        headerMap.put("Content-Type", "application/json");
+        return httpClient.post(url, orderJson, headerMap, 5000);
     }
 
     public void deleteSavedOrder() {
