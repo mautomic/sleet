@@ -27,23 +27,29 @@ public class Order {
     @JsonProperty("cancelable")
     boolean cancelable = true;
 
-    @JsonProperty("status")
-    String status;
-
     @JsonProperty("orderStrategyType")
-    String orderStrategyType;
+    String orderStrategyType = "SINGLE";
 
     @JsonProperty("orderLegCollection")
     OrderLegCollection orderLegCollection;
 
-    public Order(String orderType, String session, String duration, double quantity, double price, boolean cancelable, String status, String orderStrategyType, OrderLegCollection orderLegCollection) {
+    public Order() {
+    }
+
+    public Order(String orderType, double quantity, double price, OrderLegCollection orderLegCollection) {
+        this.orderType = orderType;
+        this.quantity = quantity;
+        this.price = price;
+        this.orderLegCollection = orderLegCollection;
+    }
+
+    public Order(String orderType, String session, String duration, double quantity, double price, boolean cancelable, String orderStrategyType, OrderLegCollection orderLegCollection) {
         this.orderType = orderType;
         this.session = session;
         this.duration = duration;
         this.quantity = quantity;
         this.price = price;
         this.cancelable = cancelable;
-        this.status = status;
         this.orderStrategyType = orderStrategyType;
         this.orderLegCollection = orderLegCollection;
     }
@@ -94,14 +100,6 @@ public class Order {
 
     public void setCancelable(boolean cancelable) {
         this.cancelable = cancelable;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public String getOrderStrategyType() {
