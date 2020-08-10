@@ -55,7 +55,7 @@ public class AuthService extends Service {
         }
 
         final String url = API_URL + TOKEN_ENDPOINT;
-        final Response response = httpClient.post(url, builder.toString(), DEFAULT_TIMEOUT_MILLIS);
+        final Response response = httpClient.post(url, builder.toString(), null, DEFAULT_TIMEOUT_MILLIS);
         return deserializeResponse(response);
     }
 

@@ -81,25 +81,27 @@ public class HttpClient {
     /**
      * Executes a synchronous POST request
      *
-     * @param url to send a POST request
-     * @param body to send in request
+     * @param url           to send a POST request
+     * @param body          to send in request
+     * @param headerParams  to add to request
      * @param timeoutMillis time to wait for response before throwing an exception
      * @return A HTTP {@link Response}
      * @throws Exception if the response is not received before the timeout
      */
-    public Response post(final String url, final String body, final int timeoutMillis) throws Exception {
-        return post(url, body).get(timeoutMillis, TimeUnit.MILLISECONDS);
+    public Response post(final String url, final String body, Map<String, String> headerParams, final int timeoutMillis) throws Exception {
+        return post(url, body, headerParams).get(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Executes an asynchronous POST request
      *
-     * @param url to send a POST request
-     * @param body to send in request
+     * @param url          to send a POST request
+     * @param body         to send in request
+     * @param headerParams to add to request
      * @return A {@link CompletableFuture} containing the HTTP Response
      */
-    public CompletableFuture<Response> post(final String url, final String body) {
-        final Request request = createPostRequest(url, body);
+    public CompletableFuture<Response> post(final String url, final String body, Map<String, String> headerParams) {
+        final Request request = createPostRequest(url, body, headerParams);
         final ListenableFuture<Response> listenableFuture = client.executeRequest(request);
         return listenableFuture.toCompletableFuture();
     }
@@ -108,12 +110,13 @@ public class HttpClient {
      * Executes an asynchronous POST request and then the instructions in
      * the provided {@link Handler}
      *
-     * @param url to send a POST request
-     * @param body to send in request
-     * @param handler for instructions after response is received
+     * @param url          to send a POST request
+     * @param body         to send in request
+     * @param headerParams to add to request
+     * @param handler      for instructions after response is received
      */
-    public void post(final String url, final String body, final Handler<Response> handler) {
-        final Request request = createPostRequest(url, body);
+    public void post(final String url, final String body, Map<String, String> headerParams, final Handler<Response> handler) {
+        final Request request = createPostRequest(url, body, headerParams);
         final ListenableFuture<Response> listenableFuture = client.executeRequest(request);
         listenableFuture.toCompletableFuture().whenComplete((response, exception) -> {
             if (exception == null)
@@ -142,15 +145,18 @@ public class HttpClient {
     /**
      * Create a {@link Request} for POST methods
      *
-     * @param url  to send a POST request
-     * @param body to send in request
+     * @param url          to send a POST request
+     * @param body         to send in request
+     * @param headerParams to add to request
      * @return a {@link Request} to fire with the http client
      */
-    private Request createPostRequest(final String url, final String body) {
+    private Request createPostRequest(final String url, final String body, final Map<String, String> headerParams) {
         final RequestBuilder requestBuilder = new RequestBuilder("POST")
                 .setUrl(url)
                 .setBody(body)
                 .addHeader("Content-Type", "application/x-www-form-urlencoded");
+        if (headerParams != null)
+            headerParams.forEach(requestBuilder::setHeader);
         return requestBuilder.build();
     }
 }
