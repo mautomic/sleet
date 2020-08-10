@@ -53,12 +53,12 @@ public class AuthService extends Service {
         final StringBuilder builder = new StringBuilder();
         builder.append(CLIENT_ID).append(EQUALS).append(clientId).append(AND);
         builder.append(REDIRECT_URI).append(EQUALS).append(redirectUri).append(AND);
-        builder.append(ACCESS_TYPE).append(EQUALS).append(OFFLINE).append(AND);
 
         if (isRefreshToken) {
             builder.append(GRANT_TYPE).append(EQUALS).append(REFRESH_TOKEN).append(AND);
             builder.append(REFRESH_TOKEN).append(EQUALS).append(code);
         } else {
+            builder.append(ACCESS_TYPE).append(EQUALS).append(OFFLINE).append(AND);
             builder.append(GRANT_TYPE).append(EQUALS).append(AUTHORIZATION_CODE).append(AND);
             builder.append(CODE).append(EQUALS).append(code);
         }
