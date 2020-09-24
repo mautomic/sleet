@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Represents a single option contract consumed from the TD API
+ *
+ * @author mautomic
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Option {

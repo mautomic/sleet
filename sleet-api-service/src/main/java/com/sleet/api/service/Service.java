@@ -1,23 +1,19 @@
 package com.sleet.api.service;
 
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sleet.api.HttpClient;
 
 /**
  * An abstract implementation of a service class can connect to different TD API endpoints
+ *
+ * @author mautomic
  */
 public abstract class Service {
 
-    RestTemplate restTemplate;
-    final static String API_URL = "https://api.tdameritrade.com/v1/marketdata/";
-
-    /**
-     * Class used to configure properties for a {@link RestTemplate} as an HTTP connection and read timeout can hang
-     */
-    protected SimpleClientHttpRequestFactory getClientHttpRequestFactory() {
-        SimpleClientHttpRequestFactory clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
-        clientHttpRequestFactory.setConnectTimeout(3000);
-        clientHttpRequestFactory.setReadTimeout(10000);
-        return clientHttpRequestFactory;
-    }
+    HttpClient httpClient;
+    static final int DEFAULT_TIMEOUT_MILLIS = 5000;
+    final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+    final static String API_URL = "https://api.tdameritrade.com/v1/";
+    final static String MARKETDATA = "marketdata";
 }

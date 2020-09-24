@@ -7,6 +7,8 @@ import java.util.Map;
 
 /**
  * Represents an option chain for a symbol consumed from the TD API
+ *
+ * @author mautomic
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OptionChain {

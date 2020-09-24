@@ -1,12 +1,5 @@
 plugins {
     id 'java'
-    id "org.springframework.boot" version "2.2.7.RELEASE"
-}
-
-apply plugin: 'io.spring.dependency-management'
-
-bootJar {
-    enabled = false
 }
 
 group 'sleet'
@@ -21,8 +14,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile("org.springframework.boot:spring-boot-starter")
-    compile("org.springframework:spring-web")
+    compile group: 'org.asynchttpclient', name: 'async-http-client', version: '2.12.1'
     compile("com.fasterxml.jackson.core:jackson-core:2.10.4")
     compile("com.fasterxml.jackson.core:jackson-annotations:2.10.4")
     compile("com.fasterxml.jackson.core:jackson-databind:2.10.4")

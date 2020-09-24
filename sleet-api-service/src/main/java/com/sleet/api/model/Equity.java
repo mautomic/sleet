@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Represents an equity consumed from the TD API
+ *
+ * @author mautomic
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Equity {
