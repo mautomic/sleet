@@ -1,7 +1,6 @@
-package com.sleet.api;
+package com.sleet.api.service;
 
 import com.sleet.api.model.Equity;
-import com.sleet.api.service.QuoteService;
 import org.junit.Assert;
 import org.junit.Test;
 
