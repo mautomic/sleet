@@ -7,7 +7,6 @@ import org.asynchttpclient.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -35,8 +34,6 @@ public class QuoteService extends Service {
      */
     public Optional<Equity> getQuote(final String ticker) throws Exception {
         final CompletableFuture<Equity> equityFuture = getQuoteAsync(ticker);
-        if (equityFuture.isCompletedExceptionally())
-            throw new Exception("Error getting proper response from TD API");
         return Optional.ofNullable(equityFuture.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS));
     }
 
@@ -74,24 +71,23 @@ public class QuoteService extends Service {
      */
     public List<Equity> getQuotes(final List<String> tickers) throws Exception {
         String concatenated = String.join("%2C", tickers);
-        final String url = API_URL + QUOTE_URL + "&symbol=" + concatenated;
+        final String url = API_URL + MARKETDATA + QUOTE_URL + "&symbol=" + concatenated;
         final CompletableFuture<Response> responseFuture = httpClient.get(url, null);
         final Response response = responseFuture.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 
-        if (response.getStatusCode() == 200) {
-            final String json = response.getResponseBody();
-            final JsonNode node = mapper.readValue(json, JsonNode.class);
-
-            List<Equity> equities = new ArrayList<>(tickers.size());
-
-            for (String ticker : tickers) {
-                JsonNode topLevel = node.path(ticker);
-                Equity equity = mapper.treeToValue(topLevel, Equity.class);
-                equities.add(equity);
-            }
-            return equities;
+        if (response.getStatusCode() != 200) {
+            throw new Exception("Error getting proper response from TD API: " + response.getResponseBody());
         }
-        return Collections.emptyList();
+        final String json = response.getResponseBody();
+        final JsonNode node = mapper.readValue(json, JsonNode.class);
+        List<Equity> equities = new ArrayList<>(tickers.size());
+
+        for (String ticker : tickers) {
+            JsonNode topLevel = node.path(ticker);
+            Equity equity = mapper.treeToValue(topLevel, Equity.class);
+            equities.add(equity);
+        }
+        return equities;
     }
 }
 
