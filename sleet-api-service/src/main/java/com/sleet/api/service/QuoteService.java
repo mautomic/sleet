@@ -5,6 +5,7 @@ import com.sleet.api.HttpClient;
 import com.sleet.api.model.Equity;
 import org.asynchttpclient.Response;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,16 +34,36 @@ public class QuoteService extends Service {
      * @return an {@link Equity} with quote information
      */
     public Optional<Equity> getQuote(final String ticker) throws Exception {
-        final String url = API_URL + MARKETDATA + "/" + ticker + QUOTE_URL;
-        final CompletableFuture<Response> responseFuture = httpClient.get(url, null);
-        final Response response = responseFuture.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+        final CompletableFuture<Equity> equityFuture = getQuoteAsync(ticker);
+        if (equityFuture.isCompletedExceptionally())
+            throw new Exception("Error getting proper response from TD API");
+        return Optional.ofNullable(equityFuture.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS));
+    }
 
-        if (response.getStatusCode() == 200) {
-            final String json = response.getResponseBody();
-            final JsonNode node = mapper.readValue(json, JsonNode.class);
-            return Optional.ofNullable(mapper.readValue(node.get(ticker).toString(), Equity.class));
-        }
-        return Optional.empty();
+    /**
+     * Queries the TD API endpoint asynchronously for current quote info for a ticker
+     *
+     * @param ticker to get quote info for
+     * @return an {@link Equity} with quote information
+     */
+    public CompletableFuture<Equity> getQuoteAsync(final String ticker) {
+        final String url = API_URL + MARKETDATA + "/" + ticker + QUOTE_URL;
+        final CompletableFuture<Equity> equityFuture = new CompletableFuture<>();
+
+        httpClient.get(url, null).whenComplete((response, ex) -> {
+            if (response.getStatusCode() == 200) {
+                final String json = response.getResponseBody();
+                try {
+                    final JsonNode node = mapper.readValue(json, JsonNode.class);
+                    equityFuture.complete(mapper.readValue(node.get(ticker).toString(), Equity.class));
+                } catch (IOException e) {
+                    equityFuture.completeExceptionally(e);
+                }
+            } else {
+                equityFuture.complete(null);
+            }
+        });
+        return equityFuture;
     }
 
     /**
