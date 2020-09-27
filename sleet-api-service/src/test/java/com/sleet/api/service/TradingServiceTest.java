@@ -1,9 +1,8 @@
-package com.sleet.api;
+package com.sleet.api.service;
 
 import com.sleet.api.model.Instrument;
 import com.sleet.api.model.Order;
 import com.sleet.api.model.OrderLegCollection;
-import com.sleet.api.service.TradingService;
 import org.asynchttpclient.Response;
 import org.junit.Assert;
 import org.junit.Test;

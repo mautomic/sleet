@@ -1,4 +1,4 @@
-package com.sleet.api;
+package com.sleet.api.service;
 
 import com.sleet.api.model.Token;
 import com.sleet.api.service.AuthService;
