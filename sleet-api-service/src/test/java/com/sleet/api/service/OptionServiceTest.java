@@ -1,7 +1,6 @@
 package com.sleet.api.service;
 
 import com.sleet.api.model.OptionChain;
-import com.sleet.api.service.OptionService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -20,10 +19,7 @@ public class OptionServiceTest {
 
     @Test
     public void testOptionChainRequest() throws Exception {
-
-        // Must supply API key for TD API in order to run test. See readme for info.
-        final String apiKey = "";
-        final OptionService optionService = new OptionService(apiKey);
+        final OptionService optionService = new OptionService(TestConstants.API_KEY);
 
         long time = System.currentTimeMillis();
         final OptionChain optionChain = optionService.getOptionChain("SPY", "50");
@@ -45,10 +41,7 @@ public class OptionServiceTest {
 
     @Test
     public void testContinuousOptionScanningPerformance() throws Exception {
-
-        // Must supply API key for TD API in order to run test. See readme for info.
-        final String apiKey = "";
-        final OptionService optionService = new OptionService(apiKey);
+        final OptionService optionService = new OptionService(TestConstants.API_KEY);
 
         final String[] tickers = {"QQQ", "SPY", "IWM", "$VIX.X", "$SPX.X", "MSFT", "AAPL", "NFLX", "FB", "TSLA",
                 "NVDA", "BYND", "TLT", "SPCE", "XLF"};

@@ -17,10 +17,7 @@ public class QuoteServiceTest {
 
     @Test
     public void testQuoteRequest() throws Exception {
-
-        // Must supply API key for TD API in order to run test. See readme for info.
-        final String apiKey = "";
-        final QuoteService quoteService = new QuoteService(apiKey);
+        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
 
         long time = System.currentTimeMillis();
         final Optional<Equity> equityOptional = quoteService.getQuote("SPY");
@@ -36,9 +33,7 @@ public class QuoteServiceTest {
 
     @Test
     public void testMultipleTickers() throws Exception {
-        // Must supply API key for TD API in order to run test. See readme for info.
-        final String apiKey = "";
-        final QuoteService quoteService = new QuoteService(apiKey);
+        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
 
         List<String> tickers = Arrays.asList("SPY", "AAPL", "MSFT");
         long time = System.currentTimeMillis();
@@ -59,10 +54,7 @@ public class QuoteServiceTest {
 
     @Test
     public void testContinuousQuoteScanningPerformance() throws Exception {
-
-        // Must supply API key for TD API in order to run test. See readme for info.
-        final String apiKey = "";
-        final QuoteService quoteService = new QuoteService(apiKey);
+        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
 
         final String[] tickers = {"QQQ", "DIS", "AAPL", "FB", "SPY", "MSFT", "$VIX.X", "AMD", "AMZN", "$SPX.X"};
         for (int j=0; j<3; j++) {
@@ -74,6 +66,5 @@ public class QuoteServiceTest {
             // Throttle so TD API doesn't hit max requests per second limit
             Thread.sleep(2000);
         }
-
     }
 }
