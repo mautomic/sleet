@@ -70,7 +70,7 @@ public class OptionService extends Service {
      * @return {@link OptionChain} with all option data for the ticker
      */
     public OptionChain getOptionChain(final String ticker, final String strikeCount) throws Exception {
-        final List<String> urls = new ArrayList<>();
+        final List<String> urls = new ArrayList<>(2);
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
                 .append(SYMBOL)
@@ -110,19 +110,53 @@ public class OptionService extends Service {
      * Queries the TD API endpoint for a ticker's option chain, filtering for contracts
      * expiring before a specified date
      *
-     * @param ticker of security to retrieve options for
-     * @param furthestExpirationDate of options to retrieve starting from today
+     * @param ticker                 of security to retrieve options for
+     * @param furthestExpirationDate of options to retrieve starting from today, must follow the format of yyyy-MM-dd
+     * @param otmOnly                if only out-of-the-money options should be returned, or all
      * @return {@link OptionChain} with all option data for the ticker
      */
-    public OptionChain getOTMCloseExpirationOptionChain(final String ticker, final String furthestExpirationDate) throws Exception {
-        final List<String> urls = new ArrayList<>();
+    public OptionChain getCloseExpirationOptionChain(final String ticker, final String furthestExpirationDate, boolean otmOnly) throws Exception {
+        return getCloseExpirationOptionChain(ticker, furthestExpirationDate, DEFAULT_STRIKE_COUNT, otmOnly);
+    }
+
+    /**
+     * Queries the TD API endpoint asynchronously for a ticker's option chain, filtering
+     * for contracts expiring before a specified date
+     *
+     * @param ticker                 of security to retrieve options for
+     * @param furthestExpirationDate of options to retrieve starting from today, must follow the format of yyyy-MM-dd
+     * @param otmOnly                if only out-of-the-money options should be returned, or all
+     * @return {@link CompletableFuture} with an {@link OptionChain}
+     */
+    public CompletableFuture<OptionChain> getCloseExpirationOptionChainAsync(final String ticker, final String furthestExpirationDate, boolean otmOnly) {
+        return getCloseExpirationOptionChainAsync(ticker, furthestExpirationDate, DEFAULT_STRIKE_COUNT, otmOnly);
+    }
+
+    /**
+     * Queries the TD API endpoint for a ticker's option chain, filtering for contracts
+     * expiring before a specified date and the specified number of strikes
+     *
+     * @param ticker                 of security to retrieve options for
+     * @param furthestExpirationDate of options to retrieve starting from today, must follow the format of yyyy-MM-dd
+     * @param strikeCount            of options to get in a single expiration period
+     * @param otmOnly                if only out-of-the-money options should be returned, or all
+     * @return {@link OptionChain} with all option data for the ticker
+     */
+    public OptionChain getCloseExpirationOptionChain(final String ticker,
+                                                     final String furthestExpirationDate,
+                                                     final String strikeCount,
+                                                     boolean otmOnly) throws Exception {
+        final List<String> urls = new ArrayList<>(2);
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
                 .append(SYMBOL)
                 .append(ticker)
+                .append(STRIKE_COUNT)
+                .append(strikeCount)
                 .append(TO_DATE)
-                .append(furthestExpirationDate)
-                .append(OTM);
+                .append(furthestExpirationDate);
+        if (otmOnly)
+            builder.append(OTM);
 
         for (final Contract contract : Contract.values())
             urls.add(builder.toString() + contract.name());
@@ -132,20 +166,28 @@ public class OptionService extends Service {
 
     /**
      * Queries the TD API endpoint asynchronously for a ticker's option chain, filtering
-     * for contracts expiring before a specified date
+     * for contracts expiring before a specified date and the specified number of strikes
      *
-     * @param ticker of security to retrieve options for
-     * @param furthestExpirationDate of options to retrieve starting from today
+     * @param ticker                 of security to retrieve options for
+     * @param furthestExpirationDate of options to retrieve starting from today, must follow the format of yyyy-MM-dd
+     * @param strikeCount            of options to get in a single expiration period
+     * @param otmOnly                if only out-of-the-money options should be returned, or all
      * @return {@link CompletableFuture} with an {@link OptionChain}
      */
-    public CompletableFuture<OptionChain> getOTMCloseExpirationOptionChainAsync(final String ticker, final String furthestExpirationDate) {
+    public CompletableFuture<OptionChain> getCloseExpirationOptionChainAsync(final String ticker,
+                                                                             final String furthestExpirationDate,
+                                                                             final String strikeCount,
+                                                                             boolean otmOnly) {
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
                 .append(SYMBOL)
                 .append(ticker)
+                .append(STRIKE_COUNT)
+                .append(strikeCount)
                 .append(TO_DATE)
-                .append(furthestExpirationDate)
-                .append(OTM);
+                .append(furthestExpirationDate);
+        if (otmOnly)
+            builder.append(OTM);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
         httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
@@ -156,7 +198,7 @@ public class OptionService extends Service {
      * Queries the TD API endpoint for all options for a ticker on a specific
      * expiration date
      *
-     * @param ticker of security to retrieve options for
+     * @param ticker         of security to retrieve options for
      * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
      * @return {@link OptionChain} with all option data for the ticker
      */
