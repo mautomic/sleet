@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class TradingService extends Service {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OptionService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TradingService.class);
 
     private final static String ACCOUNTS = "accounts";
     private final static String ORDERS = "orders";
