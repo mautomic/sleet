@@ -1,5 +1,6 @@
 package com.sleet.api.service;
 
+import com.sleet.api.model.Option;
 import com.sleet.api.model.OptionChain;
 import org.junit.Assert;
 import org.junit.Test;
@@ -7,6 +8,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -40,6 +42,21 @@ public class OptionServiceTest {
     }
 
     @Test
+    public void testOptionChainRequestForStrikeAndDate() throws Exception {
+
+        final OptionService optionService = new OptionService(TestConstants.API_KEY);
+        final OptionChain optionChain = optionService.getOptionChainForStrikeAndDate("TLT", "155.5", "2020-12-18");
+
+        Assert.assertNotNull(optionChain);
+        Assert.assertNotNull(optionChain.getCallExpDateMap());
+        Assert.assertNotNull(optionChain.getPutExpDateMap());
+
+        Map<String, Map<String, List<Option>>> map = optionChain.getCallExpDateMap();
+        Option option = map.get("2020-12-18:14").get("155.5").get(0);
+        Assert.assertEquals("TLT_121820C155.5", option.getSymbol());
+    }
+
+    @Test
     public void testContinuousOptionScanningPerformance() throws Exception {
         final OptionService optionService = new OptionService(TestConstants.API_KEY);
 
@@ -47,7 +64,7 @@ public class OptionServiceTest {
                 "NVDA", "BYND", "TLT", "SPCE", "XLF"};
 
         final long startTime = System.currentTimeMillis();
-        for (int j=0; j<3; j++) {
+        for (int j = 0; j < 3; j++) {
 
             List<CompletableFuture<OptionChain>> futures = new ArrayList<>();
             long time = System.currentTimeMillis();

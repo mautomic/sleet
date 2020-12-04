@@ -239,7 +239,7 @@ public class OptionService extends Service {
      * @param strike of the options to retrieve
      * @return {@link OptionChain} with all option data for the ticker
      */
-    public OptionChain getOptionChainForStrike(final String ticker, final int strike) throws Exception {
+    public OptionChain getOptionChainForStrike(final String ticker, final String strike) throws Exception {
         final CompletableFuture<OptionChain> future = getOptionChainForStrikeAsync(ticker, strike);
         return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
@@ -252,7 +252,7 @@ public class OptionService extends Service {
      * @param strike of the options to retrieve
      * @return {@link CompletableFuture} with an {@link OptionChain}
      */
-    public CompletableFuture<OptionChain> getOptionChainForStrikeAsync(final String ticker, final int strike) {
+    public CompletableFuture<OptionChain> getOptionChainForStrikeAsync(final String ticker, final String strike) {
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
                 .append(SYMBOL)
@@ -269,12 +269,12 @@ public class OptionService extends Service {
      * Queries the TD API endpoint for options for a ticker on a specific expiration
      * date with a specific strike
      *
-     * @param ticker of security to retrieve options for
-     * @param strike of the options to retrieve
+     * @param ticker         of security to retrieve options for
+     * @param strike         of the options to retrieve
      * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
      * @return {@link OptionChain} with all option data for the ticker
      */
-    public OptionChain getOptionChainForStrikeAndDate(final String ticker, final int strike, final String expirationDate) throws Exception {
+    public OptionChain getOptionChainForStrikeAndDate(final String ticker, final String strike, final String expirationDate) throws Exception {
         final CompletableFuture<OptionChain> future = getOptionChainForStrikeAndDateAsync(ticker, strike, expirationDate);
         return future.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
@@ -283,12 +283,12 @@ public class OptionService extends Service {
      * Queries the TD API endpoint asynchronously for options for a ticker on a
      * specific expiration date with a specific strike
      *
-     * @param ticker of security to retrieve options for
-     * @param strike of the options to retrieve
+     * @param ticker         of security to retrieve options for
+     * @param strike         of the options to retrieve
      * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
      * @return {@link CompletableFuture} with an {@link OptionChain}
      */
-    public CompletableFuture<OptionChain> getOptionChainForStrikeAndDateAsync(final String ticker, final int strike, final String expirationDate) {
+    public CompletableFuture<OptionChain> getOptionChainForStrikeAndDateAsync(final String ticker, final String strike, final String expirationDate) {
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
                 .append(SYMBOL)
