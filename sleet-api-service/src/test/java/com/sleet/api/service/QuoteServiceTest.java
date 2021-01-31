@@ -42,15 +42,15 @@ public class QuoteServiceTest {
     public void testOptionChainRequestForStrikeAndDate() throws Exception {
 
         final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
-        final OptionChain optionChain = quoteService.getOptionChainForStrikeAndDate("TLT", "155.5", "2020-12-18");
+        final OptionChain optionChain = quoteService.getOptionChainForStrikeAndDate("TLT", "155", "2021-07-16");
 
         Assert.assertNotNull(optionChain);
         Assert.assertNotNull(optionChain.getCallExpDateMap());
         Assert.assertNotNull(optionChain.getPutExpDateMap());
 
         Map<String, Map<String, List<Option>>> map = optionChain.getCallExpDateMap();
-        Option option = map.get("2020-12-18:14").get("155.5").get(0);
-        Assert.assertEquals("TLT_121820C155.5", option.getSymbol());
+        Option option = map.get("2021-07-16:166").get("155.0").get(0);
+        Assert.assertEquals("TLT_071621C155", option.getSymbol());
     }
 
     @Test
