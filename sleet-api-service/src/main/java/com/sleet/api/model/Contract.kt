@@ -1,10 +1,10 @@
-package com.sleet.api.model;
+package com.sleet.api.model
 
 /**
- * Types of {@link Option} contracts
+ * Types of [Option] contracts
  *
  * @author mautomic
  */
-public enum Contract {
+enum class Contract {
     CALL, PUT
 }
