@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -66,8 +65,8 @@ public class QuoteServiceTest {
 
             List<CompletableFuture<OptionChain>> futures = new ArrayList<>();
             long time = System.currentTimeMillis();
-            for (int i = 0; i < tickers.length; i++) {
-                futures.add(quoteService.getOptionChainAsync(tickers[i], "100"));
+            for (String ticker : tickers) {
+                futures.add(quoteService.getOptionChainAsync(ticker, "100"));
             }
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(20, TimeUnit.SECONDS);
             System.out.println("Retrieval for " + Arrays.toString(tickers) + "  took " + (System.currentTimeMillis() - time) + " ms");
@@ -80,15 +79,15 @@ public class QuoteServiceTest {
         final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
 
         long time = System.currentTimeMillis();
-        final Optional<Equity> equityOptional = quoteService.getQuote("SPY");
+        Equity equity = quoteService.getQuote("SPY");
         System.out.println("Retrieval for SPY quote info took " + (System.currentTimeMillis() - time) + " ms");
 
         long time2 = System.currentTimeMillis();
-        final Optional<Equity> equity2Optional = quoteService.getQuote("AAPL");
+        Equity equity2 = quoteService.getQuote("AAPL");
         System.out.println("Retrieval for AAPL quote info took " + (System.currentTimeMillis() - time2) + " ms");
 
-        Assert.assertNotNull(equityOptional.filter(equity -> equity.getSymbol().contains("SPY")));
-        Assert.assertEquals(218.26, equityOptional.get().getFiftyTwoWeekLow(), 0.0001);
+        Assert.assertNotNull(equity);
+        Assert.assertEquals(218.26, equity.getFiftyTwoWeekLow(), 0.0001);
     }
 
     @Test

@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -51,9 +50,9 @@ public class QuoteService extends Service {
      * @param ticker to get quote info for
      * @return an {@link Equity} with quote information
      */
-    public Optional<Equity> getQuote(final String ticker) throws Exception {
+    public Equity getQuote(final String ticker) throws Exception {
         final CompletableFuture<Equity> equityFuture = getQuoteAsync(ticker);
-        return Optional.ofNullable(equityFuture.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS));
+        return equityFuture.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
 
     /**
