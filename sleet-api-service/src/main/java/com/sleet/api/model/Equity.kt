@@ -10,22 +10,22 @@ import com.fasterxml.jackson.annotation.JsonProperty
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class Equity(
-    symbol: String? = null,
-    description: String? = null,
-    bid: Double = 0.0,
-    ask: Double = 0.0,
-    last: Double = 0.0,
-    mark: Double = 0.0,
-    bidSize: Int = 0,
-    askSize: Int = 0,
-    lastSize: Int = 0,
-    highPrice: Double = 0.0,
-    lowPrice: Double = 0.0,
-    openPrice: Double = 0.0,
-    closePrice: Double = 0.0,
-    totalVolume: Long = 0,
-    volatility: Double = 0.0,
-    netChange: Double = 0.0,
+    open val symbol: String? = null,
+    open val description: String? = null,
+    open val bid: Double = 0.0,
+    open val ask: Double = 0.0,
+    open val last: Double = 0.0,
+    open val mark: Double = 0.0,
+    open val bidSize: Int = 0,
+    open val askSize: Int = 0,
+    open val lastSize: Int = 0,
+    open val highPrice: Double = 0.0,
+    open val lowPrice: Double = 0.0,
+    open val openPrice: Double = 0.0,
+    open val closePrice: Double = 0.0,
+    open val totalVolume: Long = 0,
+    open val volatility: Double = 0.0,
+    open val netChange: Double = 0.0,
     open val assetType: String? = null,
     open val assetMainType: String? = null,
     open val quoteTimeInLong: Long = 0,
@@ -35,12 +35,7 @@ open class Equity(
     open val peRatio: Double = 0.0,
     open val divAmount: Double = 0.0,
     open val divYield: Double = 0.0
-) :
-
-    Asset(
-        symbol, description, bid, ask, last, mark, bidSize, askSize, lastSize,
-        highPrice, lowPrice, openPrice, closePrice, totalVolume, volatility, netChange
-    ) {
+) {
 
     override fun toString(): String {
         return symbol!!

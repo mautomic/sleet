@@ -9,22 +9,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class Option(
-    symbol: String? = null,
-    description: String? = null,
-    bid: Double = 0.0,
-    ask: Double = 0.0,
-    last: Double = 0.0,
-    mark: Double = 0.0,
-    bidSize: Int = 0,
-    askSize: Int = 0,
-    lastSize: Int = 0,
-    highPrice: Double = 0.0,
-    lowPrice: Double = 0.0,
-    openPrice: Double = 0.0,
-    closePrice: Double = 0.0,
-    totalVolume: Long = 0,
-    volatility: Double = 0.0,
-    netChange: Double = 0.0,
+    open val symbol: String? = null,
+    open val description: String? = null,
+    open val bid: Double = 0.0,
+    open val ask: Double = 0.0,
+    open val last: Double = 0.0,
+    open val mark: Double = 0.0,
+    open val bidSize: Int = 0,
+    open val askSize: Int = 0,
+    open val lastSize: Int = 0,
+    open val highPrice: Double = 0.0,
+    open val lowPrice: Double = 0.0,
+    open val openPrice: Double = 0.0,
+    open val closePrice: Double = 0.0,
+    open val totalVolume: Long = 0,
+    open val volatility: Double = 0.0,
+    open val netChange: Double = 0.0,
     open val putCall: String? = null,
     open val delta: Double = 0.0,
     open val gamma: Double = 0.0,
@@ -35,13 +35,9 @@ open class Option(
     open val theoreticalVolatility: Double = 0.0,
     open val strikePrice: Double = 0.0,
     open val daysToExpiration: Int = 0,
-    open val percentChange: Double = 0.0
-) :
-
-    Asset(
-        symbol, description, bid, ask, last, mark, bidSize, askSize, lastSize,
-        highPrice, lowPrice, openPrice, closePrice, totalVolume, volatility, netChange
-    ) {
+    open val percentChange: Double = 0.0,
+    open val multiplier: Double = 100.0
+) {
 
     override fun toString(): String {
         return "$strikePrice : $mark"
@@ -74,7 +70,8 @@ open class Option(
         var theoreticalVolatility: Double = 0.0,
         var strikePrice: Double = 0.0,
         var daysToExpiration: Int = 0,
-        var percentChange: Double = 0.0
+        var percentChange: Double = 0.0,
+        var multiplier: Double = 100.0
     ) {
 
         fun symbol(symbol: String) = apply { this.symbol = symbol }
@@ -108,10 +105,36 @@ open class Option(
         fun strikePrice(strikePrice: Double) = apply { this.strikePrice = strikePrice }
         fun daysToExpiration(daysToExpiration: Int) = apply { this.daysToExpiration = daysToExpiration }
         fun percentChange(percentChange: Double) = apply { this.percentChange = percentChange }
+        fun multiplier(multiplier: Double) = apply { this.multiplier = multiplier }
         fun build() = Option(
-            symbol, description, bid, ask, last, mark, bidSize, askSize, lastSize, highPrice,
-            lowPrice, openPrice, closePrice, totalVolume, volatility, netChange, putCall, delta, gamma, theta, vega,
-            openInterest, theoreticalOptionValue, theoreticalVolatility, strikePrice, daysToExpiration, percentChange
+            symbol,
+            description,
+            bid,
+            ask,
+            last,
+            mark,
+            bidSize,
+            askSize,
+            lastSize,
+            highPrice,
+            lowPrice,
+            openPrice,
+            closePrice,
+            totalVolume,
+            volatility,
+            netChange,
+            putCall,
+            delta,
+            gamma,
+            theta,
+            vega,
+            openInterest,
+            theoreticalOptionValue,
+            theoreticalVolatility,
+            strikePrice,
+            daysToExpiration,
+            percentChange,
+            multiplier
         )
     }
 }

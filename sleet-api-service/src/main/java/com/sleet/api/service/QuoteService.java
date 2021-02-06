@@ -2,6 +2,7 @@ package com.sleet.api.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sleet.api.HttpClient;
+import com.sleet.api.model.Asset;
 import com.sleet.api.model.Contract;
 import com.sleet.api.model.Equity;
 import com.sleet.api.model.Option;
@@ -50,8 +51,8 @@ public class QuoteService extends Service {
      * @param ticker to get quote info for
      * @return an {@link Equity} with quote information
      */
-    public Equity getQuote(final String ticker) throws Exception {
-        final CompletableFuture<Equity> equityFuture = getQuoteAsync(ticker);
+    public Asset getQuote(final String ticker) throws Exception {
+        final CompletableFuture<Asset> equityFuture = getQuoteAsync(ticker);
         return equityFuture.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
 
@@ -61,16 +62,16 @@ public class QuoteService extends Service {
      * @param ticker to get quote info for
      * @return an {@link Equity} with quote information
      */
-    public CompletableFuture<Equity> getQuoteAsync(final String ticker) {
+    public CompletableFuture<Asset> getQuoteAsync(final String ticker) {
         final String url = API_URL + MARKETDATA + "/" + ticker + QUOTE_URL;
-        final CompletableFuture<Equity> equityFuture = new CompletableFuture<>();
+        final CompletableFuture<Asset> equityFuture = new CompletableFuture<>();
 
         httpClient.get(url, null).whenComplete((response, ex) -> {
             if (response.getStatusCode() == 200) {
                 final String json = response.getResponseBody();
                 try {
                     final JsonNode node = mapper.readValue(json, JsonNode.class);
-                    equityFuture.complete(mapper.readValue(node.get(ticker).toString(), Equity.class));
+                    equityFuture.complete(mapper.readValue(node.get(ticker).toString(), Asset.class));
                 } catch (IOException e) {
                     equityFuture.completeExceptionally(e);
                 }
@@ -87,7 +88,7 @@ public class QuoteService extends Service {
      * @param tickers to get quotes for
      * @return a list of {@link Equity} objects with quote information
      */
-    public List<Equity> getQuotes(final List<String> tickers) throws Exception {
+    public List<Asset> getQuotes(final List<String> tickers) throws Exception {
         String concatenated = String.join("%2C", tickers);
         final String url = API_URL + MARKETDATA + QUOTE_URL + "&symbol=" + concatenated;
         final CompletableFuture<Response> responseFuture = httpClient.get(url, null);
@@ -98,11 +99,11 @@ public class QuoteService extends Service {
         }
         final String json = response.getResponseBody();
         final JsonNode node = mapper.readValue(json, JsonNode.class);
-        List<Equity> equities = new ArrayList<>(tickers.size());
+        List<Asset> equities = new ArrayList<>(tickers.size());
 
         for (String ticker : tickers) {
             JsonNode topLevel = node.path(ticker);
-            Equity equity = mapper.treeToValue(topLevel, Equity.class);
+            Asset equity = mapper.treeToValue(topLevel, Asset.class);
             equities.add(equity);
         }
         return equities;
