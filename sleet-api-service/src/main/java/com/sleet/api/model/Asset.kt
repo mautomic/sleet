@@ -10,22 +10,22 @@ import com.fasterxml.jackson.annotation.JsonAlias
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class Asset(
-    val symbol: String? = null,
-    val description: String? = null,
-    @get:JsonAlias("bid", "bidPrice") val bid: Double = 0.0,
-    @get:JsonAlias("ask", "askPrice") val ask: Double = 0.0,
-    @get:JsonAlias("last", "lastPrice") val last: Double = 0.0,
-    val mark: Double = 0.0,
-    val bidSize: Int = 0,
-    val askSize: Int = 0,
-    val lastSize: Int = 0,
-    val highPrice: Double = 0.0,
-    val lowPrice: Double = 0.0,
-    val openPrice: Double = 0.0,
-    val closePrice: Double = 0.0,
-    val totalVolume: Long = 0,
-    val volatility: Double = 0.0,
-    val netChange: Double = 0.0
+    open val symbol: String? = null,
+    open val description: String? = null,
+    @get:JsonAlias("bid", "bidPrice") open val bid: Double = 0.0,
+    @get:JsonAlias("ask", "askPrice") open val ask: Double = 0.0,
+    @get:JsonAlias("last", "lastPrice") open val last: Double = 0.0,
+    open val mark: Double = 0.0,
+    open val bidSize: Int = 0,
+    open val askSize: Int = 0,
+    open val lastSize: Int = 0,
+    open val highPrice: Double = 0.0,
+    open val lowPrice: Double = 0.0,
+    open val openPrice: Double = 0.0,
+    open val closePrice: Double = 0.0,
+    open val totalVolume: Long = 0,
+    open val volatility: Double = 0.0,
+    open val netChange: Double = 0.0
 ) {
 
     class Builder(

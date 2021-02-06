@@ -26,15 +26,15 @@ open class Equity(
     totalVolume: Long = 0,
     volatility: Double = 0.0,
     netChange: Double = 0.0,
-    val assetType: String? = null,
-    val assetMainType: String? = null,
-    val quoteTimeInLong: Long = 0,
-    val tradeTimeInLong: Long = 0,
-    @get:JsonProperty("52WkHigh") val fiftyTwoWeekHigh: Double = 0.0,
-    @get:JsonProperty("52WkLow") val fiftyTwoWeekLow: Double = 0.0,
-    val peRatio: Double = 0.0,
-    val divAmount: Double = 0.0,
-    val divYield: Double = 0.0
+    open val assetType: String? = null,
+    open val assetMainType: String? = null,
+    open val quoteTimeInLong: Long = 0,
+    open val tradeTimeInLong: Long = 0,
+    @get:JsonProperty("52WkHigh") open val fiftyTwoWeekHigh: Double = 0.0,
+    @get:JsonProperty("52WkLow") open val fiftyTwoWeekLow: Double = 0.0,
+    open val peRatio: Double = 0.0,
+    open val divAmount: Double = 0.0,
+    open val divYield: Double = 0.0
 ) :
 
     Asset(

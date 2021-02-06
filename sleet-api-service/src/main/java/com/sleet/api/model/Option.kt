@@ -25,17 +25,17 @@ open class Option(
     totalVolume: Long = 0,
     volatility: Double = 0.0,
     netChange: Double = 0.0,
-    val putCall: String? = null,
-    val delta: Double = 0.0,
-    val gamma: Double = 0.0,
-    val theta: Double = 0.0,
-    val vega: Double = 0.0,
-    val openInterest: Long = 0,
-    val theoreticalOptionValue: Double = 0.0,
-    val theoreticalVolatility: Double = 0.0,
-    val strikePrice: Double = 0.0,
-    val daysToExpiration: Int = 0,
-    val percentChange: Double = 0.0
+    open val putCall: String? = null,
+    open val delta: Double = 0.0,
+    open val gamma: Double = 0.0,
+    open val theta: Double = 0.0,
+    open val vega: Double = 0.0,
+    open val openInterest: Long = 0,
+    open val theoreticalOptionValue: Double = 0.0,
+    open val theoreticalVolatility: Double = 0.0,
+    open val strikePrice: Double = 0.0,
+    open val daysToExpiration: Int = 0,
+    open val percentChange: Double = 0.0
 ) :
 
     Asset(
