@@ -1,7 +1,6 @@
 package com.sleet.api.service;
 
-import com.sleet.api.model.Equity;
-import com.sleet.api.model.Option;
+import com.sleet.api.model.Asset;
 import com.sleet.api.model.OptionChain;
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,9 +47,9 @@ public class QuoteServiceTest {
         Assert.assertNotNull(optionChain.getCallExpDateMap());
         Assert.assertNotNull(optionChain.getPutExpDateMap());
 
-        Map<String, Map<String, List<Option>>> map = optionChain.getCallExpDateMap();
-        Option option = map.get("2021-07-16:166").get("155.0").get(0);
-        Assert.assertEquals("TLT_071621C155", option.getSymbol());
+        Map<String, Map<String, List<Asset>>> map = optionChain.getCallExpDateMap();
+        Asset asset = map.get("2021-07-16:166").get("155.0").get(0);
+        Assert.assertEquals("TLT_071621C155", asset.getSymbol());
     }
 
     @Test
@@ -79,11 +78,11 @@ public class QuoteServiceTest {
         final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
 
         long time = System.currentTimeMillis();
-        Equity equity = quoteService.getQuote("SPY");
+        Asset equity = quoteService.getQuote("SPY");
         System.out.println("Retrieval for SPY quote info took " + (System.currentTimeMillis() - time) + " ms");
 
         long time2 = System.currentTimeMillis();
-        Equity equity2 = quoteService.getQuote("AAPL");
+        Asset equity2 = quoteService.getQuote("AAPL");
         System.out.println("Retrieval for AAPL quote info took " + (System.currentTimeMillis() - time2) + " ms");
 
         Assert.assertNotNull(equity);
@@ -96,7 +95,7 @@ public class QuoteServiceTest {
 
         List<String> tickers = Arrays.asList("SPY", "AAPL", "MSFT");
         long time = System.currentTimeMillis();
-        final List<Equity> equities = quoteService.getQuotes(tickers);
+        final List<Asset> equities = quoteService.getQuotes(tickers);
         System.out.println("Retrieval for multiple quotes info took " + (System.currentTimeMillis() - time) + " ms");
 
         Assert.assertNotNull(equities);
@@ -107,7 +106,7 @@ public class QuoteServiceTest {
                 .count());
         Assert.assertEquals(218.26, equities.stream()
                 .filter(equity -> equity.getSymbol().contains("SPY"))
-                .mapToDouble(Equity::getFiftyTwoWeekLow)
+                .mapToDouble(Asset::getFiftyTwoWeekLow)
                 .sum(), 0.0001);
     }
 

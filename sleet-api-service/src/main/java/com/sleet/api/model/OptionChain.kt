@@ -13,8 +13,8 @@ open class OptionChain {
     val interestRate = 0.0
     val underlyingPrice = 0.0
     val volatility = 0.0
-    var callExpDateMap: Map<String, Map<String, List<Option>>>? = null
-    var putExpDateMap: Map<String, Map<String, List<Option>>>? = null
+    var callExpDateMap: Map<String, Map<String, List<Asset>>>? = null
+    var putExpDateMap: Map<String, Map<String, List<Asset>>>? = null
     override fun toString(): String {
         return "$symbol : $underlyingPrice"
     }
