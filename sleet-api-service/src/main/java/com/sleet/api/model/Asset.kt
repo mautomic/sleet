@@ -28,7 +28,7 @@ open class Asset(
     open val volatility: Double = 0.0,
     open val netChange: Double = 0.0,
     open val putCall: String? = null,
-    open val delta: Double = 0.0,
+    open val delta: Double = 1.0,
     open val gamma: Double = 0.0,
     open val theta: Double = 0.0,
     open val vega: Double = 0.0,
