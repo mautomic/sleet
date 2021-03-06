@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.sleet.api.Constants.*;
+
 /**
  * A {@link Service} implementation that provides methods to view account info
  * and place orders via the TD API. Any API calls from this service will require
@@ -19,14 +21,6 @@ import java.util.Map;
 public class TradingService extends Service {
 
     private static final Logger LOG = LoggerFactory.getLogger(TradingService.class);
-
-    private final static String ACCOUNTS = "accounts";
-    private final static String ORDERS = "orders";
-    private final static String SAVED_ORDERS = "savedorders";
-    private final static String AUTHORIZATION = "authorization";
-    private final static String BEARER = "Bearer ";
-    private final static String CONTENT_TYPE = "Content-Type";
-    private final static String APPLICATION_JSON = "application/json";
 
     public TradingService() {
         httpClient = new HttpClient(DEFAULT_TIMEOUT_MILLIS, DEFAULT_TIMEOUT_MILLIS);
@@ -57,9 +51,9 @@ public class TradingService extends Service {
 
         final Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AUTHORIZATION, BEARER + accessToken);
-        headerMap.put("Content-Type", "application/json");
+        headerMap.put(CONTENT_TYPE, APPLICATION_JSON);
 
-        return httpClient.post(url, orderJson, headerMap, 5000);
+        return httpClient.post(url, orderJson, headerMap, DEFAULT_TIMEOUT_MILLIS);
     }
 
     public void getSavedOrder() {
@@ -81,7 +75,7 @@ public class TradingService extends Service {
         final Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AUTHORIZATION, BEARER + accessToken);
         headerMap.put(CONTENT_TYPE, APPLICATION_JSON);
-        return httpClient.post(url, orderJson, headerMap, 5000);
+        return httpClient.post(url, orderJson, headerMap, DEFAULT_TIMEOUT_MILLIS);
     }
 
     public void deleteSavedOrder() {

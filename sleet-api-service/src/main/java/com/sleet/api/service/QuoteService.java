@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static com.sleet.api.Constants.*;
+
 /**
  * A {@link Service} implementation that provides methods to retrieve option and equity data from the TD API
  *
@@ -27,15 +29,6 @@ public class QuoteService extends Service {
 
     private static String OPTION_CHAIN_URL;
     private static String QUOTE_URL;
-    private static final String OTM = "&range=OTM";
-    private static final String CONTRACT_TYPE = "&contractType=";
-    private static final String SYMBOL = "&symbol=";
-    private static final String STRIKE_COUNT = "&strikeCount=";
-    private static final String STRIKE = "&strike=";
-    private static final String FROM_DATE = "&fromDate=";
-    private static final String TO_DATE = "&toDate=";
-    // Count for above and below at-the-money, so x2 contracts are returned
-    private static final String DEFAULT_STRIKE_COUNT = "100";
 
     private static final Logger LOG = LoggerFactory.getLogger(QuoteService.class);
 
@@ -143,11 +136,11 @@ public class QuoteService extends Service {
         final List<String> urls = new ArrayList<>(2);
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
-                .append(SYMBOL)
+                .append(QUERY_PARAM_SYMBOL)
                 .append(ticker)
-                .append(STRIKE_COUNT)
+                .append(QUERY_PARAM_STRIKE_COUNT)
                 .append(strikeCount)
-                .append(CONTRACT_TYPE);
+                .append(QUERY_PARAM_CONTRACT_TYPE);
 
         for (final Contract contract : Contract.values())
             urls.add(builder.toString() + contract.name());
@@ -166,9 +159,9 @@ public class QuoteService extends Service {
     public CompletableFuture<OptionChain> getOptionChainAsync(final String ticker, final String strikeCount) {
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
-                .append(SYMBOL)
+                .append(QUERY_PARAM_SYMBOL)
                 .append(ticker)
-                .append(STRIKE_COUNT)
+                .append(QUERY_PARAM_STRIKE_COUNT)
                 .append(strikeCount);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
@@ -219,14 +212,14 @@ public class QuoteService extends Service {
         final List<String> urls = new ArrayList<>(2);
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
-                .append(SYMBOL)
+                .append(QUERY_PARAM_SYMBOL)
                 .append(ticker)
-                .append(STRIKE_COUNT)
+                .append(QUERY_PARAM_STRIKE_COUNT)
                 .append(strikeCount)
-                .append(TO_DATE)
+                .append(QUERY_PARAM_TO_DATE)
                 .append(furthestExpirationDate);
         if (otmOnly)
-            builder.append(OTM);
+            builder.append(QUERY_PARAM_OTM);
 
         for (final Contract contract : Contract.values())
             urls.add(builder.toString() + contract.name());
@@ -250,14 +243,14 @@ public class QuoteService extends Service {
                                                                              boolean otmOnly) {
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
-                .append(SYMBOL)
+                .append(QUERY_PARAM_SYMBOL)
                 .append(ticker)
-                .append(STRIKE_COUNT)
+                .append(QUERY_PARAM_STRIKE_COUNT)
                 .append(strikeCount)
-                .append(TO_DATE)
+                .append(QUERY_PARAM_TO_DATE)
                 .append(furthestExpirationDate);
         if (otmOnly)
-            builder.append(OTM);
+            builder.append(QUERY_PARAM_OTM);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
         httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
@@ -288,13 +281,13 @@ public class QuoteService extends Service {
     public CompletableFuture<OptionChain> getOptionChainForDateAsync(final String ticker, final String expirationDate) {
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
-                .append(SYMBOL)
+                .append(QUERY_PARAM_SYMBOL)
                 .append(ticker)
-                .append(STRIKE_COUNT)
+                .append(QUERY_PARAM_STRIKE_COUNT)
                 .append(DEFAULT_STRIKE_COUNT)
-                .append(TO_DATE)
+                .append(QUERY_PARAM_TO_DATE)
                 .append(expirationDate)
-                .append(FROM_DATE)
+                .append(QUERY_PARAM_FROM_DATE)
                 .append(expirationDate);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
@@ -325,9 +318,9 @@ public class QuoteService extends Service {
     public CompletableFuture<OptionChain> getOptionChainForStrikeAsync(final String ticker, final String strike) {
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
-                .append(SYMBOL)
+                .append(QUERY_PARAM_SYMBOL)
                 .append(ticker)
-                .append(STRIKE)
+                .append(QUERY_PARAM_STRIKE)
                 .append(strike);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
@@ -361,13 +354,13 @@ public class QuoteService extends Service {
     public CompletableFuture<OptionChain> getOptionChainForStrikeAndDateAsync(final String ticker, final String strike, final String expirationDate) {
         final StringBuilder builder = new StringBuilder()
                 .append(OPTION_CHAIN_URL)
-                .append(SYMBOL)
+                .append(QUERY_PARAM_SYMBOL)
                 .append(ticker)
-                .append(TO_DATE)
+                .append(QUERY_PARAM_TO_DATE)
                 .append(expirationDate)
-                .append(FROM_DATE)
+                .append(QUERY_PARAM_FROM_DATE)
                 .append(expirationDate)
-                .append(STRIKE)
+                .append(QUERY_PARAM_STRIKE)
                 .append(strike);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();

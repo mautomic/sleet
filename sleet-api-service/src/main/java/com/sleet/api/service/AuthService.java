@@ -7,6 +7,8 @@ import org.asynchttpclient.Response;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.sleet.api.Constants.*;
+
 /**
  * A {@link Service} implementation that provides a method to retrieve a
  * {@link Token} for order interactions and account information
@@ -14,21 +16,6 @@ import java.util.Map;
  * @author mautomic
  */
 public class AuthService extends Service {
-
-    private final static String TOKEN_ENDPOINT = "oauth2/token";
-    private final static String GRANT_TYPE = "grant_type";
-    private final static String AUTHORIZATION_CODE = "authorization_code";
-    private final static String REFRESH_TOKEN = "refresh_token";
-    private final static String CLIENT_ID = "client_id";
-    private final static String REDIRECT_URI = "redirect_uri";
-    private final static String ACCESS_TYPE = "access_type";
-    private final static String CODE = "code";
-    private final static String OFFLINE = "offline";
-    private final static String CONTENT_TYPE = "Content-Type";
-    private final static String URL_ENCODED = "application/x-www-form-urlencoded";
-
-    private final static char EQUALS = '=';
-    private final static char AND = '&';
 
     private final String clientId;
     private final String redirectUri;
