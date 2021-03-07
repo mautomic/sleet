@@ -1,6 +1,8 @@
 package com.sleet.api.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sleet.api.HttpClient;
 import com.sleet.api.model.Asset;
 import com.sleet.api.model.Contract;
@@ -21,21 +23,23 @@ import java.util.concurrent.TimeUnit;
 import static com.sleet.api.Constants.*;
 
 /**
- * A {@link Service} implementation that provides methods to retrieve option and equity data from the TD API
+ * An API interface that provides methods to retrieve option and equity data from the TD API
  *
  * @author mautomic
  */
-public class QuoteService extends Service {
+public class QuoteService {
 
     private static String OPTION_CHAIN_URL;
     private static String QUOTE_URL;
+    private final HttpClient httpClient;
 
     private static final Logger LOG = LoggerFactory.getLogger(QuoteService.class);
+    private final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
 
-    public QuoteService(final String apiKey) {
-        httpClient = new HttpClient(DEFAULT_TIMEOUT_MILLIS, DEFAULT_TIMEOUT_MILLIS);
+    public QuoteService(final String apiKey, final HttpClient httpClient) {
         OPTION_CHAIN_URL = API_URL + MARKETDATA + "/chains?apikey=" + apiKey;
         QUOTE_URL = "/quotes?apikey=" + apiKey;
+        this.httpClient = httpClient;
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.sleet.api.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sleet.api.HttpClient;
 import com.sleet.api.model.Token;
 import org.asynchttpclient.Response;
@@ -10,20 +12,22 @@ import java.util.Map;
 import static com.sleet.api.Constants.*;
 
 /**
- * A {@link Service} implementation that provides a method to retrieve a
+ * An API interface that provides a method to retrieve a
  * {@link Token} for order interactions and account information
  *
  * @author mautomic
  */
-public class AuthService extends Service {
+public class AuthService {
 
     private final String clientId;
     private final String redirectUri;
+    private final HttpClient httpClient;
+    private final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
 
-    public AuthService(final String clientId, final String redirectUri) {
-        httpClient = new HttpClient(DEFAULT_TIMEOUT_MILLIS, DEFAULT_TIMEOUT_MILLIS);
+    public AuthService(final String clientId, final String redirectUri, final HttpClient httpClient) {
         this.clientId = clientId;
         this.redirectUri = redirectUri;
+        this.httpClient = httpClient;
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.sleet.api.service;
 
+import com.sleet.api.HttpClient;
 import com.sleet.api.model.Token;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,7 +20,8 @@ public class AuthServiceTest {
         final String redirectUri = "https://127.0.0.1";
         final String grantCode = "";
 
-        final AuthService authService = new AuthService(TestConstants.API_KEY, redirectUri);
+        final AuthService authService = new AuthService(TestConstants.API_KEY, redirectUri,
+                new HttpClient(5000, 5000));
         final Token token = authService.getPostAccessToken(grantCode, false);
         System.out.println(token.getAccessToken());
         System.out.println(token.getRefreshToken());
@@ -36,7 +38,8 @@ public class AuthServiceTest {
 
         final String refreshTokenEncoded = URLEncoder.encode(refreshToken, StandardCharsets.UTF_8.toString());
 
-        final AuthService authService = new AuthService(TestConstants.API_KEY, redirectUri);
+        final AuthService authService = new AuthService(TestConstants.API_KEY, redirectUri,
+                new HttpClient(5000, 5000));
         final Token token = authService.getPostAccessToken(refreshTokenEncoded, true);
         System.out.println(token.getAccessToken());
         System.out.println(token.getRefreshToken());

@@ -1,5 +1,7 @@
 package com.sleet.api.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sleet.api.HttpClient;
 import com.sleet.api.model.Order;
 import org.asynchttpclient.Response;
@@ -12,18 +14,21 @@ import java.util.Map;
 import static com.sleet.api.Constants.*;
 
 /**
- * A {@link Service} implementation that provides methods to view account info
+ * An TD API interface that provides methods to view account info
  * and place orders via the TD API. Any API calls from this service will require
  * an authorization grant.
  *
  * @author mautomic
  */
-public class TradingService extends Service {
+public class TradingService {
+
+    private final HttpClient httpClient;
 
     private static final Logger LOG = LoggerFactory.getLogger(TradingService.class);
+    private final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
 
-    public TradingService() {
-        httpClient = new HttpClient(DEFAULT_TIMEOUT_MILLIS, DEFAULT_TIMEOUT_MILLIS);
+    public TradingService(final HttpClient httpClient) {
+        this.httpClient = httpClient;
     }
 
     public String getAccountInfo(final String accountNum, final String accessToken) throws Exception {

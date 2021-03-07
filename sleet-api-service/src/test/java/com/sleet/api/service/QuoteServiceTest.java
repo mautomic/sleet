@@ -1,5 +1,6 @@
 package com.sleet.api.service;
 
+import com.sleet.api.HttpClient;
 import com.sleet.api.model.Asset;
 import com.sleet.api.model.OptionChain;
 import org.junit.Assert;
@@ -21,7 +22,8 @@ public class QuoteServiceTest {
 
     @Test
     public void testOptionChainRequest() throws Exception {
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
+        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY,
+                new HttpClient(5000, 5000));
 
         long time = System.currentTimeMillis();
         final OptionChain optionChain = quoteService.getOptionChain("SPY", "50");
@@ -40,7 +42,8 @@ public class QuoteServiceTest {
     @Test
     public void testOptionChainRequestForStrikeAndDate() throws Exception {
 
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
+        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY,
+                new HttpClient(5000, 5000));
         final OptionChain optionChain = quoteService.getOptionChainForStrikeAndDate("TLT", "155", "2021-07-16");
 
         Assert.assertNotNull(optionChain);
@@ -54,7 +57,8 @@ public class QuoteServiceTest {
 
     @Test
     public void testContinuousOptionScanningPerformance() throws Exception {
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
+        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY,
+                new HttpClient(5000, 5000));
 
         final String[] tickers = {"QQQ", "SPY", "IWM", "$VIX.X", "$SPX.X", "MSFT", "AAPL", "NFLX", "FB", "TSLA",
                 "NVDA", "BYND", "TLT", "SPCE", "XLF"};
@@ -75,7 +79,8 @@ public class QuoteServiceTest {
 
     @Test
     public void testQuoteRequest() throws Exception {
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
+        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY,
+                new HttpClient(5000, 5000));
 
         long time = System.currentTimeMillis();
         Asset equity = quoteService.getQuote("SPY");
@@ -91,7 +96,8 @@ public class QuoteServiceTest {
 
     @Test
     public void testMultipleTickers() throws Exception {
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
+        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY,
+                new HttpClient(5000, 5000));
 
         List<String> tickers = Arrays.asList("SPY", "AAPL", "MSFT");
         long time = System.currentTimeMillis();
@@ -112,10 +118,11 @@ public class QuoteServiceTest {
 
     @Test
     public void testContinuousQuoteScanningPerformance() throws Exception {
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY);
+        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY,
+                new HttpClient(5000, 5000));
 
         final String[] tickers = {"QQQ", "DIS", "AAPL", "FB", "SPY", "MSFT", "$VIX.X", "AMD", "AMZN", "$SPX.X"};
-        for (int j=0; j<3; j++) {
+        for (int j = 0; j < 3; j++) {
             for (String ticker : tickers) {
                 long time = System.currentTimeMillis();
                 quoteService.getQuote(ticker);
