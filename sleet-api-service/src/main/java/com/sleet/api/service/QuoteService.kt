@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.sleet.api.RequestUtil.Companion.createGetRequest
 import com.sleet.api.Constants
+import com.sleet.api.Constants.DEFAULT_TIMEOUT_MILLIS
 import com.sleet.api.model.Asset
 import com.sleet.api.model.Contract
 import com.sleet.api.model.OptionChain
@@ -13,10 +14,10 @@ import org.asynchttpclient.Response
 import org.slf4j.LoggerFactory
 
 import kotlin.Throws
+import kotlin.system.exitProcess
 import java.lang.Exception
 import java.lang.StringBuilder
 import java.util.ArrayList
-import java.util.Arrays
 import java.io.IOException
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
@@ -43,25 +44,25 @@ class QuoteService(
      * Queries the TD API endpoint for current quote info for a ticker
      *
      * @param ticker to get quote info for
-     * @return an [Equity] with quote information
+     * @return an [Asset] with quote information
      */
     @Throws(Exception::class)
     fun getQuote(ticker: String): Asset? {
-        return getQuoteAsync(ticker)[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        return getQuoteAsync(ticker)[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
     }
 
     /**
      * Queries the TD API endpoint asynchronously for current quote info for a ticker
      *
      * @param ticker to get quote info for
-     * @return an [Equity] with quote information
+     * @return an [Asset] with quote information
      */
     fun getQuoteAsync(ticker: String): CompletableFuture<Asset?> {
         val url = Constants.API_URL + Constants.MARKETDATA + "/" + ticker + QUOTE_URL
         val equityFuture = CompletableFuture<Asset?>()
         val request = createGetRequest(url, null)
 
-        httpClient.executeRequest(request).toCompletableFuture().whenComplete { response: Response, ex: Throwable? ->
+        httpClient.executeRequest(request).toCompletableFuture().whenComplete { response: Response, _: Throwable? ->
             if (response.statusCode == 200) {
                 try {
                     val node = mapper.readValue(response.responseBody, JsonNode::class.java)
@@ -79,7 +80,7 @@ class QuoteService(
      * Queries the TD API endpoint for current quote info for multiple tickers
      *
      * @param tickers to get quotes for
-     * @return a list of [Equity] objects with quote information
+     * @return a list of [Asset] objects with quote information
      */
     @Throws(Exception::class)
     fun getQuotes(tickers: List<String?>): List<Asset> {
@@ -88,7 +89,7 @@ class QuoteService(
 
         val request = createGetRequest(url, null)
         val responseFuture = httpClient.executeRequest(request).toCompletableFuture()
-        val response = responseFuture[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        val response = responseFuture[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
         if (response.statusCode != 200) {
             throw Exception("Error getting proper response from TD API: " + response.responseBody)
         }
@@ -145,7 +146,9 @@ class QuoteService(
             .append(Constants.QUERY_PARAM_STRIKE_COUNT)
             .append(strikeCount)
             .append(Constants.QUERY_PARAM_CONTRACT_TYPE)
-        for (contract in Contract.values()) urls.add(builder.toString() + contract.name)
+
+        for (contract in Contract.values())
+            urls.add(builder.toString() + contract.name)
         return getCallsAndPutsConcurrently(urls)
     }
 
@@ -164,10 +167,11 @@ class QuoteService(
             .append(ticker)
             .append(Constants.QUERY_PARAM_STRIKE_COUNT)
             .append(strikeCount)
+
         val future = CompletableFuture<OptionChain?>()
         val request = createGetRequest(builder.toString(), null)
         httpClient.executeRequest(request).toCompletableFuture()
-            .whenComplete { resp: Response, ex: Throwable? -> future.complete(deserializeResponse(resp)) }
+            .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         return future
     }
 
@@ -262,10 +266,11 @@ class QuoteService(
             .append(furthestExpirationDate)
         if (otmOnly)
             builder.append(Constants.QUERY_PARAM_OTM)
+
         val future = CompletableFuture<OptionChain?>()
         val request = createGetRequest(builder.toString(), null)
         httpClient.executeRequest(request).toCompletableFuture()
-            .whenComplete { resp: Response, ex: Throwable? -> future.complete(deserializeResponse(resp)) }
+            .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         return future
     }
 
@@ -278,10 +283,7 @@ class QuoteService(
      */
     @Throws(Exception::class)
     fun getOptionChainForDate(ticker: String?, expirationDate: String?): OptionChain? {
-        return getOptionChainForDateAsync(
-            ticker,
-            expirationDate
-        )[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        return getOptionChainForDateAsync(ticker, expirationDate)[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
     }
 
     /**
@@ -302,10 +304,11 @@ class QuoteService(
             .append(expirationDate)
             .append(Constants.QUERY_PARAM_FROM_DATE)
             .append(expirationDate)
+
         val future = CompletableFuture<OptionChain?>()
         val request = createGetRequest(builder.toString(), null)
         httpClient.executeRequest(request).toCompletableFuture()
-            .whenComplete { resp: Response, ex: Throwable? -> future.complete(deserializeResponse(resp)) }
+            .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         return future
     }
 
@@ -318,7 +321,7 @@ class QuoteService(
      */
     @Throws(Exception::class)
     fun getOptionChainForStrike(ticker: String?, strike: String?): OptionChain? {
-        return getOptionChainForStrikeAsync(ticker, strike)[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        return getOptionChainForStrikeAsync(ticker, strike)[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
     }
 
     /**
@@ -335,10 +338,11 @@ class QuoteService(
             .append(ticker)
             .append(Constants.QUERY_PARAM_STRIKE)
             .append(strike)
+
         val future = CompletableFuture<OptionChain?>()
         val request = createGetRequest(builder.toString(), null)
         httpClient.executeRequest(request).toCompletableFuture()
-            .whenComplete { resp: Response, ex: Throwable? -> future.complete(deserializeResponse(resp)) }
+            .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         return future
     }
 
@@ -354,7 +358,7 @@ class QuoteService(
     @Throws(Exception::class)
     fun getOptionChainForStrikeAndDate(ticker: String?, strike: String?, expirationDate: String?): OptionChain? {
         val future = getOptionChainForStrikeAndDateAsync(ticker, strike, expirationDate)
-        return future[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        return future[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
     }
 
     /**
@@ -384,7 +388,7 @@ class QuoteService(
         val future = CompletableFuture<OptionChain?>()
         val request = createGetRequest(builder.toString(), null)
         httpClient.executeRequest(request).toCompletableFuture()
-            .whenComplete { resp: Response, ex: Throwable? -> future.complete(deserializeResponse(resp)) }
+            .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         return future
     }
 
@@ -399,15 +403,15 @@ class QuoteService(
      */
     @Throws(Exception::class)
     private fun getCallsAndPutsConcurrently(urls: List<String>): OptionChain {
-        val futures: List<CompletableFuture<OptionChain?>> = Arrays.asList(CompletableFuture(), CompletableFuture())
+        val futures: List<CompletableFuture<OptionChain?>> = listOf(CompletableFuture(), CompletableFuture())
 
         for ((index, url) in urls.withIndex()) {
             val future = futures[index]
             val request = createGetRequest(url, null)
             httpClient.executeRequest(request).toCompletableFuture()
-                .whenComplete { resp: Response, ex: Throwable? -> future.complete(deserializeResponse(resp)) }
+                .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         }
-        CompletableFuture.allOf(*futures.toTypedArray<CompletableFuture<*>>())[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        CompletableFuture.allOf(*futures.toTypedArray<CompletableFuture<*>>())[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
 
         // Combine the two chains
         val fullChain = futures[0].get()
@@ -442,6 +446,6 @@ class QuoteService(
     private fun logFailure(e: Exception) {
         LOG.error("Could not retrieve option chain", e)
         if (e.message!!.contains("InvalidApiKey"))
-            System.exit(1)
+            exitProcess(1)
     }
 }

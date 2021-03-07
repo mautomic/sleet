@@ -12,20 +12,16 @@ import org.asynchttpclient.Request
 import org.slf4j.LoggerFactory
 
 import kotlin.Throws
-import java.util.HashMap
 import java.util.concurrent.TimeUnit
 import java.lang.Exception
 
 /**
- * An TD API interface that provides methods to view account info
- * and place orders via the TD API. Any API calls from this service will require
- * an authorization grant.
+ * An TD API interface that provides methods to view account info and place orders.
+ * Any API calls from this service will require an authorization grant.
  *
  * @author mautomic
  */
-class TradingService(
-    private val httpClient: AsyncHttpClient
-) {
+class TradingService(private val httpClient: AsyncHttpClient) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TradingService::class.java)

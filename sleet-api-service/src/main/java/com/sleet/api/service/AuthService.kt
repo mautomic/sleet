@@ -8,7 +8,6 @@ import com.sleet.api.Constants.EQUALS
 import com.sleet.api.RequestUtil.Companion.createPostRequest
 import com.sleet.api.model.Token
 import org.asynchttpclient.AsyncHttpClient
-import org.asynchttpclient.Response
 
 import kotlin.Throws
 import java.lang.Exception
@@ -37,7 +36,7 @@ class AuthService(
      *
      * @param code           current access or refresh token code
      * @param isRefreshToken designates to use access token or refresh token field in POST
-     * @return [] Token with new access and refresh tokens
+     * @return [Token] with new access and refresh tokens
      * @throws Exception if there is an issue with the POST request
      */
     @Throws(Exception::class)
@@ -54,17 +53,14 @@ class AuthService(
             builder.append(Constants.GRANT_TYPE).append(EQUALS).append(Constants.AUTHORIZATION_CODE).append(AND)
             builder.append(Constants.CODE).append(EQUALS).append(code)
         }
+
         val headerParams: MutableMap<String, String> = HashMap()
         headerParams[Constants.CONTENT_TYPE] = Constants.URL_ENCODED
         val url: String = Constants.API_URL + Constants.TOKEN_ENDPOINT
 
         val request = createPostRequest(url, builder.toString(), headerParams)
         val response = httpClient.executeRequest(request)[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
-        return deserializeResponse(response)
-    }
-
-    @Throws(Exception::class)
-    private fun deserializeResponse(response: Response): Token {
-        return mapper.readValue(response.responseBody, Token::class.java)
+        val responseJson = mapper.readValue(response.responseBody, Token::class.java)
+        return responseJson
     }
 }
