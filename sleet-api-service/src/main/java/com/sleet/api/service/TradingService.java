@@ -2,14 +2,17 @@ package com.sleet.api.service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sleet.api.HttpClient;
+import com.sleet.api.RequestUtil;
 import com.sleet.api.model.Order;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Request;
 import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.sleet.api.Constants.*;
 
@@ -22,12 +25,12 @@ import static com.sleet.api.Constants.*;
  */
 public class TradingService {
 
-    private final HttpClient httpClient;
+    private final AsyncHttpClient httpClient;
 
     private static final Logger LOG = LoggerFactory.getLogger(TradingService.class);
     private final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
 
-    public TradingService(final HttpClient httpClient) {
+    public TradingService(final AsyncHttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
@@ -35,7 +38,9 @@ public class TradingService {
         final String url = API_URL + ACCOUNTS + "/" + accountNum;
         final Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AUTHORIZATION, BEARER + accessToken);
-        final Response response = httpClient.get(url, headerMap, DEFAULT_TIMEOUT_MILLIS);
+
+        final Request request = RequestUtil.createGetRequest(url, headerMap);
+        final Response response = httpClient.executeRequest(request).get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         return response.getResponseBody();
     }
 
@@ -58,7 +63,8 @@ public class TradingService {
         headerMap.put(AUTHORIZATION, BEARER + accessToken);
         headerMap.put(CONTENT_TYPE, APPLICATION_JSON);
 
-        return httpClient.post(url, orderJson, headerMap, DEFAULT_TIMEOUT_MILLIS);
+        final Request request = RequestUtil.createPostRequest(url, orderJson, headerMap);
+        return httpClient.executeRequest(request).get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
 
     public void getSavedOrder() {
@@ -80,7 +86,9 @@ public class TradingService {
         final Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AUTHORIZATION, BEARER + accessToken);
         headerMap.put(CONTENT_TYPE, APPLICATION_JSON);
-        return httpClient.post(url, orderJson, headerMap, DEFAULT_TIMEOUT_MILLIS);
+
+        final Request request = RequestUtil.createPostRequest(url, orderJson, headerMap);
+        return httpClient.executeRequest(request).get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
 
     public void deleteSavedOrder() {

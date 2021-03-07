@@ -1,9 +1,9 @@
 package com.sleet.api.service;
 
-import com.sleet.api.HttpClient;
 import com.sleet.api.model.Instrument;
 import com.sleet.api.model.Order;
 import com.sleet.api.model.OrderLegCollection;
+import org.asynchttpclient.Dsl;
 import org.asynchttpclient.Response;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class TradingServiceTest {
         final String accessToken = "";
         final String accountNum = "";
 
-        final TradingService tradingService = new TradingService(new HttpClient(5000, 5000));
+        final TradingService tradingService = new TradingService(Dsl.asyncHttpClient(Dsl.config()));
         final String jsonAccountInfo = tradingService.getAccountInfo(accountNum, accessToken);
         System.out.println(jsonAccountInfo);
         Assert.assertNotNull(jsonAccountInfo);
@@ -39,7 +39,7 @@ public class TradingServiceTest {
         final String accessToken = "";
         final String accountNum = "";
 
-        final TradingService tradingService = new TradingService(new HttpClient(5000, 5000));
+        final TradingService tradingService = new TradingService(Dsl.asyncHttpClient(Dsl.config()));
 
         Instrument instrument = new Instrument("SPY", "EQUITY");
         List<OrderLegCollection> legCollectionList = new ArrayList<>();
@@ -60,7 +60,7 @@ public class TradingServiceTest {
         final String accessToken = "";
         final String accountNum = "";
 
-        final TradingService tradingService = new TradingService(new HttpClient(5000, 5000));
+        final TradingService tradingService = new TradingService(Dsl.asyncHttpClient(Dsl.config()));
 
         Instrument instrument = new Instrument("SPY", "EQUITY");
         List<OrderLegCollection> legCollectionList = new ArrayList<>();
@@ -81,7 +81,7 @@ public class TradingServiceTest {
         final String accessToken = "";
         final String accountNum = "";
 
-        final TradingService tradingService = new TradingService(new HttpClient(5000, 5000));
+        final TradingService tradingService = new TradingService(Dsl.asyncHttpClient(Dsl.config()));
 
         Instrument instrument = new Instrument("SPY_082120C335", "OPTION");
 
@@ -104,7 +104,7 @@ public class TradingServiceTest {
         final String accessToken = "";
         final String accountNum = "";
 
-        final TradingService tradingService = new TradingService(new HttpClient(5000, 5000));
+        final TradingService tradingService = new TradingService(Dsl.asyncHttpClient(Dsl.config()));
 
         Instrument buyOption = new Instrument("SPY_082120C335", "OPTION");
         Instrument sellOption = new Instrument("SPY_082120C340", "OPTION");

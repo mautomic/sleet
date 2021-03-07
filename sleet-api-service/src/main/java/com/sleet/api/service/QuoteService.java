@@ -3,12 +3,14 @@ package com.sleet.api.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sleet.api.HttpClient;
+import com.sleet.api.RequestUtil;
 import com.sleet.api.model.Asset;
 import com.sleet.api.model.Contract;
 import com.sleet.api.model.Equity;
 import com.sleet.api.model.Option;
 import com.sleet.api.model.OptionChain;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Request;
 import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +33,12 @@ public class QuoteService {
 
     private static String OPTION_CHAIN_URL;
     private static String QUOTE_URL;
-    private final HttpClient httpClient;
+    private final AsyncHttpClient httpClient;
 
     private static final Logger LOG = LoggerFactory.getLogger(QuoteService.class);
     private final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
 
-    public QuoteService(final String apiKey, final HttpClient httpClient) {
+    public QuoteService(final String apiKey, final AsyncHttpClient httpClient) {
         OPTION_CHAIN_URL = API_URL + MARKETDATA + "/chains?apikey=" + apiKey;
         QUOTE_URL = "/quotes?apikey=" + apiKey;
         this.httpClient = httpClient;
@@ -63,7 +65,9 @@ public class QuoteService {
         final String url = API_URL + MARKETDATA + "/" + ticker + QUOTE_URL;
         final CompletableFuture<Asset> equityFuture = new CompletableFuture<>();
 
-        httpClient.get(url, null).whenComplete((response, ex) -> {
+        final Request request = RequestUtil.createGetRequest(url, null);
+
+        httpClient.executeRequest(request).toCompletableFuture().whenComplete((response, ex) -> {
             if (response.getStatusCode() == 200) {
                 final String json = response.getResponseBody();
                 try {
@@ -88,7 +92,9 @@ public class QuoteService {
     public List<Asset> getQuotes(final List<String> tickers) throws Exception {
         String concatenated = String.join("%2C", tickers);
         final String url = API_URL + MARKETDATA + QUOTE_URL + "&symbol=" + concatenated;
-        final CompletableFuture<Response> responseFuture = httpClient.get(url, null);
+
+        final Request request = RequestUtil.createGetRequest(url, null);
+        final CompletableFuture<Response> responseFuture = httpClient.executeRequest(request).toCompletableFuture();
         final Response response = responseFuture.get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 
         if (response.getStatusCode() != 200) {
@@ -169,7 +175,9 @@ public class QuoteService {
                 .append(strikeCount);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
-        httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
+        final Request request = RequestUtil.createGetRequest(builder.toString(), null);
+        httpClient.executeRequest(request).toCompletableFuture().whenComplete(
+                (resp, ex) -> future.complete(deserializeResponse(resp)));
         return future;
     }
 
@@ -257,7 +265,10 @@ public class QuoteService {
             builder.append(QUERY_PARAM_OTM);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
-        httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
+        final Request request = RequestUtil.createGetRequest(builder.toString(), null);
+
+        httpClient.executeRequest(request).toCompletableFuture().whenComplete(
+                (resp, ex) -> future.complete(deserializeResponse(resp)));
         return future;
     }
 
@@ -295,7 +306,10 @@ public class QuoteService {
                 .append(expirationDate);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
-        httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
+        final Request request = RequestUtil.createGetRequest(builder.toString(), null);
+
+        httpClient.executeRequest(request).toCompletableFuture().whenComplete(
+                (resp, ex) -> future.complete(deserializeResponse(resp)));
         return future;
     }
 
@@ -328,7 +342,10 @@ public class QuoteService {
                 .append(strike);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
-        httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
+        final Request request = RequestUtil.createGetRequest(builder.toString(), null);
+
+        httpClient.executeRequest(request).toCompletableFuture().whenComplete(
+                (resp, ex) -> future.complete(deserializeResponse(resp)));
         return future;
     }
 
@@ -368,7 +385,10 @@ public class QuoteService {
                 .append(strike);
 
         final CompletableFuture<OptionChain> future = new CompletableFuture<>();
-        httpClient.get(builder.toString(), null).whenComplete((resp, ex) -> future.complete(deserializeResponse(resp)));
+        final Request request = RequestUtil.createGetRequest(builder.toString(), null);
+
+        httpClient.executeRequest(request).toCompletableFuture().whenComplete(
+                (resp, ex) -> future.complete(deserializeResponse(resp)));
         return future;
     }
 
@@ -388,7 +408,10 @@ public class QuoteService {
         int index = 0;
         for (final String url : urls) {
             final CompletableFuture<OptionChain> future = futures.get(index++);
-            httpClient.get(url, null, response -> future.complete(deserializeResponse(response)));
+            final Request request = RequestUtil.createGetRequest(url, null);
+
+            httpClient.executeRequest(request).toCompletableFuture().whenComplete(
+                    (resp, ex) -> future.complete(deserializeResponse(resp)));
         }
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);

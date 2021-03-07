@@ -2,12 +2,15 @@ package com.sleet.api.service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sleet.api.HttpClient;
+import com.sleet.api.RequestUtil;
 import com.sleet.api.model.Token;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Request;
 import org.asynchttpclient.Response;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.sleet.api.Constants.*;
 
@@ -21,10 +24,10 @@ public class AuthService {
 
     private final String clientId;
     private final String redirectUri;
-    private final HttpClient httpClient;
+    private final AsyncHttpClient httpClient;
     private final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
 
-    public AuthService(final String clientId, final String redirectUri, final HttpClient httpClient) {
+    public AuthService(final String clientId, final String redirectUri, final AsyncHttpClient httpClient) {
         this.clientId = clientId;
         this.redirectUri = redirectUri;
         this.httpClient = httpClient;
@@ -58,7 +61,8 @@ public class AuthService {
         headerParams.put(CONTENT_TYPE, URL_ENCODED);
 
         final String url = API_URL + TOKEN_ENDPOINT;
-        final Response response = httpClient.post(url, builder.toString(), headerParams, DEFAULT_TIMEOUT_MILLIS);
+        final Request request = RequestUtil.createPostRequest(url, builder.toString(), headerParams);
+        final Response response = httpClient.executeRequest(request).get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         return deserializeResponse(response);
     }
 
