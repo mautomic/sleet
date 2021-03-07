@@ -1,122 +1,113 @@
-package com.sleet.api.service;
+package com.sleet.api.service
 
-import com.sleet.api.model.Instrument;
-import com.sleet.api.model.Order;
-import com.sleet.api.model.OrderLegCollection;
-import org.asynchttpclient.Dsl;
-import org.asynchttpclient.Response;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.sleet.api.model.Instrument
+import com.sleet.api.model.OrderLegCollection
+import com.sleet.api.model.Order
+import org.asynchttpclient.Dsl
+import org.junit.Assert
+import org.junit.Test
+import kotlin.Throws
+import java.lang.Exception
+import java.util.ArrayList
+import java.util.Arrays
 
 /**
- * Test class for {@link TradingService}
+ * Test class for [TradingService]
  *
  * @author mautomic
  */
-public class TradingServiceTest {
+class TradingServiceTest {
 
     @Test
-    public void testAccountInfoRequest() throws Exception {
+    @Throws(Exception::class)
+    fun testAccountInfoRequest() {
 
         // Must supply account num and access token for TD API in order to run test. See readme for info.
-        final String accessToken = "";
-        final String accountNum = "";
-
-        final TradingService tradingService = new TradingService(Dsl.asyncHttpClient(Dsl.config()));
-        final String jsonAccountInfo = tradingService.getAccountInfo(accountNum, accessToken);
-        System.out.println(jsonAccountInfo);
-        Assert.assertNotNull(jsonAccountInfo);
+        val accessToken = ""
+        val accountNum = ""
+        val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
+        val jsonAccountInfo = tradingService.getAccountInfo(accountNum, accessToken)
+        println(jsonAccountInfo)
+        Assert.assertNotNull(jsonAccountInfo)
     }
 
     @Test
-    public void testCreateSavedOrder() throws Exception {
+    @Throws(Exception::class)
+    fun testCreateSavedOrder() {
 
         // Must supply account num and access token for TD API in order to run test. See readme for info.
-        final String accessToken = "";
-        final String accountNum = "";
+        val accessToken = ""
+        val accountNum = ""
+        val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
+        val instrument = Instrument("SPY", "EQUITY")
 
-        final TradingService tradingService = new TradingService(Dsl.asyncHttpClient(Dsl.config()));
+        val legCollectionList: MutableList<OrderLegCollection> = ArrayList()
+        val orderLegCollection = OrderLegCollection("BUY", 1, instrument)
+        legCollectionList.add(orderLegCollection)
 
-        Instrument instrument = new Instrument("SPY", "EQUITY");
-        List<OrderLegCollection> legCollectionList = new ArrayList<>();
-        OrderLegCollection orderLegCollection = new OrderLegCollection("BUY", 1, instrument);
-        legCollectionList.add(orderLegCollection);
-
-        Order order = new Order("LIMIT", "NORMAL", "DAY", 320, "SINGLE", "NONE", legCollectionList);
-
-        Response response = tradingService.createSavedOrder(order, accountNum, accessToken);
-        System.out.println(response.getResponseBody());
+        val order = Order("LIMIT", "NORMAL", "DAY", 320.0, "SINGLE", "NONE", legCollectionList)
+        val response = tradingService.createSavedOrder(order, accountNum, accessToken)
+        println(response.responseBody)
     }
 
     @Test
-    public void testPlaceEquityOrder() throws Exception {
+    @Throws(Exception::class)
+    fun testPlaceEquityOrder() {
 
         // Must supply account num and access token for TD API in order to run test. See readme for info.
         // BE CAREFUL: THIS WILL CREATE A REAL ORDER
-        final String accessToken = "";
-        final String accountNum = "";
+        val accessToken = ""
+        val accountNum = ""
+        val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
+        val instrument = Instrument("SPY", "EQUITY")
 
-        final TradingService tradingService = new TradingService(Dsl.asyncHttpClient(Dsl.config()));
+        val legCollectionList: MutableList<OrderLegCollection> = ArrayList()
+        val orderLegCollection = OrderLegCollection("BUY", 1, instrument)
 
-        Instrument instrument = new Instrument("SPY", "EQUITY");
-        List<OrderLegCollection> legCollectionList = new ArrayList<>();
-        OrderLegCollection orderLegCollection = new OrderLegCollection("BUY", 1, instrument);
-        legCollectionList.add(orderLegCollection);
-
-        Order order = new Order("LIMIT", "NORMAL", "DAY", 320, "SINGLE", "NONE", legCollectionList);
-
-        Response response = tradingService.placeOrder(order, accountNum, accessToken);
-        System.out.println(response.getResponseBody());
+        legCollectionList.add(orderLegCollection)
+        val order = Order("LIMIT", "NORMAL", "DAY", 320.0, "SINGLE", "NONE", legCollectionList)
+        val response = tradingService.placeOrder(order, accountNum, accessToken)
+        println(response.responseBody)
     }
 
     @Test
-    public void testPlaceOptionOrder() throws Exception {
+    @Throws(Exception::class)
+    fun testPlaceOptionOrder() {
 
         // Must supply account num and access token for TD API in order to run test. See readme for info.
         // BE CAREFUL: THIS WILL CREATE A REAL ORDER
-        final String accessToken = "";
-        final String accountNum = "";
+        val accessToken = ""
+        val accountNum = ""
+        val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
+        val instrument = Instrument("SPY_082120C335", "OPTION")
 
-        final TradingService tradingService = new TradingService(Dsl.asyncHttpClient(Dsl.config()));
+        val orderLegCollection = OrderLegCollection("BUY_TO_OPEN", 1, instrument)
+        val legs: MutableList<OrderLegCollection> = ArrayList()
+        legs.add(orderLegCollection)
 
-        Instrument instrument = new Instrument("SPY_082120C335", "OPTION");
-
-        OrderLegCollection orderLegCollection = new OrderLegCollection("BUY_TO_OPEN", 1, instrument);
-
-        List<OrderLegCollection> legs = new ArrayList<>();
-        legs.add(orderLegCollection);
-
-        Order order = new Order("LIMIT", "NORMAL", "DAY", 2.10, "SINGLE", "NONE", legs);
-
-        Response response = tradingService.placeOrder(order, accountNum, accessToken);
-        System.out.println(response.getResponseBody());
+        val order = Order("LIMIT", "NORMAL", "DAY", 2.10, "SINGLE", "NONE", legs)
+        val response = tradingService.placeOrder(order, accountNum, accessToken)
+        println(response.responseBody)
     }
 
     @Test
-    public void testPlaceOptionSpreadOrder() throws Exception {
+    @Throws(Exception::class)
+    fun testPlaceOptionSpreadOrder() {
 
         // Must supply account num and access token for TD API in order to run test. See readme for info.
         // BE CAREFUL: THIS WILL CREATE A REAL ORDER
-        final String accessToken = "";
-        final String accountNum = "";
+        val accessToken = ""
+        val accountNum = ""
+        val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
+        val buyOption = Instrument("SPY_082120C335", "OPTION")
+        val sellOption = Instrument("SPY_082120C340", "OPTION")
 
-        final TradingService tradingService = new TradingService(Dsl.asyncHttpClient(Dsl.config()));
+        val buyLeg = OrderLegCollection("BUY_TO_OPEN", 1, buyOption)
+        val sellLeg = OrderLegCollection("SELL_TO_OPEN", 1, sellOption)
+        val legs = Arrays.asList(buyLeg, sellLeg)
 
-        Instrument buyOption = new Instrument("SPY_082120C335", "OPTION");
-        Instrument sellOption = new Instrument("SPY_082120C340", "OPTION");
-
-        OrderLegCollection buyLeg = new OrderLegCollection("BUY_TO_OPEN", 1, buyOption);
-        OrderLegCollection sellLeg = new OrderLegCollection("SELL_TO_OPEN", 1, sellOption);
-
-        List<OrderLegCollection> legs = Arrays.asList(buyLeg, sellLeg);
-
-        Order order = new Order("NET_DEBIT", "NORMAL", "DAY", 1.20, "SINGLE", "VERTICAL", legs);
-
-        Response response = tradingService.placeOrder(order, accountNum, accessToken);
-        System.out.println(response.getResponseBody());
+        val order = Order("NET_DEBIT", "NORMAL", "DAY", 1.20, "SINGLE", "VERTICAL", legs)
+        val response = tradingService.placeOrder(order, accountNum, accessToken)
+        println(response.responseBody)
     }
 }

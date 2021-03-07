@@ -1,129 +1,125 @@
-package com.sleet.api.service;
+package com.sleet.api.service
 
-import com.sleet.api.model.Asset;
-import com.sleet.api.model.OptionChain;
-import org.asynchttpclient.Dsl;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import com.sleet.api.model.OptionChain
+import com.sleet.api.model.Asset
+import org.asynchttpclient.Dsl
+import org.junit.Assert
+import org.junit.Test
+import kotlin.Throws
+import java.lang.Exception
+import java.util.ArrayList
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
+import java.util.Arrays
 
 /**
- * Test class for {@link QuoteService}
+ * Test class for [QuoteService]
  *
  * @author mautomic
  */
-public class QuoteServiceTest {
+class QuoteServiceTest {
 
     @Test
-    public void testOptionChainRequest() throws Exception {
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()));
+    @Throws(Exception::class)
+    fun testOptionChainRequest() {
+        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val time = System.currentTimeMillis()
+        val optionChain = quoteService.getOptionChain("SPY", "50")
+        println("Retrieval for SPY options took " + (System.currentTimeMillis() - time) + " ms")
 
-        long time = System.currentTimeMillis();
-        final OptionChain optionChain = quoteService.getOptionChain("SPY", "50");
-        System.out.println("Retrieval for SPY options took " + (System.currentTimeMillis() - time) + " ms");
-
-        Assert.assertNotNull(optionChain);
-        Assert.assertNotNull(optionChain.getCallExpDateMap());
-        Assert.assertNotNull(optionChain.getPutExpDateMap());
-
-        Assert.assertEquals("SPY", optionChain.getSymbol());
-
-        Assert.assertFalse(optionChain.getCallExpDateMap().isEmpty());
-        Assert.assertFalse(optionChain.getPutExpDateMap().isEmpty());
+        Assert.assertNotNull(optionChain)
+        Assert.assertNotNull(optionChain.callExpDateMap)
+        Assert.assertNotNull(optionChain.putExpDateMap)
+        Assert.assertEquals("SPY", optionChain.symbol)
+        Assert.assertFalse(optionChain.callExpDateMap!!.isEmpty())
+        Assert.assertFalse(optionChain.putExpDateMap!!.isEmpty())
     }
 
     @Test
-    public void testOptionChainRequestForStrikeAndDate() throws Exception {
+    @Throws(Exception::class)
+    fun testOptionChainRequestForStrikeAndDate() {
+        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val optionChain = quoteService.getOptionChainForStrikeAndDate("TLT", "155", "2021-07-16")
+        Assert.assertNotNull(optionChain)
+        Assert.assertNotNull(optionChain!!.callExpDateMap)
+        Assert.assertNotNull(optionChain.putExpDateMap)
 
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()));
-        final OptionChain optionChain = quoteService.getOptionChainForStrikeAndDate("TLT", "155", "2021-07-16");
-
-        Assert.assertNotNull(optionChain);
-        Assert.assertNotNull(optionChain.getCallExpDateMap());
-        Assert.assertNotNull(optionChain.getPutExpDateMap());
-
-        Map<String, Map<String, List<Asset>>> map = optionChain.getCallExpDateMap();
-        Asset asset = map.get("2021-07-16:166").get("155.0").get(0);
-        Assert.assertEquals("TLT_071621C155", asset.getSymbol());
+        val map = optionChain.callExpDateMap
+        val asset = map!!["2021-07-16:166"]!!["155.0"]!![0]
+        Assert.assertEquals("TLT_071621C155", asset.symbol)
     }
 
     @Test
-    public void testContinuousOptionScanningPerformance() throws Exception {
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()));
+    @Throws(Exception::class)
+    fun testContinuousOptionScanningPerformance() {
+        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val tickers = arrayOf(
+            "QQQ", "SPY", "IWM", "\$VIX.X", "\$SPX.X", "MSFT", "AAPL", "NFLX", "FB", "TSLA",
+            "NVDA", "BYND", "TLT", "SPCE", "XLF"
+        )
+        val startTime = System.currentTimeMillis()
+        for (j in 0..2) {
+            val futures: MutableList<CompletableFuture<OptionChain?>> = ArrayList()
+            val time = System.currentTimeMillis()
+            for (ticker in tickers)
+                futures.add(quoteService.getOptionChainAsync(ticker, "100"))
 
-        final String[] tickers = {"QQQ", "SPY", "IWM", "$VIX.X", "$SPX.X", "MSFT", "AAPL", "NFLX", "FB", "TSLA",
-                "NVDA", "BYND", "TLT", "SPCE", "XLF"};
-
-        final long startTime = System.currentTimeMillis();
-        for (int j = 0; j < 3; j++) {
-
-            List<CompletableFuture<OptionChain>> futures = new ArrayList<>();
-            long time = System.currentTimeMillis();
-            for (String ticker : tickers) {
-                futures.add(quoteService.getOptionChainAsync(ticker, "100"));
-            }
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(20, TimeUnit.SECONDS);
-            System.out.println("Retrieval for " + Arrays.toString(tickers) + "  took " + (System.currentTimeMillis() - time) + " ms");
+            CompletableFuture.allOf(*futures.toTypedArray<CompletableFuture<*>>())[20, TimeUnit.SECONDS]
+            println("Retrieval for " + Arrays.toString(tickers) + "  took " + (System.currentTimeMillis() - time) + " ms")
         }
-        System.out.println("Took total of " + (System.currentTimeMillis() - startTime) + " ms");
+        println("Took total of " + (System.currentTimeMillis() - startTime) + " ms")
     }
 
     @Test
-    public void testQuoteRequest() throws Exception {
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()));
+    @Throws(Exception::class)
+    fun testQuoteRequest() {
+        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val time = System.currentTimeMillis()
+        val equity = quoteService.getQuote("SPY")
+        println("Retrieval for SPY quote info took " + (System.currentTimeMillis() - time) + " ms")
 
-        long time = System.currentTimeMillis();
-        Asset equity = quoteService.getQuote("SPY");
-        System.out.println("Retrieval for SPY quote info took " + (System.currentTimeMillis() - time) + " ms");
+        val time2 = System.currentTimeMillis()
+        val equity2 = quoteService.getQuote("AAPL")
+        println("Retrieval for AAPL quote info took " + (System.currentTimeMillis() - time2) + " ms")
 
-        long time2 = System.currentTimeMillis();
-        Asset equity2 = quoteService.getQuote("AAPL");
-        System.out.println("Retrieval for AAPL quote info took " + (System.currentTimeMillis() - time2) + " ms");
-
-        Assert.assertNotNull(equity);
-        Assert.assertEquals(218.26, equity.getFiftyTwoWeekLow(), 0.0001);
+        Assert.assertNotNull(equity)
+        Assert.assertEquals(218.26, equity!!.fiftyTwoWeekLow, 0.0001)
     }
 
     @Test
-    public void testMultipleTickers() throws Exception {
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()));
+    @Throws(Exception::class)
+    fun testMultipleTickers() {
+        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val tickers = Arrays.asList("SPY", "AAPL", "MSFT")
+        val time = System.currentTimeMillis()
+        val equities = quoteService.getQuotes(tickers)
+        println("Retrieval for multiple quotes info took " + (System.currentTimeMillis() - time) + " ms")
 
-        List<String> tickers = Arrays.asList("SPY", "AAPL", "MSFT");
-        long time = System.currentTimeMillis();
-        final List<Asset> equities = quoteService.getQuotes(tickers);
-        System.out.println("Retrieval for multiple quotes info took " + (System.currentTimeMillis() - time) + " ms");
-
-        Assert.assertNotNull(equities);
-        Assert.assertFalse(equities.isEmpty());
-        Assert.assertEquals(3, equities.size());
+        Assert.assertNotNull(equities)
+        Assert.assertFalse(equities.isEmpty())
+        Assert.assertEquals(3, equities.size.toLong())
         Assert.assertEquals(1, equities.stream()
-                .filter(equity -> equity.getSymbol().contains("SPY"))
-                .count());
+            .filter { equity: Asset -> equity.symbol!!.contains("SPY") }
+            .count())
         Assert.assertEquals(218.26, equities.stream()
-                .filter(equity -> equity.getSymbol().contains("SPY"))
-                .mapToDouble(Asset::getFiftyTwoWeekLow)
-                .sum(), 0.0001);
+            .filter { equity: Asset -> equity.symbol!!.contains("SPY") }
+            .mapToDouble(Asset::fiftyTwoWeekLow)
+            .sum(), 0.0001)
     }
 
     @Test
-    public void testContinuousQuoteScanningPerformance() throws Exception {
-        final QuoteService quoteService = new QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()));
-
-        final String[] tickers = {"QQQ", "DIS", "AAPL", "FB", "SPY", "MSFT", "$VIX.X", "AMD", "AMZN", "$SPX.X"};
-        for (int j = 0; j < 3; j++) {
-            for (String ticker : tickers) {
-                long time = System.currentTimeMillis();
-                quoteService.getQuote(ticker);
-                System.out.println("Retrieval for " + ticker + " quote info took " + (System.currentTimeMillis() - time) + " ms");
+    @Throws(Exception::class)
+    fun testContinuousQuoteScanningPerformance() {
+        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val tickers = arrayOf("QQQ", "DIS", "AAPL", "FB", "SPY", "MSFT", "\$VIX.X", "AMD", "AMZN", "\$SPX.X")
+        for (j in 0..2) {
+            for (ticker in tickers) {
+                val time = System.currentTimeMillis()
+                quoteService.getQuote(ticker)
+                println("Retrieval for " + ticker + " quote info took " + (System.currentTimeMillis() - time) + " ms")
             }
             // Throttle so TD API doesn't hit max requests per second limit
-            Thread.sleep(2000);
+            Thread.sleep(2000)
         }
     }
 }
