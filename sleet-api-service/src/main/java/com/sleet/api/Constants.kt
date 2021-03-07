@@ -17,7 +17,7 @@ object Constants {
     const val CLIENT_ID = "client_id"
     const val CODE = "code"
     const val CONTENT_TYPE = "Content-Type"
-    const val DEFAULT_TIMEOUT_MILLIS = 5000
+    const val DEFAULT_TIMEOUT_MILLIS = 5000L
     const val DEFAULT_STRIKE_COUNT = "100"
     const val DEFAULT_REDIRECT_URI = "https://127.0.0.1"
     const val EQUALS = '='

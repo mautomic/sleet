@@ -15,9 +15,11 @@ import org.asynchttpclient.Dsl
  */
 class TDClient @JvmOverloads constructor(apiKey: String, redirectUri: String = DEFAULT_REDIRECT_URI) {
 
-    private val httpClient: AsyncHttpClient? =
+    private val httpClient: AsyncHttpClient =
         Dsl.asyncHttpClient(
-            Dsl.config().setReadTimeout(DEFAULT_TIMEOUT_MILLIS).setConnectTimeout(DEFAULT_TIMEOUT_MILLIS)
+            Dsl.config()
+                .setReadTimeout(DEFAULT_TIMEOUT_MILLIS.toInt())
+                .setConnectTimeout(DEFAULT_TIMEOUT_MILLIS.toInt())
         )
 
     val authenticator: AuthService = AuthService(apiKey, redirectUri, httpClient)
