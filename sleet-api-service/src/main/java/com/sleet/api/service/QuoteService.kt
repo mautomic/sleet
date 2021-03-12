@@ -429,7 +429,7 @@ class QuoteService(
      * @return [OptionChain] for the original request, or null if exception occurs
      */
     private fun deserializeResponse(response: Response): OptionChain? {
-        if (response.statusCode != 200) {
+        if (response.statusCode == 200) {
             try {
                 return mapper.readValue(response.responseBody, OptionChain::class.java)
             } catch (e: Exception) {

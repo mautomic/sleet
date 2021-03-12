@@ -39,14 +39,15 @@ class QuoteServiceTest {
     @Throws(Exception::class)
     fun testOptionChainRequestForStrikeAndDate() {
         val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
-        val optionChain = quoteService.getOptionChainForStrikeAndDate("TLT", "155", "2021-07-16")
+        val optionChain = quoteService.getOptionChainForStrikeAndDate("SPY", "400", "2023-01-20")
         Assert.assertNotNull(optionChain)
         Assert.assertNotNull(optionChain!!.callExpDateMap)
         Assert.assertNotNull(optionChain.putExpDateMap)
 
         val map = optionChain.callExpDateMap
-        val asset = map!!["2021-07-16:166"]!!["155.0"]!![0]
-        Assert.assertEquals("TLT_071621C155", asset.symbol)
+        val strikes = map?.entries?.iterator()?.next()?.value
+        val asset = strikes!!["400.0"]!![0]
+        Assert.assertEquals("SPY_012023C400", asset.symbol)
     }
 
     @Test
