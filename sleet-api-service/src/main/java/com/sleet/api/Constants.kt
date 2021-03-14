@@ -28,6 +28,7 @@ object Constants {
     const val REDIRECT_URI = "redirect_uri"
     const val REFRESH_TOKEN = "refresh_token"
     const val SAVED_ORDERS = "savedorders"
+    const val SLASH = "/"
     const val TOKEN_ENDPOINT = "oauth2/token"
     const val URL_ENCODED = "application/x-www-form-urlencoded"
 

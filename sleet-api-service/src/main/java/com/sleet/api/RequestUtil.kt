@@ -29,5 +29,23 @@ class RequestUtil {
             }
             return requestBuilder.build()
         }
+
+        @JvmStatic
+        fun createDeleteRequest(url: String, headerParams: Map<String, String>?): Request? {
+            val requestBuilder = RequestBuilder("DELETE").setUrl(url)
+            headerParams?.forEach { (name: String, value: String) ->
+                requestBuilder.setHeader(name, value)
+            }
+            return requestBuilder.build()
+        }
+
+        @JvmStatic
+        fun createPutRequest(url: String, body: String, headerParams: Map<String, String>?): Request? {
+            val requestBuilder = RequestBuilder("PUT").setUrl(url).setBody(body)
+            headerParams?.forEach { (name: String, value: String) ->
+                requestBuilder.setHeader(name, value)
+            }
+            return requestBuilder.build()
+        }
     }
 }
