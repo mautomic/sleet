@@ -21,4 +21,5 @@ dependencies {
     compile("com.fasterxml.jackson.core:jackson-databind:2.10.4")
     compile "org.jetbrains.kotlin:kotlin-reflect:1.4.10"
     compile "org.jetbrains.kotlin:kotlin-stdlib:1.4.10"
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
 }
