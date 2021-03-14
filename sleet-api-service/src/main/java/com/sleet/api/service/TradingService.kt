@@ -28,14 +28,13 @@ import java.lang.Exception
 
 /**
  * An TD API interface that provides methods to view account info and place orders.
- * Any API calls from this service will require an authorization grant.
+ * Any API calls with this service will require an access token to be authenticated.
  *
  * @author mautomic
  */
 class TradingService(private val httpClient: AsyncHttpClient) {
 
     companion object {
-        private val LOG = LoggerFactory.getLogger(TradingService::class.java)
         private val mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
     }
 
@@ -66,7 +65,7 @@ class TradingService(private val httpClient: AsyncHttpClient) {
      *
      * @param accountNum  to create order in
      * @param accessToken to authenticate with
-     * @param orderId     to retrieve
+     * @param orderId     of order to retrieve
      * @param savedOrder  true indicates it is not a real working order, just a saved order
      * @return a [Response] with the HTTP status and body
      * @throws Exception if there is an issue creating or executing the GET request
@@ -93,6 +92,7 @@ class TradingService(private val httpClient: AsyncHttpClient) {
      * @param order       to place
      * @param accountNum  to place order in
      * @param accessToken to authenticate with
+     * @param savedOrder  true indicates it is not a real working order, just a saved order
      * @return a [Response] with the HTTP status and body
      * @throws Exception if there is an issue creating or executing the POST request
      */
@@ -112,9 +112,10 @@ class TradingService(private val httpClient: AsyncHttpClient) {
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/delete/accounts/%7BaccountId%7D/orders/%7BorderId%7D-0">Cancel Order</a>
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/delete/accounts/%7BaccountId%7D/savedorders/%7BsavedOrderId%7D-0">Delete Saved Order</a>
      *
-     * @param order       to cancel
      * @param accountNum  to cancel order in
      * @param accessToken to authenticate with
+     * @param orderId     of order to cancel
+     * @param savedOrder  true indicates it is not a real working order, just a saved order
      * @return a [Response] with the HTTP status and body
      * @throws Exception if there is an issue creating or executing the DELETE request
      */
@@ -139,6 +140,7 @@ class TradingService(private val httpClient: AsyncHttpClient) {
      * @param order       to replace
      * @param accountNum  to replace order in
      * @param accessToken to authenticate with
+     * @param savedOrder  true indicates it is not a real working order, just a saved order
      * @return a [Response] with the HTTP status and body
      * @throws Exception if there is an issue creating or executing the PUT request
      */
@@ -156,8 +158,6 @@ class TradingService(private val httpClient: AsyncHttpClient) {
      */
     private fun createOrderRequest(url: String, order: Order, accessToken: String, update: Boolean = false): Request? {
         val orderJson = mapper.writeValueAsString(order)
-        LOG.info("Creating order with schema:\n $orderJson")
-
         val headerMap: Map<String, String> = mapOf(
             AUTHORIZATION to BEARER + accessToken,
             CONTENT_TYPE to APPLICATION_JSON
