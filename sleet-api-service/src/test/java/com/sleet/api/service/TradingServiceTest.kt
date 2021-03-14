@@ -46,7 +46,7 @@ class TradingServiceTest {
         legCollectionList.add(orderLegCollection)
 
         val order = Order("LIMIT", "NORMAL", "DAY", 320.0, "SINGLE", "NONE", legCollectionList)
-        val response = tradingService.createSavedOrder(order, accountNum, accessToken)
+        val response = tradingService.placeOrder(order, accountNum, accessToken)
         println(response.responseBody)
     }
 
@@ -66,7 +66,7 @@ class TradingServiceTest {
 
         legCollectionList.add(orderLegCollection)
         val order = Order("LIMIT", "NORMAL", "DAY", 320.0, "SINGLE", "NONE", legCollectionList)
-        val response = tradingService.placeOrder(order, accountNum, accessToken)
+        val response = tradingService.placeOrder(order, accountNum, accessToken, true)
         println(response.responseBody)
     }
 
@@ -86,7 +86,7 @@ class TradingServiceTest {
         legs.add(orderLegCollection)
 
         val order = Order("LIMIT", "NORMAL", "DAY", 2.10, "SINGLE", "NONE", legs)
-        val response = tradingService.placeOrder(order, accountNum, accessToken)
+        val response = tradingService.placeOrder(order, accountNum, accessToken, true)
         println(response.responseBody)
     }
 
@@ -107,7 +107,7 @@ class TradingServiceTest {
         val legs = Arrays.asList(buyLeg, sellLeg)
 
         val order = Order("NET_DEBIT", "NORMAL", "DAY", 1.20, "SINGLE", "VERTICAL", legs)
-        val response = tradingService.placeOrder(order, accountNum, accessToken)
+        val response = tradingService.placeOrder(order, accountNum, accessToken, true)
         println(response.responseBody)
     }
 }

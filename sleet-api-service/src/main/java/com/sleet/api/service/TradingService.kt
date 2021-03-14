@@ -20,7 +20,6 @@ import com.sleet.api.model.Order
 import org.asynchttpclient.Response
 import org.asynchttpclient.AsyncHttpClient
 import org.asynchttpclient.Request
-import org.slf4j.LoggerFactory
 
 import kotlin.Throws
 import java.util.concurrent.TimeUnit
@@ -58,22 +57,22 @@ class TradingService(private val httpClient: AsyncHttpClient) {
     }
 
     /**
-     * Get a specific existing order. Unless the savedOrder flag is explicitly overridden, this function is
-     * set to retrieve saved orders, not real orders, as a safety mechanism.
+     * Get a specific existing order. Unless the realOrder flag is explicitly overridden, this function is
+     * set to retrieve saved orders as a safety mechanism.
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/get/accounts/%7BaccountId%7D/orders/%7BorderId%7D-0">Get Order</a>
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/get/accounts/%7BaccountId%7D/savedorders/%7BsavedOrderId%7D-0">Get Saved Order</a>
      *
      * @param accountNum  to create order in
      * @param accessToken to authenticate with
      * @param orderId     of order to retrieve
-     * @param savedOrder  true indicates it is not a real working order, just a saved order
+     * @param realOrder   true indicates a real working order, false indicates a saved order
      * @return a [Response] with the HTTP status and body
      * @throws Exception if there is an issue creating or executing the GET request
      */
     @Throws(Exception::class)
-    fun getOrder(accountNum: String, accessToken: String, orderId: String, savedOrder: Boolean = true): Response {
+    fun getOrder(accountNum: String, accessToken: String, orderId: String, realOrder: Boolean = false): Response {
         val url: String =
-            if (!savedOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS + SLASH + orderId
+            if (realOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS + SLASH + orderId
             else API_URL + ACCOUNTS + SLASH + accountNum + SLASH + SAVED_ORDERS + SLASH + orderId
 
         val headerMap: Map<String, String> = mapOf(
@@ -84,22 +83,22 @@ class TradingService(private val httpClient: AsyncHttpClient) {
     }
 
     /**
-     * Place a specific existing order. Unless the savedOrder flag is explicitly overridden, this function is
-     * set to create saved orders, not real orders, as a safety mechanism.
+     * Place a specific existing order. Unless the realOrder flag is explicitly overridden, this function is
+     * set to create saved orders as a safety mechanism.
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/post/accounts/%7BaccountId%7D/orders-0">Place Order</a>
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/post/accounts/%7BaccountId%7D/savedorders-0">Create Saved Order</a>
      *
      * @param order       to place
      * @param accountNum  to place order in
      * @param accessToken to authenticate with
-     * @param savedOrder  true indicates it is not a real working order, just a saved order
+     * @param realOrder   true indicates a real working order, false indicates a saved order
      * @return a [Response] with the HTTP status and body
      * @throws Exception if there is an issue creating or executing the POST request
      */
     @Throws(Exception::class)
-    fun placeOrder(order: Order, accountNum: String, accessToken: String, savedOrder: Boolean = true): Response {
+    fun placeOrder(order: Order, accountNum: String, accessToken: String, realOrder: Boolean = false): Response {
         val url: String =
-            if (!savedOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS
+            if (realOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS
             else API_URL + ACCOUNTS + SLASH + accountNum + SLASH + SAVED_ORDERS
 
         val request = createOrderRequest(url, order, accessToken)
@@ -107,21 +106,21 @@ class TradingService(private val httpClient: AsyncHttpClient) {
     }
 
     /**
-     * Cancel a specific existing order. Unless the savedOrder flag is explicitly overridden, this function is
-     * set to cancel saved orders, not real orders, as a safety mechanism.
+     * Cancel a specific existing order. Unless the realOrder flag is explicitly overridden, this function is
+     * set to cancel saved orders as a safety mechanism.
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/delete/accounts/%7BaccountId%7D/orders/%7BorderId%7D-0">Cancel Order</a>
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/delete/accounts/%7BaccountId%7D/savedorders/%7BsavedOrderId%7D-0">Delete Saved Order</a>
      *
      * @param accountNum  to cancel order in
      * @param accessToken to authenticate with
      * @param orderId     of order to cancel
-     * @param savedOrder  true indicates it is not a real working order, just a saved order
+     * @param realOrder   true indicates a real working order, false indicates a saved order
      * @return a [Response] with the HTTP status and body
      * @throws Exception if there is an issue creating or executing the DELETE request
      */
-    fun cancelOrder(accountNum: String, accessToken: String, orderId: String, savedOrder: Boolean = true): Response {
+    fun cancelOrder(accountNum: String, accessToken: String, orderId: String, realOrder: Boolean = false): Response {
         val url: String =
-            if (!savedOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS + SLASH + orderId
+            if (realOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS + SLASH + orderId
             else API_URL + ACCOUNTS + SLASH + accountNum + SLASH + SAVED_ORDERS + SLASH + orderId
 
         val headerMap: Map<String, String> = mapOf(
@@ -132,21 +131,21 @@ class TradingService(private val httpClient: AsyncHttpClient) {
     }
 
     /**
-     * Replace a specific existing order. Unless the savedOrder flag is explicitly overridden, this function is
-     * set to replace saved orders, not real orders, as a safety mechanism.
+     * Replace a specific existing order. Unless the realOrder flag is explicitly overridden, this function is
+     * set to replace saved orders as a safety mechanism.
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/put/accounts/%7BaccountId%7D/orders/%7BorderId%7D-0">Replace Order</a>
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/put/accounts/%7BaccountId%7D/savedorders/%7BsavedOrderId%7D-0">Replace Saved Order</a>
      *
      * @param order       to replace
      * @param accountNum  to replace order in
      * @param accessToken to authenticate with
-     * @param savedOrder  true indicates it is not a real working order, just a saved order
+     * @param realOrder   true indicates a real working order, false indicates a saved order
      * @return a [Response] with the HTTP status and body
      * @throws Exception if there is an issue creating or executing the PUT request
      */
-    fun replaceOrder(order: Order, accountNum: String, accessToken: String, savedOrder: Boolean = true): Response {
+    fun replaceOrder(order: Order, accountNum: String, accessToken: String, realOrder: Boolean = false): Response {
         val url: String =
-            if (!savedOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS
+            if (realOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS
             else API_URL + ACCOUNTS + SLASH + accountNum + SLASH + SAVED_ORDERS
 
         val request = createOrderRequest(url, order, accessToken, true)
