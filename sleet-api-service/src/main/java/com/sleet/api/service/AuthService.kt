@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit
  */
 class AuthService(
     private val clientId: String,
-    private val redirectUri: String,
     private val httpClient: AsyncHttpClient
 ) {
 
@@ -43,7 +42,6 @@ class AuthService(
     fun getPostAccessToken(code: String?, isRefreshToken: Boolean): Token {
         val builder = StringBuilder()
         builder.append(Constants.CLIENT_ID).append(EQUALS).append(clientId).append(AND)
-        builder.append(Constants.REDIRECT_URI).append(EQUALS).append(redirectUri).append(AND)
 
         if (isRefreshToken) {
             builder.append(Constants.GRANT_TYPE).append(EQUALS).append(Constants.REFRESH_TOKEN).append(AND)
