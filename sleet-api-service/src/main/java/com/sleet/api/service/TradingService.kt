@@ -12,11 +12,15 @@ import com.sleet.api.Constants.BEARER
 import com.sleet.api.Constants.CONTENT_TYPE
 import com.sleet.api.Constants.DEFAULT_TIMEOUT_MILLIS
 import com.sleet.api.Constants.ORDERS
+import com.sleet.api.Constants.QUERY_PARAM_FROM_ENTERED_TIME
+import com.sleet.api.Constants.QUERY_PARAM_STATUS
+import com.sleet.api.Constants.QUERY_PARAM_TO_ENTERED_TIME
 import com.sleet.api.Constants.SAVED_ORDERS
 import com.sleet.api.Constants.SLASH
 import com.sleet.api.RequestUtil.Companion.createDeleteRequest
 import com.sleet.api.RequestUtil.Companion.createPutRequest
 import com.sleet.api.model.Order
+import org.apache.commons.lang3.StringUtils
 import org.asynchttpclient.Response
 import org.asynchttpclient.AsyncHttpClient
 import org.asynchttpclient.Request
@@ -75,6 +79,60 @@ class TradingService(private val httpClient: AsyncHttpClient) {
             if (realOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS + SLASH + orderId
             else API_URL + ACCOUNTS + SLASH + accountNum + SLASH + SAVED_ORDERS + SLASH + orderId
 
+        val headerMap: Map<String, String> = mapOf(
+            AUTHORIZATION to BEARER + accessToken
+        )
+        val request = createGetRequest(url, headerMap)
+        return httpClient.executeRequest(request)[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+    }
+
+    /**
+     * Get all real orders for this account between provided dates. By default, all types of order statuses are returned
+     * @see <a href="https://developer.tdameritrade.com/account-access/apis/get/accounts/%7BaccountId%7D/orders-0">Get Orders By Path</a>
+     *
+     * @param accountNum  to retrieve orders from
+     * @param accessToken to authenticate with
+     * @param fromEnteredTime to indicate up till how far back to retrieve existing orders
+     * @param toEnteredTime to indicate up till how recently to retrieve existing orders
+     * @param status of types of orders to query for (ie, FILLED, WORKING, ...)
+     * @return a [Response] with the HTTP status and body
+     * @throws Exception if there is an issue creating or executing the GET request
+     */
+    @Throws(Exception::class)
+    fun getAllOrders(
+        accountNum: String,
+        accessToken: String,
+        fromEnteredTime: String,
+        toEnteredTime: String,
+        status: String = StringUtils.EMPTY
+    ): Response {
+
+        var url: String = API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS +
+                "?$QUERY_PARAM_FROM_ENTERED_TIME$fromEnteredTime$QUERY_PARAM_TO_ENTERED_TIME$toEnteredTime"
+
+        if (!StringUtils.isEmpty(status))
+            url += QUERY_PARAM_STATUS + status
+
+        val headerMap: Map<String, String> = mapOf(
+            AUTHORIZATION to BEARER + accessToken
+        )
+        val request = createGetRequest(url, headerMap)
+        return httpClient.executeRequest(request)[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+    }
+
+    /**
+     * Get all saved orders for this account
+     * @see <a href="https://developer.tdameritrade.com/account-access/apis/get/accounts/%7BaccountId%7D/savedorders/%7BsavedOrderId%7D-0">Get Saved Orders By Path</a>
+     *
+     * @param accountNum  to retrieve saved orders from
+     * @param accessToken to authenticate with
+     * @return a [Response] with the HTTP status and body
+     * @throws Exception if there is an issue creating or executing the GET request
+     */
+    @Throws(Exception::class)
+    fun getAllSavedOrders(accountNum: String, accessToken: String): Response {
+
+        val url: String = API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS
         val headerMap: Map<String, String> = mapOf(
             AUTHORIZATION to BEARER + accessToken
         )

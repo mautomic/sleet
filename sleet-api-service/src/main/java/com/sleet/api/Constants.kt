@@ -37,6 +37,9 @@ object Constants {
     const val QUERY_PARAM_SYMBOL = "&symbol="
     const val QUERY_PARAM_STRIKE_COUNT = "&strikeCount="
     const val QUERY_PARAM_STRIKE = "&strike="
+    const val QUERY_PARAM_STATUS = "&status="
     const val QUERY_PARAM_FROM_DATE = "&fromDate="
     const val QUERY_PARAM_TO_DATE = "&toDate="
+    const val QUERY_PARAM_FROM_ENTERED_TIME = "&fromEnteredTime="
+    const val QUERY_PARAM_TO_ENTERED_TIME = "&toEnteredTime="
 }
