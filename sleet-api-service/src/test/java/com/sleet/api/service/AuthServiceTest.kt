@@ -18,29 +18,33 @@ class AuthServiceTest {
     @Test
     @Throws(Exception::class)
     fun testGetAccessTokenWithAuthGrant() {
-        val redirectUri = "https://127.0.0.1"
+        // This grantCode needs to be URL encoded
         val grantCode = ""
+        val redirectUri = "https://127.0.0.1:8443/callback"
+
         val authService = AuthService(TestConstants.API_KEY, redirectUri, Dsl.asyncHttpClient(Dsl.config()))
         val token = authService.getPostAccessToken(grantCode, false)
-        println(token.accessToken)
-        println(token.refreshToken)
+        println(token?.accessToken)
+        println(token?.refreshToken)
         Assert.assertNotNull(token)
-        Assert.assertNotNull(token.accessToken)
-        Assert.assertNotNull(token.refreshToken)
+        Assert.assertNotNull(token?.accessToken)
+        Assert.assertNotNull(token?.refreshToken)
     }
 
     @Test
     @Throws(Exception::class)
     fun testGetAccessTokenWithRefreshToken() {
-        val redirectUri = "https://127.0.0.1"
+        // This refreshToken needs to be URL encoded
         val refreshToken = ""
+        val redirectUri = "https://127.0.0.1:8443/callback"
+
         val refreshTokenEncoded = URLEncoder.encode(refreshToken, StandardCharsets.UTF_8.toString())
         val authService = AuthService(TestConstants.API_KEY, redirectUri, Dsl.asyncHttpClient(Dsl.config()))
         val token = authService.getPostAccessToken(refreshTokenEncoded, true)
-        println(token.accessToken)
-        println(token.refreshToken)
+        println(token?.accessToken)
+        println(token?.refreshToken)
         Assert.assertNotNull(token)
-        Assert.assertNull(token.accessToken)
-        Assert.assertNotNull(token.refreshToken)
+        Assert.assertNull(token?.accessToken)
+        Assert.assertNotNull(token?.refreshToken)
     }
 }

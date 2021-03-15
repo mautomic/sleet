@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit
  */
 class AuthService(
     private val clientId: String,
+    private val redirectUri: String,
     private val httpClient: AsyncHttpClient
 ) {
 
@@ -39,9 +40,10 @@ class AuthService(
      * @throws Exception if there is an issue with the POST request
      */
     @Throws(Exception::class)
-    fun getPostAccessToken(code: String?, isRefreshToken: Boolean): Token {
+    fun getPostAccessToken(code: String, isRefreshToken: Boolean): Token? {
         val builder = StringBuilder()
         builder.append(Constants.CLIENT_ID).append(EQUALS).append(clientId).append(AND)
+        builder.append(Constants.REDIRECT_URI).append(EQUALS).append(redirectUri).append(AND)
 
         if (isRefreshToken) {
             builder.append(Constants.GRANT_TYPE).append(EQUALS).append(Constants.REFRESH_TOKEN).append(AND)
@@ -58,7 +60,9 @@ class AuthService(
 
         val request = createPostRequest(url, builder.toString(), headerParams)
         val response = httpClient.executeRequest(request)[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
-        val responseJson = mapper.readValue(response.responseBody, Token::class.java)
-        return responseJson
+
+        if (response.statusCode != 200)
+            return null
+        return mapper.readValue(response.responseBody, Token::class.java)
     }
 }

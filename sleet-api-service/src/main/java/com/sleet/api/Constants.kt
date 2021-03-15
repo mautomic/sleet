@@ -19,7 +19,7 @@ object Constants {
     const val CONTENT_TYPE = "Content-Type"
     const val DEFAULT_TIMEOUT_MILLIS = 5000L
     const val DEFAULT_STRIKE_COUNT = "100"
-    const val DEFAULT_REDIRECT_URI = "https://127.0.0.1"
+    const val DEFAULT_REDIRECT_URI = "https://127.0.0.1:8443/callback"
     const val EQUALS = '='
     const val GRANT_TYPE = "grant_type"
     const val MARKETDATA = "marketdata"
