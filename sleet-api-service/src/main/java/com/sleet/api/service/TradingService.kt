@@ -13,6 +13,7 @@ import com.sleet.api.Constants.CONTENT_TYPE
 import com.sleet.api.Constants.DEFAULT_TIMEOUT_MILLIS
 import com.sleet.api.Constants.ORDERS
 import com.sleet.api.Constants.QUERY_PARAM_FROM_ENTERED_TIME
+import com.sleet.api.Constants.QUERY_PARAM_ORDERS_AND_POSITIONS
 import com.sleet.api.Constants.QUERY_PARAM_STATUS
 import com.sleet.api.Constants.QUERY_PARAM_TO_ENTERED_TIME
 import com.sleet.api.Constants.SAVED_ORDERS
@@ -47,12 +48,16 @@ class TradingService(private val httpClient: AsyncHttpClient) {
      *
      * @param accountNum  to retrieve info for
      * @param accessToken to authenticate with
+     * @param getPositionsAndOrders query param for extra account details
      * @return a [Response] with the HTTP status and body
      * @throws Exception if there is an issue creating or executing the GET request
      */
     @Throws(Exception::class)
-    fun getAccountInfo(accountNum: String, accessToken: String): Response {
-        val url: String = API_URL + ACCOUNTS + SLASH + accountNum
+    fun getAccountInfo(accountNum: String, accessToken: String, getPositionsAndOrders: Boolean = true): Response {
+        var url: String = API_URL + ACCOUNTS + SLASH + accountNum
+        if (getPositionsAndOrders) {
+            url += QUERY_PARAM_ORDERS_AND_POSITIONS
+        }
         val headerMap: Map<String, String> = mapOf(
             AUTHORIZATION to BEARER + accessToken
         )

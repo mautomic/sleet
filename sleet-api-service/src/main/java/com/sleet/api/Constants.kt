@@ -42,4 +42,5 @@ object Constants {
     const val QUERY_PARAM_TO_DATE = "&toDate="
     const val QUERY_PARAM_FROM_ENTERED_TIME = "&fromEnteredTime="
     const val QUERY_PARAM_TO_ENTERED_TIME = "&toEnteredTime="
+    const val QUERY_PARAM_ORDERS_AND_POSITIONS = "?fields=positions%2Corders"
 }
