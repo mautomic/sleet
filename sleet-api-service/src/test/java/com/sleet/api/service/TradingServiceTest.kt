@@ -22,11 +22,8 @@ class TradingServiceTest {
     @Throws(Exception::class)
     fun testAccountInfoRequest() {
 
-        // Must supply account num and access token for TD API in order to run test. See readme for info.
-        val accessToken = ""
-        val accountNum = ""
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
-        val jsonAccountInfo = tradingService.getAccountInfo(accountNum, accessToken)
+        val jsonAccountInfo = tradingService.getAccountInfo(TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN)
         println(jsonAccountInfo)
         Assert.assertNotNull(jsonAccountInfo)
     }
@@ -35,9 +32,6 @@ class TradingServiceTest {
     @Throws(Exception::class)
     fun testCreateSavedOrder() {
 
-        // Must supply account num and access token for TD API in order to run test. See readme for info.
-        val accessToken = ""
-        val accountNum = ""
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
         val instrument = Instrument("SPY", "EQUITY")
 
@@ -46,7 +40,7 @@ class TradingServiceTest {
         legCollectionList.add(orderLegCollection)
 
         val order = Order("LIMIT", "NORMAL", "DAY", 320.0, "SINGLE", "NONE", legCollectionList)
-        val response = tradingService.placeOrder(order, accountNum, accessToken)
+        val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN)
         println(response.responseBody)
     }
 
@@ -54,10 +48,7 @@ class TradingServiceTest {
     @Throws(Exception::class)
     fun testPlaceEquityOrder() {
 
-        // Must supply account num and access token for TD API in order to run test. See readme for info.
         // BE CAREFUL: THIS WILL CREATE A REAL ORDER
-        val accessToken = ""
-        val accountNum = ""
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
         val instrument = Instrument("PLTR", "EQUITY")
 
@@ -66,20 +57,17 @@ class TradingServiceTest {
 
         legCollectionList.add(orderLegCollection)
         val order = Order("LIMIT", "NORMAL", "DAY", 22.0, "SINGLE", "NONE", legCollectionList)
-        val response = tradingService.placeOrder(order, accountNum, accessToken, true)
+        val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, true)
         println(response.responseBody)
     }
 
     @Test
     @Throws(Exception::class)
     fun testGetEquityOrder() {
-
-        val accessToken = ""
-        val accountNum = ""
         val orderId = "4191208491"
 
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
-        val response = tradingService.getOrder(accountNum, accessToken, orderId, true)
+        val response = tradingService.getOrder(TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, orderId, true)
         println(response.responseBody)
     }
 
@@ -87,10 +75,7 @@ class TradingServiceTest {
     @Throws(Exception::class)
     fun testReplaceEquityOrder() {
 
-        // Must supply account num and access token for TD API in order to run test. See readme for info.
         // BE CAREFUL: THIS WILL CREATE A REAL ORDER
-        val accessToken = ""
-        val accountNum = ""
         val orderId = "4191208491"
 
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
@@ -101,7 +86,8 @@ class TradingServiceTest {
 
         legCollectionList.add(orderLegCollection)
         val order = Order("LIMIT", "NORMAL", "DAY", 21.5, "SINGLE", "NONE", legCollectionList)
-        val response = tradingService.replaceOrder(order, accountNum, accessToken, orderId, true)
+        val response =
+            tradingService.replaceOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, orderId, true)
         println(response.responseBody)
     }
 
@@ -109,12 +95,10 @@ class TradingServiceTest {
     @Throws(Exception::class)
     fun testCancelEquityOrder() {
 
-        val accessToken = ""
-        val accountNum = ""
         val orderId = "4191342218"
 
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
-        val response = tradingService.cancelOrder(accountNum, accessToken, orderId, true)
+        val response = tradingService.cancelOrder(TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, orderId, true)
         println(response.responseBody)
     }
 
@@ -122,10 +106,7 @@ class TradingServiceTest {
     @Throws(Exception::class)
     fun testPlaceOptionOrder() {
 
-        // Must supply account num and access token for TD API in order to run test. See readme for info.
         // BE CAREFUL: THIS WILL CREATE A REAL ORDER
-        val accessToken = ""
-        val accountNum = ""
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
         val instrument = Instrument("SPY_082120C335", "OPTION")
 
@@ -134,7 +115,7 @@ class TradingServiceTest {
         legs.add(orderLegCollection)
 
         val order = Order("LIMIT", "NORMAL", "DAY", 2.10, "SINGLE", "NONE", legs)
-        val response = tradingService.placeOrder(order, accountNum, accessToken, true)
+        val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, true)
         println(response.responseBody)
     }
 
@@ -142,10 +123,7 @@ class TradingServiceTest {
     @Throws(Exception::class)
     fun testPlaceOptionSpreadOrder() {
 
-        // Must supply account num and access token for TD API in order to run test. See readme for info.
         // BE CAREFUL: THIS WILL CREATE A REAL ORDER
-        val accessToken = ""
-        val accountNum = ""
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
         val buyOption = Instrument("SPY_082120C335", "OPTION")
         val sellOption = Instrument("SPY_082120C340", "OPTION")
@@ -155,7 +133,7 @@ class TradingServiceTest {
         val legs = Arrays.asList(buyLeg, sellLeg)
 
         val order = Order("NET_DEBIT", "NORMAL", "DAY", 1.20, "SINGLE", "VERTICAL", legs)
-        val response = tradingService.placeOrder(order, accountNum, accessToken, true)
+        val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, true)
         println(response.responseBody)
     }
 }
