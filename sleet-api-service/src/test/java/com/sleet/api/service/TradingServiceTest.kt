@@ -59,14 +59,62 @@ class TradingServiceTest {
         val accessToken = ""
         val accountNum = ""
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
-        val instrument = Instrument("SPY", "EQUITY")
+        val instrument = Instrument("PLTR", "EQUITY")
 
         val legCollectionList: MutableList<OrderLegCollection> = ArrayList()
         val orderLegCollection = OrderLegCollection("BUY", 1, instrument)
 
         legCollectionList.add(orderLegCollection)
-        val order = Order("LIMIT", "NORMAL", "DAY", 320.0, "SINGLE", "NONE", legCollectionList)
+        val order = Order("LIMIT", "NORMAL", "DAY", 22.0, "SINGLE", "NONE", legCollectionList)
         val response = tradingService.placeOrder(order, accountNum, accessToken, true)
+        println(response.responseBody)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun testGetEquityOrder() {
+
+        val accessToken = ""
+        val accountNum = ""
+        val orderId = "4191208491"
+
+        val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
+        val response = tradingService.getOrder(accountNum, accessToken, orderId, true)
+        println(response.responseBody)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun testReplaceEquityOrder() {
+
+        // Must supply account num and access token for TD API in order to run test. See readme for info.
+        // BE CAREFUL: THIS WILL CREATE A REAL ORDER
+        val accessToken = ""
+        val accountNum = ""
+        val orderId = "4191208491"
+
+        val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
+        val instrument = Instrument("PLTR", "EQUITY")
+
+        val legCollectionList: MutableList<OrderLegCollection> = ArrayList()
+        val orderLegCollection = OrderLegCollection("BUY", 1, instrument)
+
+        legCollectionList.add(orderLegCollection)
+        val order = Order("LIMIT", "NORMAL", "DAY", 21.5, "SINGLE", "NONE", legCollectionList)
+        val response = tradingService.replaceOrder(order, accountNum, accessToken, orderId, true)
+        println(response.responseBody)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun testCancelEquityOrder() {
+
+        val accessToken = ""
+        val accountNum = ""
+        val orderId = "4191342218"
+
+        val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
+        val response = tradingService.cancelOrder(accountNum, accessToken, orderId, true)
         println(response.responseBody)
     }
 

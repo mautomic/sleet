@@ -194,17 +194,24 @@ class TradingService(private val httpClient: AsyncHttpClient) {
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/put/accounts/%7BaccountId%7D/orders/%7BorderId%7D-0">Replace Order</a>
      * @see <a href="https://developer.tdameritrade.com/account-access/apis/put/accounts/%7BaccountId%7D/savedorders/%7BsavedOrderId%7D-0">Replace Saved Order</a>
      *
-     * @param order       to replace
+     * @param order       new order to replace with
      * @param accountNum  to replace order in
      * @param accessToken to authenticate with
+     * @param orderId     of old order to replace
      * @param realOrder   true indicates a real working order, false indicates a saved order
      * @return a [Response] with the HTTP status and body
      * @throws Exception if there is an issue creating or executing the PUT request
      */
-    fun replaceOrder(order: Order, accountNum: String, accessToken: String, realOrder: Boolean = false): Response {
+    fun replaceOrder(
+        order: Order,
+        accountNum: String,
+        accessToken: String,
+        orderId: String,
+        realOrder: Boolean = false
+    ): Response {
         val url: String =
-            if (realOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS
-            else API_URL + ACCOUNTS + SLASH + accountNum + SLASH + SAVED_ORDERS
+            if (realOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS + SLASH + orderId
+            else API_URL + ACCOUNTS + SLASH + accountNum + SLASH + SAVED_ORDERS + SLASH + orderId
 
         val request = createOrderRequest(url, order, accessToken, true)
         return httpClient.executeRequest(request)[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
