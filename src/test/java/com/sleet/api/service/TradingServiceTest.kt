@@ -37,7 +37,7 @@ class TradingServiceTest {
         val orderLegCollection = OrderLegCollection(Instruction.BUY.name, 1, instrument)
         legCollectionList.add(orderLegCollection)
 
-        val order = Order(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 320.0,
+        val order = TDOrder(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 320.0,
             OrderStrategyType.SINGLE.name, ComplexOrderStrategyType.NONE.name, legCollectionList)
 
         val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN)
@@ -56,7 +56,7 @@ class TradingServiceTest {
         val orderLegCollection = OrderLegCollection(Instruction.BUY.name, 1, instrument)
 
         legCollectionList.add(orderLegCollection)
-        val order = Order(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 22.0,
+        val order = TDOrder(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 22.0,
             OrderStrategyType.SINGLE.name, ComplexOrderStrategyType.NONE.name, legCollectionList)
 
         val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, true)
@@ -87,7 +87,7 @@ class TradingServiceTest {
         val orderLegCollection = OrderLegCollection(Instruction.BUY.name, 1, instrument)
 
         legCollectionList.add(orderLegCollection)
-        val order = Order(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 21.5,
+        val order = TDOrder(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 21.5,
             OrderStrategyType.SINGLE.name, ComplexOrderStrategyType.NONE.name, legCollectionList)
 
         val response =
@@ -118,7 +118,7 @@ class TradingServiceTest {
         val legs: MutableList<OrderLegCollection> = ArrayList()
         legs.add(orderLegCollection)
 
-        val order = Order(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 2.10,
+        val order = TDOrder(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 2.10,
             OrderStrategyType.SINGLE.name, ComplexOrderStrategyType.NONE.name, legs)
 
         val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, true)
@@ -138,7 +138,7 @@ class TradingServiceTest {
         val sellLeg = OrderLegCollection(Instruction.SELL_TO_OPEN.name, 1, sellOption)
         val legs = Arrays.asList(buyLeg, sellLeg)
 
-        val order = Order(OrderType.NET_DEBIT.name, Session.NORMAL.name, Duration.DAY.name, 1.20,
+        val order = TDOrder(OrderType.NET_DEBIT.name, Session.NORMAL.name, Duration.DAY.name, 1.20,
             OrderStrategyType.SINGLE.name, ComplexOrderStrategyType.VERTICAL.name, legs)
 
         val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, true)

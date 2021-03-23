@@ -1,7 +1,7 @@
 package com.sleet.api.model
 
 /**
- * Represents an instrument within an [Order]
+ * Represents an instrument within an [TDOrder]
  *
  * @author mautomic
  */

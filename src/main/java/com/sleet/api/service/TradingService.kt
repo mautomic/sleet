@@ -20,7 +20,7 @@ import com.sleet.api.Constants.SAVED_ORDERS
 import com.sleet.api.Constants.SLASH
 import com.sleet.api.RequestUtil.Companion.createDeleteRequest
 import com.sleet.api.RequestUtil.Companion.createPutRequest
-import com.sleet.api.model.Order
+import com.sleet.api.model.TDOrder
 import org.apache.commons.lang3.StringUtils
 import org.asynchttpclient.Response
 import org.asynchttpclient.AsyncHttpClient
@@ -159,7 +159,7 @@ class TradingService(private val httpClient: AsyncHttpClient) {
      * @throws Exception if there is an issue creating or executing the POST request
      */
     @Throws(Exception::class)
-    fun placeOrder(order: Order, accountNum: String, accessToken: String, realOrder: Boolean = false): Response {
+    fun placeOrder(order: TDOrder, accountNum: String, accessToken: String, realOrder: Boolean = false): Response {
         val url: String =
             if (realOrder) API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS
             else API_URL + ACCOUNTS + SLASH + accountNum + SLASH + SAVED_ORDERS
@@ -208,7 +208,7 @@ class TradingService(private val httpClient: AsyncHttpClient) {
      * @throws Exception if there is an issue creating or executing the PUT request
      */
     fun replaceOrder(
-        order: Order,
+        order: TDOrder,
         accountNum: String,
         accessToken: String,
         orderId: String,
@@ -225,7 +225,7 @@ class TradingService(private val httpClient: AsyncHttpClient) {
     /**
      * Translate an order to JSON format and create a POST/PUT request for order placement or replacement
      */
-    private fun createOrderRequest(url: String, order: Order, accessToken: String, update: Boolean = false): Request? {
+    private fun createOrderRequest(url: String, order: TDOrder, accessToken: String, update: Boolean = false): Request? {
         val orderJson = mapper.writeValueAsString(order)
         val headerMap: Map<String, String> = mapOf(
             AUTHORIZATION to BEARER + accessToken,

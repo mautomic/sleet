@@ -1,7 +1,7 @@
 package com.sleet.api.model
 
 /**
- * Represents a collection of legs within an [Order]
+ * Represents a collection of legs within an [TDOrder]
  *
  * @author mautomic
  */

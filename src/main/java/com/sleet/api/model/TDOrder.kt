@@ -7,7 +7,7 @@ import java.util.Collections
  *
  * @author mautomic
  */
-open class Order(
+open class TDOrder(
     var orderType: String = OrderType.LIMIT.name,
     var session: String = Session.NORMAL.name,
     var duration: String = Duration.DAY.name,
@@ -38,6 +38,6 @@ open class Order(
             apply { this.orderLegCollection = orderLegCollection }
 
         fun build() =
-            Order(orderType, session, duration, price, orderStrategyType, complexOrderStrategyType, orderLegCollection)
+            TDOrder(orderType, session, duration, price, orderStrategyType, complexOrderStrategyType, orderLegCollection)
     }
 }
