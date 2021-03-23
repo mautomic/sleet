@@ -1,4 +1,4 @@
-package com.sleet.api
+package com.sleet.api.util
 
 import com.sleet.api.model.Asset
 import com.sleet.api.model.Contract

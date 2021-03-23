@@ -1,7 +1,7 @@
 package com.sleet.api.service
 
-import com.sleet.api.RequestUtil.Companion.createGetRequest
-import com.sleet.api.RequestUtil.Companion.createPostRequest
+import com.sleet.api.util.RequestUtil.Companion.createGetRequest
+import com.sleet.api.util.RequestUtil.Companion.createPostRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.sleet.api.Constants.API_URL
@@ -18,8 +18,8 @@ import com.sleet.api.Constants.QUERY_PARAM_STATUS
 import com.sleet.api.Constants.QUERY_PARAM_TO_ENTERED_TIME
 import com.sleet.api.Constants.SAVED_ORDERS
 import com.sleet.api.Constants.SLASH
-import com.sleet.api.RequestUtil.Companion.createDeleteRequest
-import com.sleet.api.RequestUtil.Companion.createPutRequest
+import com.sleet.api.util.RequestUtil.Companion.createDeleteRequest
+import com.sleet.api.util.RequestUtil.Companion.createPutRequest
 import com.sleet.api.model.TDOrder
 import org.apache.commons.lang3.StringUtils
 import org.asynchttpclient.Response

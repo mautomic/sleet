@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.sleet.api.Constants
 import com.sleet.api.Constants.AND
 import com.sleet.api.Constants.EQUALS
-import com.sleet.api.RequestUtil.Companion.createPostRequest
+import com.sleet.api.util.RequestUtil.Companion.createPostRequest
 import com.sleet.api.model.Token
 import org.asynchttpclient.AsyncHttpClient
 

@@ -1,4 +1,4 @@
-package com.sleet.api
+package com.sleet.api.util
 
 import org.asynchttpclient.Request
 import org.asynchttpclient.RequestBuilder

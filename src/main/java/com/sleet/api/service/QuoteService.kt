@@ -3,7 +3,7 @@ package com.sleet.api.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
-import com.sleet.api.RequestUtil.Companion.createGetRequest
+import com.sleet.api.util.RequestUtil.Companion.createGetRequest
 import com.sleet.api.Constants
 import com.sleet.api.Constants.DEFAULT_TIMEOUT_MILLIS
 import com.sleet.api.model.Asset
