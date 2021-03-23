@@ -1,8 +1,6 @@
 package com.sleet.api.service
 
-import com.sleet.api.model.Instrument
-import com.sleet.api.model.OrderLegCollection
-import com.sleet.api.model.Order
+import com.sleet.api.model.*
 import org.asynchttpclient.Dsl
 import org.junit.Assert
 import org.junit.Test
@@ -33,13 +31,15 @@ class TradingServiceTest {
     fun testCreateSavedOrder() {
 
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
-        val instrument = Instrument("SPY", "EQUITY")
+        val instrument = Instrument("SPY", AssetType.EQUITY.name)
 
         val legCollectionList: MutableList<OrderLegCollection> = ArrayList()
-        val orderLegCollection = OrderLegCollection("BUY", 1, instrument)
+        val orderLegCollection = OrderLegCollection(Instruction.BUY.name, 1, instrument)
         legCollectionList.add(orderLegCollection)
 
-        val order = Order("LIMIT", "NORMAL", "DAY", 320.0, "SINGLE", "NONE", legCollectionList)
+        val order = Order(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 320.0,
+            OrderStrategyType.SINGLE.name, ComplexOrderStrategyType.NONE.name, legCollectionList)
+
         val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN)
         println(response.responseBody)
     }
@@ -50,13 +50,15 @@ class TradingServiceTest {
 
         // BE CAREFUL: THIS WILL CREATE A REAL ORDER
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
-        val instrument = Instrument("PLTR", "EQUITY")
+        val instrument = Instrument("PLTR", AssetType.EQUITY.name)
 
         val legCollectionList: MutableList<OrderLegCollection> = ArrayList()
-        val orderLegCollection = OrderLegCollection("BUY", 1, instrument)
+        val orderLegCollection = OrderLegCollection(Instruction.BUY.name, 1, instrument)
 
         legCollectionList.add(orderLegCollection)
-        val order = Order("LIMIT", "NORMAL", "DAY", 22.0, "SINGLE", "NONE", legCollectionList)
+        val order = Order(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 22.0,
+            OrderStrategyType.SINGLE.name, ComplexOrderStrategyType.NONE.name, legCollectionList)
+
         val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, true)
         println(response.responseBody)
     }
@@ -79,13 +81,15 @@ class TradingServiceTest {
         val orderId = "4191208491"
 
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
-        val instrument = Instrument("PLTR", "EQUITY")
+        val instrument = Instrument("PLTR", AssetType.EQUITY.name)
 
         val legCollectionList: MutableList<OrderLegCollection> = ArrayList()
-        val orderLegCollection = OrderLegCollection("BUY", 1, instrument)
+        val orderLegCollection = OrderLegCollection(Instruction.BUY.name, 1, instrument)
 
         legCollectionList.add(orderLegCollection)
-        val order = Order("LIMIT", "NORMAL", "DAY", 21.5, "SINGLE", "NONE", legCollectionList)
+        val order = Order(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 21.5,
+            OrderStrategyType.SINGLE.name, ComplexOrderStrategyType.NONE.name, legCollectionList)
+
         val response =
             tradingService.replaceOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, orderId, true)
         println(response.responseBody)
@@ -108,13 +112,15 @@ class TradingServiceTest {
 
         // BE CAREFUL: THIS WILL CREATE A REAL ORDER
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
-        val instrument = Instrument("SPY_082120C335", "OPTION")
+        val instrument = Instrument("SPY_071621C400", AssetType.OPTION.name)
 
-        val orderLegCollection = OrderLegCollection("BUY_TO_OPEN", 1, instrument)
+        val orderLegCollection = OrderLegCollection(Instruction.BUY_TO_OPEN.name, 1, instrument)
         val legs: MutableList<OrderLegCollection> = ArrayList()
         legs.add(orderLegCollection)
 
-        val order = Order("LIMIT", "NORMAL", "DAY", 2.10, "SINGLE", "NONE", legs)
+        val order = Order(OrderType.LIMIT.name, Session.NORMAL.name, Duration.DAY.name, 2.10,
+            OrderStrategyType.SINGLE.name, ComplexOrderStrategyType.NONE.name, legs)
+
         val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, true)
         println(response.responseBody)
     }
@@ -125,14 +131,16 @@ class TradingServiceTest {
 
         // BE CAREFUL: THIS WILL CREATE A REAL ORDER
         val tradingService = TradingService(Dsl.asyncHttpClient(Dsl.config()))
-        val buyOption = Instrument("SPY_082120C335", "OPTION")
-        val sellOption = Instrument("SPY_082120C340", "OPTION")
+        val buyOption = Instrument("SPY_071621C400", AssetType.OPTION.name)
+        val sellOption = Instrument("SPY_071621C440", AssetType.OPTION.name)
 
-        val buyLeg = OrderLegCollection("BUY_TO_OPEN", 1, buyOption)
-        val sellLeg = OrderLegCollection("SELL_TO_OPEN", 1, sellOption)
+        val buyLeg = OrderLegCollection(Instruction.BUY_TO_OPEN.name, 1, buyOption)
+        val sellLeg = OrderLegCollection(Instruction.SELL_TO_OPEN.name, 1, sellOption)
         val legs = Arrays.asList(buyLeg, sellLeg)
 
-        val order = Order("NET_DEBIT", "NORMAL", "DAY", 1.20, "SINGLE", "VERTICAL", legs)
+        val order = Order(OrderType.NET_DEBIT.name, Session.NORMAL.name, Duration.DAY.name, 1.20,
+            OrderStrategyType.SINGLE.name, ComplexOrderStrategyType.VERTICAL.name, legs)
+
         val response = tradingService.placeOrder(order, TestConstants.ACCOUNT_NUM, TestConstants.ACCESS_TOKEN, true)
         println(response.responseBody)
     }

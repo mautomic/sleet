@@ -8,22 +8,22 @@ import java.util.Collections
  * @author mautomic
  */
 open class Order(
-    var orderType: String? = "LIMIT",
-    var session: String? = "NORMAL",
-    var duration: String? = "DAY",
+    var orderType: String = OrderType.LIMIT.name,
+    var session: String = Session.NORMAL.name,
+    var duration: String = Duration.DAY.name,
     var price: Double = 0.0,
-    var orderStrategyType: String? = "SINGLE",
-    var complexOrderStrategyType: String? = "NONE",
+    var orderStrategyType: String? = OrderStrategyType.SINGLE.name,
+    var complexOrderStrategyType: String? = ComplexOrderStrategyType.NONE.name,
     var orderLegCollection: List<OrderLegCollection>? = Collections.emptyList()
 ) {
 
     class Builder(
-        var orderType: String? = "LIMIT",
-        var session: String? = "NORMAL",
-        var duration: String? = "DAY",
+        var orderType: String = OrderType.LIMIT.name,
+        var session: String = Session.NORMAL.name,
+        var duration: String = Duration.DAY.name,
         var price: Double = 0.0,
-        var orderStrategyType: String? = "SINGLE",
-        var complexOrderStrategyType: String? = "NONE",
+        var orderStrategyType: String? = OrderStrategyType.SINGLE.name,
+        var complexOrderStrategyType: String? = ComplexOrderStrategyType.NONE.name,
         var orderLegCollection: List<OrderLegCollection>? = Collections.emptyList()
     ) {
         fun orderType(orderType: String) = apply { this.orderType = orderType }
