@@ -13,5 +13,5 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 open class TDOrderMessage(
     open val orderId: String,
     open val order: TDOrder,
-    open val orderStatus: Status
+    open var orderStatus: Status
 )
