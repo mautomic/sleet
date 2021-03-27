@@ -16,18 +16,35 @@ repositories {
 ext {
     kotlinVersion = '1.4.31'
     jacksonVersion = '2.12.2'
+
+    ASYNC_HTTP_CLIENT = "org.asynchttpclient:async-http-client:2.12.2"
+    APACHE_COMMONS = "org.apache.commons:commons-lang3:3.11"
+    KOTLIN_DEPS = [
+            "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
+            "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    ]
+    JACKSON_DEPS = [
+            "com.fasterxml.jackson.core:jackson-core:$jacksonVersion",
+            "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
+            "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    ]
+}
+
+configurations {
+    // configuration that holds extra deps to include in the sleet jar for consumers
+    extraLibs
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
-    compile group: 'org.asynchttpclient', name: 'async-http-client', version: '2.12.2'
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+    extraLibs ASYNC_HTTP_CLIENT, APACHE_COMMONS, JACKSON_DEPS
+    compile ASYNC_HTTP_CLIENT, APACHE_COMMONS, JACKSON_DEPS
+    implementation KOTLIN_DEPS
+}
 
-    compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
-    compile "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
-    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+jar {
+    from {
+        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }

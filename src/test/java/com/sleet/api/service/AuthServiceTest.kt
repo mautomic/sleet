@@ -2,6 +2,7 @@ package com.sleet.api.service
 
 import org.asynchttpclient.Dsl
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.Throws
 import java.lang.Exception
@@ -16,6 +17,7 @@ import java.nio.charset.StandardCharsets
 class AuthServiceTest {
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testGetAccessTokenWithAuthGrant() {
         // This grantCode needs to be URL encoded
@@ -32,6 +34,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testGetAccessTokenWithRefreshToken() {
         // This refreshToken needs to be URL encoded

@@ -4,6 +4,7 @@ import com.sleet.api.model.OptionChain
 import com.sleet.api.model.Asset
 import org.asynchttpclient.Dsl
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.Throws
 import java.lang.Exception
@@ -20,6 +21,7 @@ import java.util.Arrays
 class QuoteServiceTest {
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testOptionChainRequest() {
         val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
@@ -36,6 +38,7 @@ class QuoteServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testOptionChainRequestForStrikeAndDate() {
         val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
@@ -51,6 +54,7 @@ class QuoteServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testContinuousOptionScanningPerformance() {
         val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
@@ -72,6 +76,7 @@ class QuoteServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testQuoteRequest() {
         val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
@@ -88,6 +93,7 @@ class QuoteServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testMultipleTickers() {
         val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
@@ -109,6 +115,7 @@ class QuoteServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testContinuousQuoteScanningPerformance() {
         val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))

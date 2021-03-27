@@ -3,6 +3,7 @@ package com.sleet.api.service
 import com.sleet.api.model.*
 import org.asynchttpclient.Dsl
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.Throws
 import java.lang.Exception
@@ -17,6 +18,7 @@ import java.util.Arrays
 class TradingServiceTest {
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testAccountInfoRequest() {
 
@@ -27,6 +29,7 @@ class TradingServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testCreateSavedOrder() {
 
@@ -45,6 +48,7 @@ class TradingServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testPlaceEquityOrder() {
 
@@ -64,6 +68,7 @@ class TradingServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testGetEquityOrder() {
         val orderId = "4191208491"
@@ -74,6 +79,7 @@ class TradingServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testReplaceEquityOrder() {
 
@@ -96,6 +102,7 @@ class TradingServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testCancelEquityOrder() {
 
@@ -107,6 +114,7 @@ class TradingServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testPlaceOptionOrder() {
 
@@ -126,6 +134,7 @@ class TradingServiceTest {
     }
 
     @Test
+    @Ignore
     @Throws(Exception::class)
     fun testPlaceOptionSpreadOrder() {
 
