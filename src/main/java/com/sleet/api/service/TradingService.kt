@@ -137,7 +137,7 @@ class TradingService(private val httpClient: AsyncHttpClient) {
     @Throws(Exception::class)
     fun getAllSavedOrders(accountNum: String, accessToken: String): Response {
 
-        val url: String = API_URL + ACCOUNTS + SLASH + accountNum + SLASH + ORDERS
+        val url: String = API_URL + ACCOUNTS + SLASH + accountNum + SLASH + SAVED_ORDERS
         val headerMap: Map<String, String> = mapOf(
             AUTHORIZATION to BEARER + accessToken
         )
