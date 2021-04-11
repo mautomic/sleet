@@ -19,6 +19,7 @@ class UserPrincipals {
     val accessLevel: String? = null
     val streamerInfo: StreamerInfo? = null
     val streamerSubscriptionKeys: StreamerSubscriptionKeys? = null
+    val accounts: List<Account>? = null
 }
 
 class StreamerInfo {
@@ -38,4 +39,14 @@ class StreamerSubscriptionKeys {
 
 class Key {
     val key: String? = null
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class Account {
+    val accountId: String? = null
+    val displayName: String? = null
+    val accountCdDomainId: String? = null
+    val company: String? = null
+    val segment: String? = null
+    val acl: String? = null
 }

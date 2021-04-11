@@ -62,5 +62,7 @@ class AuthServiceTest {
         Assert.assertNotNull(userPrincipals)
         Assert.assertNotNull(userPrincipals?.streamerInfo)
         Assert.assertNotNull(userPrincipals?.streamerSubscriptionKeys)
+        Assert.assertNotNull(userPrincipals?.accounts)
+        Assert.assertFalse(userPrincipals?.accounts!!.isEmpty())
     }
 }
