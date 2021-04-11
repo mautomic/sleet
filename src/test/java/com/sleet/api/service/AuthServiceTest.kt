@@ -1,7 +1,6 @@
 package com.sleet.api.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.sleet.api.ExampleClient
 import com.sleet.api.util.RequestUtil
 import org.asynchttpclient.Dsl
 import org.junit.Assert
@@ -81,7 +80,7 @@ class AuthServiceTest {
         val loginPayload = RequestUtil.createStreamingLoginPayload(userPrincipals!!)
         println("Sent to ws: " + loginPayload)
 
-        val c = ExampleClient(URI("wss://streamer-ws.tdameritrade.com/ws"), loginPayload)
+        val c = ExampleStreamingClient(URI("wss://streamer-ws.tdameritrade.com/ws"), loginPayload)
         c.connect()
 
         // Wait for a few seconds so we can connect before sending a quote request
