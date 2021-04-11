@@ -41,6 +41,7 @@ dependencies {
     extraLibs ASYNC_HTTP_CLIENT, APACHE_COMMONS, JACKSON_DEPS
     compile ASYNC_HTTP_CLIENT, APACHE_COMMONS, JACKSON_DEPS
     implementation KOTLIN_DEPS
+    implementation group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.5.1'
 }
 
 jar {
