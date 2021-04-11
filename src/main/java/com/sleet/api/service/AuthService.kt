@@ -7,6 +7,8 @@ import com.sleet.api.Constants.AND
 import com.sleet.api.Constants.EQUALS
 import com.sleet.api.util.RequestUtil.Companion.createPostRequest
 import com.sleet.api.model.Token
+import com.sleet.api.model.UserPrincipals
+import com.sleet.api.util.RequestUtil
 import org.asynchttpclient.AsyncHttpClient
 
 import kotlin.Throws
@@ -64,5 +66,25 @@ class AuthService(
         if (response.statusCode != 200)
             return null
         return mapper.readValue(response.responseBody, Token::class.java)
+    }
+
+    /**
+     * Get a [UserPrincipals] payload from the TD API for streaming setup
+     *
+     * @param accessToken used to authenticate with TD
+     * @return [UserPrincipals] with account and streaming details
+     * @throws Exception if there is an issue with the GET request
+     */
+    @Throws(Exception::class)
+    fun getUserPrincipals(accessToken: String): UserPrincipals? {
+        val url = Constants.API_URL + Constants.QUERY_PARAM_USER_PRINCIPALS
+        val headerMap: Map<String, String> = mapOf(
+            Constants.AUTHORIZATION to Constants.BEARER + accessToken
+        )
+        val request = RequestUtil.createGetRequest(url, headerMap)
+        val response = httpClient.executeRequest(request)[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        if (response.statusCode != 200)
+            return null
+        return mapper.readValue(response.responseBody, UserPrincipals::class.java)
     }
 }

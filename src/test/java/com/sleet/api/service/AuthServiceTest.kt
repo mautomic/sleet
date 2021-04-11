@@ -50,4 +50,17 @@ class AuthServiceTest {
         Assert.assertNull(token?.accessToken)
         Assert.assertNotNull(token?.refreshToken)
     }
+
+    @Test
+    @Ignore
+    @Throws(Exception::class)
+    fun testGetUserPrincipals() {
+        val redirectUri = "https://127.0.0.1:8443/callback"
+        val authService = AuthService(TestConstants.API_KEY, redirectUri, Dsl.asyncHttpClient(Dsl.config()))
+
+        val userPrincipals = authService.getUserPrincipals(TestConstants.ACCESS_TOKEN)
+        Assert.assertNotNull(userPrincipals)
+        Assert.assertNotNull(userPrincipals?.streamerInfo)
+        Assert.assertNotNull(userPrincipals?.streamerSubscriptionKeys)
+    }
 }
