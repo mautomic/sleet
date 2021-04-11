@@ -4,6 +4,7 @@ import com.sleet.api.model.UserPrincipals
 import org.asynchttpclient.Request
 import org.asynchttpclient.RequestBuilder
 import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Utilities to create requests for a [AsyncHttpClient]
@@ -57,6 +58,7 @@ class RequestUtil {
 
             val timestamp = streamerInfo.tokenTimestamp
             val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+            sdf.timeZone = TimeZone.getTimeZone("GMT")
             val epochMillis = sdf.parse(timestamp).time
             val epochStr = epochMillis.toString()
 
