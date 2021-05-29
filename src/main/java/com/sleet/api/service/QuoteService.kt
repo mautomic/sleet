@@ -6,9 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.sleet.api.util.RequestUtil.Companion.createGetRequest
 import com.sleet.api.Constants
 import com.sleet.api.Constants.DEFAULT_TIMEOUT_MILLIS
-import com.sleet.api.model.Asset
-import com.sleet.api.model.Contract
-import com.sleet.api.model.OptionChain
+import com.sleet.api.model.*
 import org.asynchttpclient.AsyncHttpClient
 import org.asynchttpclient.Response
 import org.slf4j.LoggerFactory
@@ -33,6 +31,7 @@ class QuoteService(
 ) {
 
     private var OPTION_CHAIN_URL: String = Constants.API_URL + Constants.MARKETDATA + "/chains?apikey=" + apiKey
+    private var HIST_PRICE_URL: String = Constants.API_URL + Constants.MARKETDATA
     private var QUOTE_URL: String = "/quotes?apikey=$apiKey"
 
     companion object {
@@ -325,6 +324,47 @@ class QuoteService(
     }
 
     /**
+     * Queries the TD API endpoint for historical prices for a specified period & frequency
+     *
+     * @param ticker of security to retrieve prices for
+     * @param periodType type of period to show, e.g. [day, month, year, ytd]
+     * @param period number of periods to show
+     * @param frequencyType type of frequency with which a new candle is formed, e.g. [minute, daily, weekly, monthly]
+     * @param frequency the number of frequencies to be included
+     * @param startDate start date as milliseconds since epoch
+     * @param endDate end date as milliseconds since epoch
+     * @return [Response] with all option data for the ticker
+     */
+    @Throws(Exception::class)
+    fun getPriceHistory(ticker: String?, periodType: String?, period: String?, frequencyType: String?, frequency: String?,
+                        startDate: String?, endDate: String?): CompletableFuture<Candles?> {
+
+        val builder = StringBuilder()
+            .append(HIST_PRICE_URL)
+            .append(Constants.SLASH)
+            .append(ticker)
+            .append(Constants.PRICEHISTORY)
+            .append(Constants.QUESTION_MARK)
+            .append(Constants.QUERY_PARAM_PERIOD_TYPE)
+            .append(periodType)
+            .append(Constants.AND)
+            .append(Constants.QUERY_PARAM_PERIOD)
+            .append(period)
+            .append(Constants.AND)
+            .append(Constants.QUERY_PARAM_FREQUENCY_TYPE)
+            .append(frequencyType)
+            .append(Constants.AND)
+            .append(Constants.QUERY_PARAM_FREQUENCY)
+            .append(frequency)
+
+        val future = CompletableFuture<Candles?>()
+        val request = createGetRequest(builder.toString(), null)
+        httpClient.executeRequest(request).toCompletableFuture()
+            .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeHistoryResponse(resp)) }
+        return future
+    }
+
+    /**
      * Queries the TD API endpoint asynchronously for all options for a ticker with a specific strike price
      *
      * @param ticker of security to retrieve options for
@@ -432,6 +472,23 @@ class QuoteService(
         if (response.statusCode == 200) {
             try {
                 return mapper.readValue(response.responseBody, OptionChain::class.java)
+            } catch (e: Exception) {
+                logFailure(e)
+            }
+        }
+        return null
+    }
+
+    /**
+     * Deserialize a JSON response string into an [PriceHistory]
+     *
+     * @param response to deserialize
+     * @return [PriceHistory] for the original request, or null if exception occurs
+     */
+    private fun deserializeHistoryResponse(response: Response): Candles? {
+        if (response.statusCode == 200) {
+            try {
+                return mapper.readValue(response.responseBody, Candles::class.java)
             } catch (e: Exception) {
                 logFailure(e)
             }
