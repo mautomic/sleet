@@ -46,8 +46,8 @@ object Constants {
     const val QUERY_PARAM_TO_ENTERED_TIME = "&toEnteredTime="
     const val QUERY_PARAM_ORDERS_AND_POSITIONS = "?fields=positions%2Corders"
     const val QUERY_PARAM_USER_PRINCIPALS = "userprincipals?fields=streamerSubscriptionKeys%2CstreamerConnectionInfo"
-    const val QUERY_PARAM_PERIOD_TYPE = "periodType="
-    const val QUERY_PARAM_PERIOD = "period="
-    const val QUERY_PARAM_FREQUENCY_TYPE = "frequencyType="
-    const val QUERY_PARAM_FREQUENCY = "frequency="
+    const val QUERY_PARAM_PERIOD_TYPE = "&periodType="
+    const val QUERY_PARAM_PERIOD = "&period="
+    const val QUERY_PARAM_FREQUENCY_TYPE = "&frequencyType="
+    const val QUERY_PARAM_FREQUENCY = "&frequency="
 }

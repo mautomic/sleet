@@ -32,6 +32,7 @@ class QuoteService(
 
     private var OPTION_CHAIN_URL: String = Constants.API_URL + Constants.MARKETDATA + "/chains?apikey=" + apiKey
     private var HIST_PRICE_URL: String = Constants.API_URL + Constants.MARKETDATA
+    private var HIST_PRICE_API: String = "/pricehistory?apikey=$apiKey"
     private var QUOTE_URL: String = "/quotes?apikey=$apiKey"
 
     companion object {
@@ -343,17 +344,13 @@ class QuoteService(
             .append(HIST_PRICE_URL)
             .append(Constants.SLASH)
             .append(ticker)
-            .append(Constants.PRICEHISTORY)
-            .append(Constants.QUESTION_MARK)
+            .append(HIST_PRICE_API)
             .append(Constants.QUERY_PARAM_PERIOD_TYPE)
             .append(periodType)
-            .append(Constants.AND)
             .append(Constants.QUERY_PARAM_PERIOD)
             .append(period)
-            .append(Constants.AND)
             .append(Constants.QUERY_PARAM_FREQUENCY_TYPE)
             .append(frequencyType)
-            .append(Constants.AND)
             .append(Constants.QUERY_PARAM_FREQUENCY)
             .append(frequency)
 
