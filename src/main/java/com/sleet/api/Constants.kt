@@ -23,6 +23,7 @@ object Constants {
     const val EQUALS = '='
     const val GRANT_TYPE = "grant_type"
     const val MARKETDATA = "marketdata"
+    const val PRICEHISTORY = "pricehistory"
     const val OFFLINE = "offline"
     const val ORDERS = "orders"
     const val REDIRECT_URI = "redirect_uri"
@@ -31,6 +32,7 @@ object Constants {
     const val SLASH = "/"
     const val TOKEN_ENDPOINT = "oauth2/token"
     const val URL_ENCODED = "application/x-www-form-urlencoded"
+    const val QUESTION_MARK = "?"
 
     const val QUERY_PARAM_OTM = "&range=OTM"
     const val QUERY_PARAM_CONTRACT_TYPE = "&contractType="
@@ -44,4 +46,8 @@ object Constants {
     const val QUERY_PARAM_TO_ENTERED_TIME = "&toEnteredTime="
     const val QUERY_PARAM_ORDERS_AND_POSITIONS = "?fields=positions%2Corders"
     const val QUERY_PARAM_USER_PRINCIPALS = "userprincipals?fields=streamerSubscriptionKeys%2CstreamerConnectionInfo"
+    const val QUERY_PARAM_PERIOD_TYPE = "&periodType="
+    const val QUERY_PARAM_PERIOD = "&period="
+    const val QUERY_PARAM_FREQUENCY_TYPE = "&frequencyType="
+    const val QUERY_PARAM_FREQUENCY = "&frequency="
 }

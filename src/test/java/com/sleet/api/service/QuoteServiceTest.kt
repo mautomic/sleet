@@ -130,4 +130,18 @@ class QuoteServiceTest {
             Thread.sleep(2000)
         }
     }
+
+
+    @Test
+    @Ignore
+    @Throws(Exception::class)
+    fun testHistoricalPrices() {
+        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val time = System.currentTimeMillis()
+        val priceHistory = quoteService.getPriceHistory("SPY", "month", "1", "daily", "1", "", "")
+        println("Retrieval for price history " + (System.currentTimeMillis() - time) + " ms")
+
+        val history = priceHistory.get()
+        Assert.assertNotNull(history)
+    }
 }
