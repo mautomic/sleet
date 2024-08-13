@@ -3,7 +3,7 @@ package com.sleet.api.model
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 /**
- * Represents an option chain for a symbol consumed from the TD API
+ * Represents an option chain for a symbol consumed from the Schwab API
  *
  * @author mautomic
  */

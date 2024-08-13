@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.sleet.api.util.RequestUtil.Companion.createGetRequest
 import com.sleet.api.Constants
-import com.sleet.api.Constants.DEFAULT_TIMEOUT_MILLIS
 import com.sleet.api.model.*
 import org.asynchttpclient.AsyncHttpClient
 import org.asynchttpclient.Response
@@ -21,7 +20,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 /**
- * An API interface that provides methods to retrieve option and equity data from the TD API
+ * An API interface that provides methods to retrieve option and equity data from the Schwab API
  *
  * @author mautomic
  */
@@ -29,11 +28,10 @@ class QuoteService(
     private val apiKey: String,
     private val httpClient: AsyncHttpClient
 ) {
-
-    private var OPTION_CHAIN_URL: String = Constants.API_URL + Constants.MARKETDATA + "/chains?apikey=" + apiKey
-    private var HIST_PRICE_URL: String = Constants.API_URL + Constants.MARKETDATA
-    private var HIST_PRICE_API: String = "/pricehistory?apikey=$apiKey"
-    private var QUOTE_URL: String = "/quotes?apikey=$apiKey"
+    private var MARKETDATA_URL: String = Constants.API_URL + "marketdata/v1/"
+    private var OPTION_CHAIN_URL: String = MARKETDATA_URL + "chains?"
+    private var HIST_PRICE_URL: String = MARKETDATA_URL + "pricehistory?"
+    private var QUOTES_URL: String = MARKETDATA_URL + "quotes?"
 
     companion object {
         private val LOG = LoggerFactory.getLogger(QuoteService::class.java)
@@ -41,32 +39,36 @@ class QuoteService(
     }
 
     /**
-     * Queries the TD API endpoint for current quote info for a ticker
+     * Queries the Schwab API endpoint for current quote info for a ticker
      *
      * @param ticker to get quote info for
-     * @return an [Asset] with quote information
+     * @return an [Equity] with quote information
      */
     @Throws(Exception::class)
-    fun getQuote(ticker: String): Asset? {
-        return getQuoteAsync(ticker)[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+    fun getQuote(ticker: String): Equity? {
+        return getQuoteAsync(ticker)[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
     }
 
     /**
-     * Queries the TD API endpoint asynchronously for current quote info for a ticker
+     * Queries the Schwab API endpoint asynchronously for current quote info for a ticker
      *
      * @param ticker to get quote info for
-     * @return an [Asset] with quote information
+     * @return an [Equity] with quote information
      */
-    fun getQuoteAsync(ticker: String): CompletableFuture<Asset?> {
-        val url = Constants.API_URL + Constants.MARKETDATA + "/" + ticker + QUOTE_URL
-        val equityFuture = CompletableFuture<Asset?>()
-        val request = createGetRequest(url, null)
+    fun getQuoteAsync(ticker: String): CompletableFuture<Equity?> {
+        val url = "$MARKETDATA_URL$ticker/quotes?fields=quote"
+        val equityFuture = CompletableFuture<Equity?>()
+        val headers = mapOf(
+            "Authorization" to "Bearer $apiKey"
+        )
+        val request = createGetRequest(url, headers)
+
 
         httpClient.executeRequest(request).toCompletableFuture().whenComplete { response: Response, _: Throwable? ->
             if (response.statusCode == 200) {
                 try {
                     val node = mapper.readValue(response.responseBody, JsonNode::class.java)
-                    equityFuture.complete(mapper.readValue(node[ticker].toString(), Asset::class.java))
+                    equityFuture.complete(mapper.readValue(node[ticker].toString(), Equity::class.java))
                 } catch (e: IOException) {
                     equityFuture.completeExceptionally(e)
                 }
@@ -77,36 +79,39 @@ class QuoteService(
     }
 
     /**
-     * Queries the TD API endpoint for current quote info for multiple tickers
+     * Queries the Schwab API endpoint for current quote info for multiple tickers
      *
      * @param tickers to get quotes for
-     * @return a list of [Asset] objects with quote information
+     * @return a list of [Equity] objects with quote information
      */
     @Throws(Exception::class)
-    fun getQuotes(tickers: List<String?>): List<Asset> {
+    fun getQuotes(tickers: List<String?>): List<Equity> {
         val concatenated = java.lang.String.join("%2C", tickers)
-        val url = Constants.API_URL + Constants.MARKETDATA + QUOTE_URL + Constants.QUERY_PARAM_SYMBOL + concatenated
+        val url = QUOTES_URL + "symbols=" + concatenated
 
-        val request = createGetRequest(url, null)
+        val headers = mapOf(
+            "Authorization" to "Bearer $apiKey"
+        )
+        val request = createGetRequest(url, headers)
         val responseFuture = httpClient.executeRequest(request).toCompletableFuture()
-        val response = responseFuture[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        val response = responseFuture[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
         if (response.statusCode != 200) {
-            throw Exception("Error getting proper response from TD API: " + response.responseBody)
+            throw Exception("Error getting proper response from Schwab API: " + response.responseBody)
         }
 
         val json = response.responseBody
         val node = mapper.readValue(json, JsonNode::class.java)
-        val equities: MutableList<Asset> = ArrayList(tickers.size)
+        val equities: MutableList<Equity> = ArrayList(tickers.size)
         for (ticker in tickers) {
             val topLevel = node.path(ticker)
-            val equity = mapper.treeToValue(topLevel, Asset::class.java)
+            val equity = mapper.treeToValue(topLevel, Equity::class.java)
             equities.add(equity)
         }
         return equities
     }
 
     /**
-     * Queries the TD API endpoint for a ticker's option chain, getting the default
+     * Queries the Schwab API endpoint for a ticker's option chain, getting the default
      * number of strikes for each expiration
      *
      * @param ticker of security to retrieve options for
@@ -118,7 +123,7 @@ class QuoteService(
     }
 
     /**
-     * Queries the TD API endpoint asynchronously for a ticker's option chain, getting
+     * Queries the Schwab API endpoint asynchronously for a ticker's option chain, getting
      * the default number of strikes for each expiration
      *
      * @param ticker of security to retrieve options for
@@ -129,7 +134,7 @@ class QuoteService(
     }
 
     /**
-     * Queries the TD API endpoint for a ticker's option chain, getting the specified
+     * Queries the Schwab API endpoint for a ticker's option chain, getting the specified
      * number of strikes for each expiration
      *
      * @param ticker of security to retrieve options for
@@ -153,7 +158,7 @@ class QuoteService(
     }
 
     /**
-     * Queries the TD API endpoint asynchronously for a ticker's option chain, getting
+     * Queries the Schwab API endpoint asynchronously for a ticker's option chain, getting
      * the specified number of strikes for each expiration
      *
      * @param ticker of security to retrieve options for
@@ -169,14 +174,17 @@ class QuoteService(
             .append(strikeCount)
 
         val future = CompletableFuture<OptionChain?>()
-        val request = createGetRequest(builder.toString(), null)
+        val headers = mapOf(
+            "Authorization" to "Bearer $apiKey"
+        )
+        val request = createGetRequest(builder.toString(), headers)
         httpClient.executeRequest(request).toCompletableFuture()
             .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         return future
     }
 
     /**
-     * Queries the TD API endpoint for a ticker's option chain, filtering for contracts
+     * Queries the Schwab API endpoint for a ticker's option chain, filtering for contracts
      * expiring before a specified date
      *
      * @param ticker                 of security to retrieve options for
@@ -190,7 +198,7 @@ class QuoteService(
     }
 
     /**
-     * Queries the TD API endpoint asynchronously for a ticker's option chain, filtering
+     * Queries the Schwab API endpoint asynchronously for a ticker's option chain, filtering
      * for contracts expiring before a specified date
      *
      * @param ticker                 of security to retrieve options for
@@ -211,7 +219,7 @@ class QuoteService(
     }
 
     /**
-     * Queries the TD API endpoint for a ticker's option chain, filtering for contracts
+     * Queries the Schwab API endpoint for a ticker's option chain, filtering for contracts
      * expiring before a specified date and the specified number of strikes
      *
      * @param ticker                 of security to retrieve options for
@@ -243,7 +251,7 @@ class QuoteService(
     }
 
     /**
-     * Queries the TD API endpoint asynchronously for a ticker's option chain, filtering
+     * Queries the Schwab API endpoint asynchronously for a ticker's option chain, filtering
      * for contracts expiring before a specified date and the specified number of strikes
      *
      * @param ticker                 of security to retrieve options for
@@ -268,14 +276,17 @@ class QuoteService(
             builder.append(Constants.QUERY_PARAM_OTM)
 
         val future = CompletableFuture<OptionChain?>()
-        val request = createGetRequest(builder.toString(), null)
+        val headers = mapOf(
+            "Authorization" to "Bearer $apiKey"
+        )
+        val request = createGetRequest(builder.toString(), headers)
         httpClient.executeRequest(request).toCompletableFuture()
             .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         return future
     }
 
     /**
-     * Queries the TD API endpoint for all options for a ticker on a specific expiration date
+     * Queries the Schwab API endpoint for all options for a ticker on a specific expiration date
      *
      * @param ticker         of security to retrieve options for
      * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
@@ -283,11 +294,11 @@ class QuoteService(
      */
     @Throws(Exception::class)
     fun getOptionChainForDate(ticker: String?, expirationDate: String?): OptionChain? {
-        return getOptionChainForDateAsync(ticker, expirationDate)[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        return getOptionChainForDateAsync(ticker, expirationDate)[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
     }
 
     /**
-     * Queries the TD API endpoint asynchronously for all options for a ticker on a specific expiration date
+     * Queries the Schwab API endpoint asynchronously for all options for a ticker on a specific expiration date
      *
      * @param ticker of security to retrieve options for
      * @param expirationDate of the options to retrieve, must follow the format of yyyy-MM-dd
@@ -306,14 +317,17 @@ class QuoteService(
             .append(expirationDate)
 
         val future = CompletableFuture<OptionChain?>()
-        val request = createGetRequest(builder.toString(), null)
+        val headers = mapOf(
+            "Authorization" to "Bearer $apiKey"
+        )
+        val request = createGetRequest(builder.toString(), headers)
         httpClient.executeRequest(request).toCompletableFuture()
             .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         return future
     }
 
     /**
-     * Queries the TD API endpoint for all options for a ticker with a specific strike price
+     * Queries the Schwab API endpoint for all options for a ticker with a specific strike price
      *
      * @param ticker of security to retrieve options for
      * @param strike of the options to retrieve
@@ -321,11 +335,11 @@ class QuoteService(
      */
     @Throws(Exception::class)
     fun getOptionChainForStrike(ticker: String?, strike: String?): OptionChain? {
-        return getOptionChainForStrikeAsync(ticker, strike)[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        return getOptionChainForStrikeAsync(ticker, strike)[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
     }
 
     /**
-     * Queries the TD API endpoint for historical prices for a specified period & frequency
+     * Queries the Schwab API endpoint for historical prices for a specified period & frequency
      *
      * @param ticker of security to retrieve prices for
      * @param periodType type of period to show, e.g. [day, month, year, ytd]
@@ -342,9 +356,8 @@ class QuoteService(
 
         val builder = StringBuilder()
             .append(HIST_PRICE_URL)
-            .append(Constants.SLASH)
+            .append("symbol=")
             .append(ticker)
-            .append(HIST_PRICE_API)
             .append(Constants.QUERY_PARAM_PERIOD_TYPE)
             .append(periodType)
             .append(Constants.QUERY_PARAM_PERIOD)
@@ -355,14 +368,17 @@ class QuoteService(
             .append(frequency)
 
         val future = CompletableFuture<Candles?>()
-        val request = createGetRequest(builder.toString(), null)
+        val headers = mapOf(
+            "Authorization" to "Bearer $apiKey"
+        )
+        val request = createGetRequest(builder.toString(), headers)
         httpClient.executeRequest(request).toCompletableFuture()
             .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeHistoryResponse(resp)) }
         return future
     }
 
     /**
-     * Queries the TD API endpoint asynchronously for all options for a ticker with a specific strike price
+     * Queries the Schwab API endpoint asynchronously for all options for a ticker with a specific strike price
      *
      * @param ticker of security to retrieve options for
      * @param strike of the options to retrieve
@@ -377,14 +393,17 @@ class QuoteService(
             .append(strike)
 
         val future = CompletableFuture<OptionChain?>()
-        val request = createGetRequest(builder.toString(), null)
+        val headers = mapOf(
+            "Authorization" to "Bearer $apiKey"
+        )
+        val request = createGetRequest(builder.toString(), headers)
         httpClient.executeRequest(request).toCompletableFuture()
             .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         return future
     }
 
     /**
-     * Queries the TD API endpoint for options for a ticker on a specific expiration
+     * Queries the Schwab API endpoint for options for a ticker on a specific expiration
      * date with a specific strike
      *
      * @param ticker         of security to retrieve options for
@@ -395,11 +414,11 @@ class QuoteService(
     @Throws(Exception::class)
     fun getOptionChainForStrikeAndDate(ticker: String?, strike: String?, expirationDate: String?): OptionChain? {
         val future = getOptionChainForStrikeAndDateAsync(ticker, strike, expirationDate)
-        return future[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        return future[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
     }
 
     /**
-     * Queries the TD API endpoint asynchronously for options for a ticker on a
+     * Queries the Schwab API endpoint asynchronously for options for a ticker on a
      * specific expiration date with a specific strike
      *
      * @param ticker         of security to retrieve options for
@@ -423,7 +442,10 @@ class QuoteService(
             .append(strike)
 
         val future = CompletableFuture<OptionChain?>()
-        val request = createGetRequest(builder.toString(), null)
+        val headers = mapOf(
+            "Authorization" to "Bearer $apiKey"
+        )
+        val request = createGetRequest(builder.toString(), headers)
         httpClient.executeRequest(request).toCompletableFuture()
             .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         return future
@@ -441,14 +463,17 @@ class QuoteService(
     @Throws(Exception::class)
     private fun getCallsAndPutsConcurrently(urls: List<String>): OptionChain {
         val futures: List<CompletableFuture<OptionChain?>> = listOf(CompletableFuture(), CompletableFuture())
+        val headers = mapOf(
+            "Authorization" to "Bearer $apiKey"
+        )
 
         for ((index, url) in urls.withIndex()) {
             val future = futures[index]
-            val request = createGetRequest(url, null)
+            val request = createGetRequest(url, headers)
             httpClient.executeRequest(request).toCompletableFuture()
                 .whenComplete { resp: Response, _: Throwable? -> future.complete(deserializeResponse(resp)) }
         }
-        CompletableFuture.allOf(*futures.toTypedArray<CompletableFuture<*>>())[DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+        CompletableFuture.allOf(*futures.toTypedArray<CompletableFuture<*>>())[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
 
         // Combine the two chains
         val fullChain = futures[0].get()

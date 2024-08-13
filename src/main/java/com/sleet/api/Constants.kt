@@ -9,7 +9,7 @@ object Constants {
     const val ACCESS_TYPE = "access_type"
     const val ACCOUNTS = "accounts"
     const val AND = '&'
-    const val API_URL = "https://api.tdameritrade.com/v1/"
+    const val API_URL = "https://api.schwabapi.com/"
     const val APPLICATION_JSON = "application/json"
     const val AUTHORIZATION = "authorization"
     const val AUTHORIZATION_CODE = "authorization_code"

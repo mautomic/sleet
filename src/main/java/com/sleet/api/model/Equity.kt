@@ -4,100 +4,89 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
- * Represents an equity consumed from the TD API
+ * Represents an equity consumed from the Schwab API
  *
  * @author mautomic
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class Equity(
     open val symbol: String? = null,
-    open val description: String? = null,
-    open val bid: Double = 0.0,
-    open val ask: Double = 0.0,
-    open val last: Double = 0.0,
-    open val mark: Double = 0.0,
-    open val bidSize: Int = 0,
-    open val askSize: Int = 0,
-    open val lastSize: Int = 0,
-    open val highPrice: Double = 0.0,
-    open val lowPrice: Double = 0.0,
-    open val openPrice: Double = 0.0,
-    open val closePrice: Double = 0.0,
-    open val totalVolume: Long = 0,
-    open val volatility: Double = 0.0,
-    open val netChange: Double = 0.0,
-    open val assetType: String? = null,
     open val assetMainType: String? = null,
-    open val quoteTimeInLong: Long = 0,
-    open val tradeTimeInLong: Long = 0,
-    @get:JsonProperty("52WkHigh") open val fiftyTwoWeekHigh: Double = 0.0,
-    @get:JsonProperty("52WkLow") open val fiftyTwoWeekLow: Double = 0.0,
-    open val peRatio: Double = 0.0,
-    open val divAmount: Double = 0.0,
-    open val divYield: Double = 0.0
+    open val assetSubType: String? = null,
+    open val quoteType: String? = null,
+    open val realtime: Boolean = false,
+    open val ssid: Long = 0,
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    open val quote: Quote? = null,
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    open val reference: Reference? = null
 ) {
 
     override fun toString(): String {
-        return symbol!!
+        return symbol ?: ""
     }
+
+    class Quote(
+        @get:JsonProperty("52WeekHigh") val fiftyTwoWeekHigh: Double = 0.0,
+        @get:JsonProperty("52WeekLow") val fiftyTwoWeekLow: Double = 0.0,
+        val askMICId: String? = null,
+        val askPrice: Double = 0.0,
+        val askSize: Int = 0,
+        val askTime: Long = 0,
+        val bidMICId: String? = null,
+        val bidPrice: Double = 0.0,
+        val bidSize: Int = 0,
+        val bidTime: Long = 0,
+        val closePrice: Double = 0.0,
+        val highPrice: Double = 0.0,
+        val lastMICId: String? = null,
+        val lastPrice: Double = 0.0,
+        val lastSize: Int = 0,
+        val lowPrice: Double = 0.0,
+        val mark: Double = 0.0,
+        val markChange: Double = 0.0,
+        val markPercentChange: Double = 0.0,
+        val netChange: Double = 0.0,
+        val netPercentChange: Double = 0.0,
+        val openPrice: Double = 0.0,
+        val postMarketChange: Double = 0.0,
+        val postMarketPercentChange: Double = 0.0,
+        val quoteTime: Long = 0,
+        val securityStatus: String? = null,
+        val totalVolume: Long = 0,
+        val tradeTime: Long = 0
+    )
+
+    class Reference(
+        val cusip: String? = null,
+        val description: String? = null,
+        val exchange: String? = null,
+        val exchangeName: String? = null,
+        val htbRate: Double = 0.0
+    )
 
     class Builder(
         var symbol: String? = null,
-        var description: String? = null,
-        var bid: Double = 0.0,
-        var ask: Double = 0.0,
-        var last: Double = 0.0,
-        var mark: Double = 0.0,
-        var bidSize: Int = 0,
-        var askSize: Int = 0,
-        var lastSize: Int = 0,
-        var highPrice: Double = 0.0,
-        var lowPrice: Double = 0.0,
-        var openPrice: Double = 0.0,
-        var closePrice: Double = 0.0,
-        var totalVolume: Long = 0,
-        var volatility: Double = 0.0,
-        var netChange: Double = 0.0,
-        var assetType: String? = null,
         var assetMainType: String? = null,
-        var quoteTimeInLong: Long = 0,
-        var tradeTimeInLong: Long = 0,
-        var fiftyTwoWeekHigh: Double = 0.0,
-        var fiftyTwoWeekLow: Double = 0.0,
-        var peRatio: Double = 0.0,
-        var divAmount: Double = 0.0,
-        var divYield: Double = 0.0
+        var assetSubType: String? = null,
+        var quoteType: String? = null,
+        var realtime: Boolean = false,
+        var ssid: Long = 0,
+        var quote: Quote? = null,
+        var reference: Reference? = null
     ) {
 
         fun symbol(symbol: String) = apply { this.symbol = symbol }
-        fun description(description: String) = apply { this.description = description }
-        fun bid(bid: Double) = apply { this.bid = bid }
-        fun ask(ask: Double) = apply { this.ask = ask }
-        fun last(last: Double) = apply { this.last = last }
-        fun mark(mark: Double) = apply { this.mark = mark }
-        fun bidSize(bidSize: Int) = apply { this.bidSize = bidSize }
-        fun askSize(askSize: Int) = apply { this.askSize = askSize }
-        fun lastSize(lastSize: Int) = apply { this.lastSize = lastSize }
-        fun highPrice(highPrice: Double) = apply { this.highPrice = highPrice }
-        fun lowPrice(lowPrice: Double) = apply { this.lowPrice = lowPrice }
-        fun openPrice(openPrice: Double) = apply { this.openPrice = openPrice }
-        fun closePrice(closePrice: Double) = apply { this.closePrice = closePrice }
-        fun totalVolume(totalVolume: Long) = apply { this.totalVolume = totalVolume }
-        fun volatility(volatility: Double) = apply { this.volatility = volatility }
-        fun netChange(netChange: Double) = apply { this.netChange = netChange }
-        fun assetType(assetType: String) = apply { this.assetType = assetType }
         fun assetMainType(assetMainType: String) = apply { this.assetMainType = assetMainType }
-        fun quoteTimeInLong(quoteTimeInLong: Long) = apply { this.quoteTimeInLong = quoteTimeInLong }
-        fun tradeTimeInLong(tradeTimeInLong: Long) = apply { this.tradeTimeInLong = tradeTimeInLong }
-        fun fiftyTwoWeekHigh(fiftyTwoWeekHigh: Double) = apply { this.fiftyTwoWeekHigh = fiftyTwoWeekHigh }
-        fun fiftyTwoWeekLow(fiftyTwoWeekLow: Double) = apply { this.fiftyTwoWeekLow = fiftyTwoWeekLow }
-        fun peRatio(peRatio: Double) = apply { this.peRatio = peRatio }
-        fun divAmount(divAmount: Double) = apply { this.divAmount = divAmount }
-        fun divYield(divYield: Double) = apply { this.divYield = divYield }
+        fun assetSubType(assetSubType: String) = apply { this.assetSubType = assetSubType }
+        fun quoteType(quoteType: String) = apply { this.quoteType = quoteType }
+        fun realtime(realtime: Boolean) = apply { this.realtime = realtime }
+        fun ssid(ssid: Long) = apply { this.ssid = ssid }
+        fun quote(quote: Quote) = apply { this.quote = quote }
+        fun reference(reference: Reference) = apply { this.reference = reference }
+
         fun build() = Equity(
-            symbol, description, bid, ask, last, mark, bidSize, askSize, lastSize, highPrice, lowPrice,
-            openPrice, closePrice, totalVolume, volatility, netChange, assetType, assetMainType, quoteTimeInLong,
-            tradeTimeInLong, fiftyTwoWeekHigh, fiftyTwoWeekLow, peRatio, divAmount, divYield
+            symbol, assetMainType, assetSubType, quoteType, realtime, ssid, quote, reference
         )
     }
 }

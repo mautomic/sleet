@@ -3,7 +3,7 @@ package com.sleet.api.model
 import java.util.Collections
 
 /**
- * Represents a single order from the TD API
+ * Represents a single order from the Schwab API
  *
  * @author mautomic
  */

@@ -3,7 +3,7 @@ package com.sleet.api.model
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 /**
- * Represents a single option contract consumed from the TD API
+ * Represents a single option contract consumed from the Schwab API
  *
  * @author mautomic
  */
