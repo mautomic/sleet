@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
 import java.lang.Exception
 
 /**
- * An TD API interface that provides methods to view account info and place orders.
+ * An Schwab API interface that provides methods to view account info and place orders.
  * Any API calls with this service will require an access token to be authenticated.
  *
  * @author mautomic

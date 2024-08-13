@@ -34,7 +34,7 @@ class AuthService(
     }
 
     /**
-     * Retrieve a [Token] containing a new access token and a refresh token from the TD API
+     * Retrieve a [Token] containing a new access token and a refresh token from the Schwab API
      *
      * @param code           current access or refresh token code
      * @param isRefreshToken designates to use access token or refresh token field in POST
@@ -69,7 +69,7 @@ class AuthService(
     }
 
     /**
-     * Get a [UserPrincipals] payload from the TD API for streaming setup
+     * Get a [UserPrincipals] payload from the Schwab API for streaming setup
      *
      * @param accessToken used to authenticate with TD
      * @return [UserPrincipals] with account and streaming details

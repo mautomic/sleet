@@ -2,6 +2,7 @@ package com.sleet.api.service
 
 import com.sleet.api.model.OptionChain
 import com.sleet.api.model.Asset
+import com.sleet.api.model.Equity
 import org.asynchttpclient.Dsl
 import org.junit.Assert
 import org.junit.Ignore
@@ -42,15 +43,15 @@ class QuoteServiceTest {
     @Throws(Exception::class)
     fun testOptionChainRequestForStrikeAndDate() {
         val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
-        val optionChain = quoteService.getOptionChainForStrikeAndDate("SPY", "400", "2023-01-20")
+        val optionChain = quoteService.getOptionChainForStrikeAndDate("SPY", "550", "2024-09-20")
         Assert.assertNotNull(optionChain)
         Assert.assertNotNull(optionChain!!.callExpDateMap)
         Assert.assertNotNull(optionChain.putExpDateMap)
 
         val map = optionChain.callExpDateMap
         val strikes = map?.entries?.iterator()?.next()?.value
-        val asset = strikes!!["400.0"]!![0]
-        Assert.assertEquals("SPY_012023C400", asset.symbol)
+        val asset = strikes!!["550.0"]!![0]
+        Assert.assertEquals("SPY   240920C00550000", asset.symbol)
     }
 
     @Test
@@ -59,7 +60,7 @@ class QuoteServiceTest {
     fun testContinuousOptionScanningPerformance() {
         val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
         val tickers = arrayOf(
-            "QQQ", "SPY", "IWM", "\$VIX.X", "\$SPX.X", "MSFT", "AAPL", "NFLX", "FB", "TSLA",
+            "QQQ", "SPY", "IWM", "\$VIX", "\$SPX", "MSFT", "AAPL", "NFLX", "FB", "TSLA",
             "NVDA", "BYND", "TLT", "SPCE", "XLF"
         )
         val startTime = System.currentTimeMillis()
@@ -89,7 +90,7 @@ class QuoteServiceTest {
         println("Retrieval for AAPL quote info took " + (System.currentTimeMillis() - time2) + " ms")
 
         Assert.assertNotNull(equity)
-        Assert.assertEquals(218.26, equity!!.fiftyTwoWeekLow, 0.0001)
+        Assert.assertEquals(409.21, equity?.quote!!.fiftyTwoWeekLow, 0.0001)
     }
 
     @Test
@@ -106,12 +107,13 @@ class QuoteServiceTest {
         Assert.assertFalse(equities.isEmpty())
         Assert.assertEquals(3, equities.size.toLong())
         Assert.assertEquals(1, equities.stream()
-            .filter { equity: Asset -> equity.symbol!!.contains("SPY") }
+            .filter { equity: Equity -> equity.symbol!!.contains("SPY") }
             .count())
-        Assert.assertEquals(218.26, equities.stream()
-            .filter { equity: Asset -> equity.symbol!!.contains("SPY") }
-            .mapToDouble(Asset::fiftyTwoWeekLow)
-            .sum(), 0.0001)
+        Assert.assertEquals(409.21, equities.stream()
+            .filter { equity -> equity.symbol?.contains("SPY") == true }
+            .mapToDouble { equity -> equity.quote?.fiftyTwoWeekLow ?: 0.0 }
+            .findFirst()
+            .orElse(0.0), 0.0001)
     }
 
     @Test
@@ -126,7 +128,7 @@ class QuoteServiceTest {
                 quoteService.getQuote(ticker)
                 println("Retrieval for " + ticker + " quote info took " + (System.currentTimeMillis() - time) + " ms")
             }
-            // Throttle so TD API doesn't hit max requests per second limit
+            // Throttle so Schwab API doesn't hit max requests per second limit
             Thread.sleep(2000)
         }
     }
@@ -143,5 +145,18 @@ class QuoteServiceTest {
 
         val history = priceHistory.get()
         Assert.assertNotNull(history)
+    }
+
+    @Test
+    @Ignore
+    @Throws(Exception::class)
+    fun testMoversRequest() {
+        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val time = System.currentTimeMillis()
+        val screeners = quoteService.getMovers("\$SPX", "VOLUME", "1")
+        println("Retrieval for SPX movers took " + (System.currentTimeMillis() - time) + " ms")
+
+        Assert.assertNotNull(screeners)
+        Assert.assertTrue(screeners!!.screeners.isNotEmpty())
     }
 }

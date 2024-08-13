@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils
 import java.util.ArrayList
 
 /**
- * Utility functions useful for interacting with data sent and consumed from the TD API
+ * Utility functions useful for interacting with data sent and consumed from the Schwab API
  *
  * @author mautomic
  */

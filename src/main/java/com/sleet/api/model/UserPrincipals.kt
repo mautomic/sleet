@@ -3,7 +3,7 @@ package com.sleet.api.model
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 /**
- * Represents a UserPrincipal payload from the TD API. Items from this can be used
+ * Represents a UserPrincipal payload from the Schwab API. Items from this can be used
  * to setup websocket streaming.
  *
  * @author mautomic
