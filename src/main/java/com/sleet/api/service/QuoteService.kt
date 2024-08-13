@@ -120,10 +120,10 @@ class QuoteService(
      * Queries the Schwab API endpoint for movers of an index
      *
      * @param symbol of security to retrieve movers for
-     * @return [Screeners] with all candidates
+     * @return [Screener] with all candidates
      */
     @Throws(Exception::class)
-    fun getMovers(symbol: String, sort: String, frequency: String): Screeners? {
+    fun getMovers(symbol: String, sort: String, frequency: String): Screener? {
         return getMoversAsync(symbol, sort, frequency)[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
     }
 
@@ -131,10 +131,10 @@ class QuoteService(
      * Queries the Schwab API endpoint for movers of an index
      *
      * @param symbol of security to retrieve movers for
-     * @return [Screeners] with all candidates
+     * @return [Screener] with all candidates
      */
     @Throws(Exception::class)
-    fun getMoversAsync(symbol: String, sort: String, frequency: String): CompletableFuture<Screeners?> {
+    fun getMoversAsync(symbol: String, sort: String, frequency: String): CompletableFuture<Screener?> {
         val builder = StringBuilder()
             .append(MOVERS_URL)
             .append(symbol)
@@ -143,9 +143,8 @@ class QuoteService(
             .append(sort)
             .append(Constants.QUERY_PARAM_FREQUENCY)
             .append(frequency)
-        println(builder.toString())
 
-        val screenersFuture = CompletableFuture<Screeners?>()
+        val screenersFuture = CompletableFuture<Screener?>()
         if (!MOVERS_LIST.contains(symbol)) {
             return screenersFuture
         }
@@ -165,7 +164,7 @@ class QuoteService(
             if (response.statusCode == 200) {
                 try {
                     val node = mapper.readValue(response.responseBody, JsonNode::class.java)
-                    screenersFuture.complete(mapper.readValue(node.toString(), Screeners::class.java))
+                    screenersFuture.complete(mapper.readValue(node.toString(), Screener::class.java))
                 } catch (e: IOException) {
                     screenersFuture.completeExceptionally(e)
                 }
