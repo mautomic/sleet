@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory
 
 import kotlin.Throws
 import kotlin.system.exitProcess
-import java.lang.Exception
 import java.lang.StringBuilder
 import java.util.ArrayList
 import java.io.IOException
@@ -32,6 +31,13 @@ class QuoteService(
     private var OPTION_CHAIN_URL: String = MARKETDATA_URL + "chains?"
     private var HIST_PRICE_URL: String = MARKETDATA_URL + "pricehistory?"
     private var QUOTES_URL: String = MARKETDATA_URL + "quotes?"
+    private var MOVERS_URL: String = MARKETDATA_URL + "/movers/"
+    private val MOVERS_LIST: List<String> = listOf(
+        "\$SPX", "\$COMPX", "\$DJI", "NYSE", "NASDAQ", "OTCBB", "INDEX_ALL", "EQUITY_ALL",
+        "OPTION_ALL", "OPTION_PUT", "OPTION_CALL"
+    )
+    private val MOVERS_SORT: List<String> = listOf("VOLUME", "TRADES", "PERCENT_CHANGE_UP", "PERCENT_CHANGE_DOWN")
+    private val MOVERS_FREQUENCY: List<String> = listOf("0", "1", "5", "10", "30", "60")
 
     companion object {
         private val LOG = LoggerFactory.getLogger(QuoteService::class.java)
@@ -109,6 +115,66 @@ class QuoteService(
         }
         return equities
     }
+
+    /**
+     * Queries the Schwab API endpoint for movers of an index
+     *
+     * @param symbol of security to retrieve movers for
+     * @return [Screeners] with all candidates
+     */
+    @Throws(Exception::class)
+    fun getMovers(symbol: String, sort: String, frequency: String): Screeners? {
+        return getMoversAsync(symbol, sort, frequency)[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
+    }
+
+    /**
+     * Queries the Schwab API endpoint for movers of an index
+     *
+     * @param symbol of security to retrieve movers for
+     * @return [Screeners] with all candidates
+     */
+    @Throws(Exception::class)
+    fun getMoversAsync(symbol: String, sort: String, frequency: String): CompletableFuture<Screeners?> {
+        val builder = StringBuilder()
+            .append(MOVERS_URL)
+            .append(symbol)
+            .append(Constants.QUESTION_MARK)
+            .append(Constants.QUERY_PARAM_SORT)
+            .append(sort)
+            .append(Constants.QUERY_PARAM_FREQUENCY)
+            .append(frequency)
+        println(builder.toString())
+
+        val screenersFuture = CompletableFuture<Screeners?>()
+        if (!MOVERS_LIST.contains(symbol)) {
+            return screenersFuture
+        }
+        if (!MOVERS_SORT.contains(sort)) {
+            return screenersFuture
+        }
+        if (!MOVERS_FREQUENCY.contains(frequency)) {
+            return screenersFuture
+        }
+
+        val headers = mapOf(
+            "Authorization" to "Bearer $apiKey"
+        )
+        val request = createGetRequest(builder.toString(), headers)
+
+        httpClient.executeRequest(request).toCompletableFuture().whenComplete { response: Response, _: Throwable? ->
+            if (response.statusCode == 200) {
+                try {
+                    val node = mapper.readValue(response.responseBody, JsonNode::class.java)
+                    screenersFuture.complete(mapper.readValue(node.toString(), Screeners::class.java))
+                } catch (e: IOException) {
+                    screenersFuture.completeExceptionally(e)
+                }
+            } else
+                screenersFuture.complete(null)
+        }
+        return screenersFuture
+    }
+
 
     /**
      * Queries the Schwab API endpoint for a ticker's option chain, getting the default

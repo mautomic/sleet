@@ -50,4 +50,5 @@ object Constants {
     const val QUERY_PARAM_PERIOD = "&period="
     const val QUERY_PARAM_FREQUENCY_TYPE = "&frequencyType="
     const val QUERY_PARAM_FREQUENCY = "&frequency="
+    const val QUERY_PARAM_SORT = "sort="
 }

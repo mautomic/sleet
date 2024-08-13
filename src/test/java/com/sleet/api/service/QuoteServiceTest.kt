@@ -146,4 +146,17 @@ class QuoteServiceTest {
         val history = priceHistory.get()
         Assert.assertNotNull(history)
     }
+
+    @Test
+    @Ignore
+    @Throws(Exception::class)
+    fun testMoversRequest() {
+        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val time = System.currentTimeMillis()
+        val screeners = quoteService.getMovers("\$SPX", "VOLUME", "1")
+        println("Retrieval for SPX movers took " + (System.currentTimeMillis() - time) + " ms")
+
+        Assert.assertNotNull(screeners)
+        Assert.assertTrue(screeners!!.screeners.isNotEmpty())
+    }
 }
