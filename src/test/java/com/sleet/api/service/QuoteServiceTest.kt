@@ -25,7 +25,7 @@ class QuoteServiceTest {
     @Ignore
     @Throws(Exception::class)
     fun testOptionChainRequest() {
-        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
         val time = System.currentTimeMillis()
         val optionChain = quoteService.getOptionChain("SPY", "50")
         println("Retrieval for SPY options took " + (System.currentTimeMillis() - time) + " ms")
@@ -42,7 +42,7 @@ class QuoteServiceTest {
     @Ignore
     @Throws(Exception::class)
     fun testOptionChainRequestForStrikeAndDate() {
-        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
         val optionChain = quoteService.getOptionChainForStrikeAndDate("SPY", "550", "2024-09-20")
         Assert.assertNotNull(optionChain)
         Assert.assertNotNull(optionChain!!.callExpDateMap)
@@ -58,7 +58,7 @@ class QuoteServiceTest {
     @Ignore
     @Throws(Exception::class)
     fun testContinuousOptionScanningPerformance() {
-        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
         val tickers = arrayOf(
             "QQQ", "SPY", "IWM", "\$VIX", "\$SPX", "MSFT", "AAPL", "NFLX", "FB", "TSLA",
             "NVDA", "BYND", "TLT", "SPCE", "XLF"
@@ -80,7 +80,7 @@ class QuoteServiceTest {
     @Ignore
     @Throws(Exception::class)
     fun testQuoteRequest() {
-        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
         val time = System.currentTimeMillis()
         val equity = quoteService.getQuote("SPY")
         println("Retrieval for SPY quote info took " + (System.currentTimeMillis() - time) + " ms")
@@ -97,7 +97,7 @@ class QuoteServiceTest {
     @Ignore
     @Throws(Exception::class)
     fun testMultipleTickers() {
-        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
         val tickers = Arrays.asList("SPY", "AAPL", "MSFT")
         val time = System.currentTimeMillis()
         val equities = quoteService.getQuotes(tickers)
@@ -120,7 +120,7 @@ class QuoteServiceTest {
     @Ignore
     @Throws(Exception::class)
     fun testContinuousQuoteScanningPerformance() {
-        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
         val tickers = arrayOf("QQQ", "DIS", "AAPL", "FB", "SPY", "MSFT", "\$VIX.X", "AMD", "AMZN", "\$SPX.X")
         for (j in 0..2) {
             for (ticker in tickers) {
@@ -138,7 +138,7 @@ class QuoteServiceTest {
     @Ignore
     @Throws(Exception::class)
     fun testHistoricalPrices() {
-        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
         val time = System.currentTimeMillis()
         val priceHistory = quoteService.getPriceHistory("SPY", "month", "1", "daily", "1", "", "")
         println("Retrieval for price history " + (System.currentTimeMillis() - time) + " ms")
@@ -151,7 +151,7 @@ class QuoteServiceTest {
     @Ignore
     @Throws(Exception::class)
     fun testMoversRequest() {
-        val quoteService = QuoteService(TestConstants.API_KEY, Dsl.asyncHttpClient(Dsl.config()))
+        val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
         val time = System.currentTimeMillis()
         val screeners = quoteService.getMovers("\$SPX", "VOLUME", "1")
         println("Retrieval for SPX movers took " + (System.currentTimeMillis() - time) + " ms")
