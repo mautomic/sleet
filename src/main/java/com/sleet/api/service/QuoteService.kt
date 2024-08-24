@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
  * @author mautomic
  */
 class QuoteService(
-    private val apiKey: String,
+    private var apiKey: String,
     private val httpClient: AsyncHttpClient
 ) {
     private var MARKETDATA_URL: String = Constants.API_URL + "marketdata/v1/"
@@ -42,6 +42,10 @@ class QuoteService(
     companion object {
         private val LOG = LoggerFactory.getLogger(QuoteService::class.java)
         private val mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
+    }
+
+    fun setApiKey(apiKey: String) {
+        this.apiKey = apiKey
     }
 
     /**
