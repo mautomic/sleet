@@ -13,7 +13,12 @@ import org.asynchttpclient.Dsl
  *
  * @author mautomic
  */
-class TDClient @JvmOverloads constructor(apiKey: String, redirectUri: String = DEFAULT_REDIRECT_URI) {
+class TDClient @JvmOverloads constructor(
+    appKey: String,
+    appSecret: String,
+    accessToken: String,
+    redirectUri: String = DEFAULT_REDIRECT_URI
+) {
 
     private val httpClient: AsyncHttpClient =
         Dsl.asyncHttpClient(
@@ -22,7 +27,7 @@ class TDClient @JvmOverloads constructor(apiKey: String, redirectUri: String = D
                 .setConnectTimeout(DEFAULT_TIMEOUT_MILLIS.toInt())
         )
 
-    val authenticator: AuthService = AuthService(apiKey, redirectUri, httpClient)
+    val authenticator: AuthService = AuthService(appKey, appSecret, redirectUri, httpClient)
     val trader: TradingService = TradingService(httpClient)
-    val quoter: QuoteService = QuoteService(apiKey, httpClient)
+    val quoter: QuoteService = QuoteService(accessToken, httpClient)
 }

@@ -30,7 +30,7 @@ object Constants {
     const val REFRESH_TOKEN = "refresh_token"
     const val SAVED_ORDERS = "savedorders"
     const val SLASH = "/"
-    const val TOKEN_ENDPOINT = "oauth2/token"
+    const val TOKEN_ENDPOINT = "v1/oauth/token"
     const val URL_ENCODED = "application/x-www-form-urlencoded"
     const val QUESTION_MARK = "?"
 

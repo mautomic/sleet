@@ -6,11 +6,13 @@ package com.sleet.api.service
  * @author mautomic
  */
 object TestConstants {
-    // Must supply API key for Schwab API in order to run test. See readme for info.
-    const val API_KEY = ""
-
-    // Must supply access token and account num for running any TradingService sample tests
-    // Don't add this unless you are sure you want to try testing an order with your account
+    // Must supply keys for Schwab API in order to run test. See readme for info.
     const val ACCESS_TOKEN = ""
+    const val REFRESH_TOKEN = ""
+    const val APP_KEY = ""
+    const val APP_SECRET = ""
+
+    // Must supply account num for running any TradingService sample tests
+    // Don't add this unless you are sure you want to try testing an order with your account
     const val ACCOUNT_NUM = ""
 }

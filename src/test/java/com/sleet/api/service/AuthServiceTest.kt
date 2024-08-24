@@ -20,15 +20,13 @@ import java.nio.charset.StandardCharsets
 class AuthServiceTest {
 
     @Test
-    @Ignore
     @Throws(Exception::class)
-    fun testGetAccessTokenWithAuthGrant() {
-        // This grantCode needs to be URL encoded
-        val grantCode = ""
+    fun testGetAccessTokenWithRefreshToken() {
         val redirectUri = "https://127.0.0.1:8443/callback"
-
-        val authService = AuthService(TestConstants.API_KEY, redirectUri, Dsl.asyncHttpClient(Dsl.config()))
-        val token = authService.getPostAccessToken(grantCode, false)
+        // This refreshToken needs to be URL encoded
+        val refreshTokenEncoded = URLEncoder.encode(TestConstants.REFRESH_TOKEN, StandardCharsets.UTF_8.toString())
+        val authService = AuthService(TestConstants.APP_KEY, TestConstants.APP_SECRET, redirectUri, Dsl.asyncHttpClient(Dsl.config()))
+        val token = authService.getUpdatedAccessToken(refreshTokenEncoded)
         println(token?.accessToken)
         println(token?.refreshToken)
         Assert.assertNotNull(token)
@@ -39,27 +37,9 @@ class AuthServiceTest {
     @Test
     @Ignore
     @Throws(Exception::class)
-    fun testGetAccessTokenWithRefreshToken() {
-        // This refreshToken needs to be URL encoded
-        val refreshToken = ""
-        val redirectUri = "https://127.0.0.1:8443/callback"
-
-        val refreshTokenEncoded = URLEncoder.encode(refreshToken, StandardCharsets.UTF_8.toString())
-        val authService = AuthService(TestConstants.API_KEY, redirectUri, Dsl.asyncHttpClient(Dsl.config()))
-        val token = authService.getPostAccessToken(refreshTokenEncoded, true)
-        println(token?.accessToken)
-        println(token?.refreshToken)
-        Assert.assertNotNull(token)
-        Assert.assertNull(token?.accessToken)
-        Assert.assertNotNull(token?.refreshToken)
-    }
-
-    @Test
-    @Ignore
-    @Throws(Exception::class)
     fun testGetUserPrincipals() {
         val redirectUri = "https://127.0.0.1:8443/callback"
-        val authService = AuthService(TestConstants.API_KEY, redirectUri, Dsl.asyncHttpClient(Dsl.config()))
+        val authService = AuthService(TestConstants.APP_KEY, TestConstants.APP_SECRET, redirectUri, Dsl.asyncHttpClient(Dsl.config()))
 
         val userPrincipals = authService.getUserPrincipals(TestConstants.ACCESS_TOKEN)
         Assert.assertNotNull(userPrincipals)
@@ -74,7 +54,7 @@ class AuthServiceTest {
     @Throws(Exception::class)
     fun testStreaming() {
         val redirectUri = "https://127.0.0.1:8443/callback"
-        val authService = AuthService(TestConstants.API_KEY, redirectUri, Dsl.asyncHttpClient(Dsl.config()))
+        val authService = AuthService(TestConstants.APP_KEY, TestConstants.APP_SECRET, redirectUri, Dsl.asyncHttpClient(Dsl.config()))
 
         val userPrincipals = authService.getUserPrincipals(TestConstants.ACCESS_TOKEN)
         val loginPayload = RequestUtil.createStreamingLoginPayload(userPrincipals!!)
@@ -90,7 +70,7 @@ class AuthServiceTest {
             "requestid" to "service_count",
             "command" to "SUBS",
             "account" to TestConstants.ACCOUNT_NUM,
-            "source" to TestConstants.API_KEY,
+            "source" to TestConstants.ACCESS_TOKEN,
             "parameters" to mapOf<String, Any>(
                 "keys" to "AAPL",
                 "fields" to "0,1,2,3,4,5,6,7,8,9"

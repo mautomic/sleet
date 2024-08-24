@@ -3,8 +3,6 @@ package com.sleet.api.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.sleet.api.Constants
-import com.sleet.api.Constants.AND
-import com.sleet.api.Constants.EQUALS
 import com.sleet.api.util.RequestUtil.Companion.createPostRequest
 import com.sleet.api.model.Token
 import com.sleet.api.model.UserPrincipals
@@ -13,8 +11,7 @@ import org.asynchttpclient.AsyncHttpClient
 
 import kotlin.Throws
 import java.lang.Exception
-import java.lang.StringBuilder
-import java.util.HashMap
+import java.util.Base64
 import java.util.concurrent.TimeUnit
 
 /**
@@ -24,43 +21,47 @@ import java.util.concurrent.TimeUnit
  * @author mautomic
  */
 class AuthService(
-    private val clientId: String,
+    private val appKey: String,
+    private val appSecret: String,
     private val redirectUri: String,
-    private val httpClient: AsyncHttpClient
+    private val httpClient: AsyncHttpClient,
 ) {
+    private var token: Token = Token()
 
     companion object {
         private val mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
     }
 
+    fun setToken(token: Token) {
+        this.token = token
+    }
+
+    fun getToken(): Token {
+        return this.token
+    }
+
     /**
      * Retrieve a [Token] containing a new access token and a refresh token from the Schwab API
      *
-     * @param code           current access or refresh token code
-     * @param isRefreshToken designates to use access token or refresh token field in POST
+     * @param code           current refresh token code
      * @return [Token] with new access and refresh tokens
      * @throws Exception if there is an issue with the POST request
      */
     @Throws(Exception::class)
-    fun getPostAccessToken(code: String, isRefreshToken: Boolean): Token? {
-        val builder = StringBuilder()
-        builder.append(Constants.CLIENT_ID).append(EQUALS).append(clientId).append(AND)
-        builder.append(Constants.REDIRECT_URI).append(EQUALS).append(redirectUri).append(AND)
+    fun getUpdatedAccessToken(code: String): Token? {
 
-        if (isRefreshToken) {
-            builder.append(Constants.GRANT_TYPE).append(EQUALS).append(Constants.REFRESH_TOKEN).append(AND)
-            builder.append(Constants.REFRESH_TOKEN).append(EQUALS).append(code)
-        } else {
-            builder.append(Constants.ACCESS_TYPE).append(EQUALS).append(Constants.OFFLINE).append(AND)
-            builder.append(Constants.GRANT_TYPE).append(EQUALS).append(Constants.AUTHORIZATION_CODE).append(AND)
-            builder.append(Constants.CODE).append(EQUALS).append(code)
-        }
+        val credentials = "$appKey:$appSecret"
+        val base64Credentials = Base64.getEncoder().encodeToString(credentials.toByteArray())
+        val authorization = "Basic $base64Credentials"
 
-        val headerParams: MutableMap<String, String> = HashMap()
-        headerParams[Constants.CONTENT_TYPE] = Constants.URL_ENCODED
+        val headerParams: Map<String, String> = mapOf(
+            Constants.CONTENT_TYPE to Constants.URL_ENCODED,
+            Constants.AUTHORIZATION to authorization
+        )
+
+        val payload = "grant_type=refresh_token&refresh_token=$code"
         val url: String = Constants.API_URL + Constants.TOKEN_ENDPOINT
-
-        val request = createPostRequest(url, builder.toString(), headerParams)
+        val request = createPostRequest(url, payload, headerParams)
         val response = httpClient.executeRequest(request)[Constants.DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS]
 
         if (response.statusCode != 200)
