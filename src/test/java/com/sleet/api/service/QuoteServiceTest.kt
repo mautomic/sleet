@@ -22,7 +22,6 @@ import java.util.Arrays
 class QuoteServiceTest {
 
     @Test
-    @Ignore
     @Throws(Exception::class)
     fun testOptionChainRequest() {
         val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
@@ -39,7 +38,6 @@ class QuoteServiceTest {
     }
 
     @Test
-    @Ignore
     @Throws(Exception::class)
     fun testOptionChainRequestForStrikeAndDate() {
         val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
@@ -55,7 +53,6 @@ class QuoteServiceTest {
     }
 
     @Test
-    @Ignore
     @Throws(Exception::class)
     fun testContinuousOptionScanningPerformance() {
         val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
@@ -77,7 +74,6 @@ class QuoteServiceTest {
     }
 
     @Test
-    @Ignore
     @Throws(Exception::class)
     fun testQuoteRequest() {
         val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
@@ -94,7 +90,6 @@ class QuoteServiceTest {
     }
 
     @Test
-    @Ignore
     @Throws(Exception::class)
     fun testMultipleTickers() {
         val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
@@ -117,7 +112,6 @@ class QuoteServiceTest {
     }
 
     @Test
-    @Ignore
     @Throws(Exception::class)
     fun testContinuousQuoteScanningPerformance() {
         val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
@@ -135,7 +129,6 @@ class QuoteServiceTest {
 
 
     @Test
-    @Ignore
     @Throws(Exception::class)
     fun testHistoricalPrices() {
         val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))
@@ -148,7 +141,6 @@ class QuoteServiceTest {
     }
 
     @Test
-    @Ignore
     @Throws(Exception::class)
     fun testMoversRequest() {
         val quoteService = QuoteService(TestConstants.ACCESS_TOKEN, Dsl.asyncHttpClient(Dsl.config()))

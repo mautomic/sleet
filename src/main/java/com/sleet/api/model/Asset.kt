@@ -47,5 +47,20 @@ open class Asset(
     @get:JsonProperty("52WkLow") open val fiftyTwoWeekLow: Double = 0.0,
     open val peRatio: Double = 0.0,
     open val divAmount: Double = 0.0,
-    open val divYield: Double = 0.0
+    open val divYield: Double = 0.0,
+    open val markChange: Double = 0.0,
+    open val markPercentChange: Double = 0.0,
+    open val intrinsicValue: Double = 0.0,
+    open val extrinsicValue: Double = 0.0,
+    open val expirationDate: String? = null,
+    open val expirationType: String? = null,
+    open val lastTradingDay: Long = 0,
+    open val settlementType: String? = null,
+    open val deliverableNote: String? = null,
+    open val optionRoot: String? = null,
+    open val exerciseType: String? = null,
+    open val nonStandard: Boolean = false,
+    open val pennyPilot: Boolean = false,
+    open val inTheMoney: Boolean = false,
+    open val mini: Boolean = false
 )
